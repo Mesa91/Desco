@@ -80,13 +80,16 @@ class DescoCard extends HTMLElement {
 
 const STILE = `
 :host { display:block; }
-ha-card { cursor:pointer; border-radius:var(--ha-card-border-radius, 32px); padding:10px 14px 12px 10px; display:flex; flex-direction:column; gap:8px; transition:filter .15s; }
+ha-card { cursor:pointer; border-radius:var(--desco-raggio, 32px); padding:10px 14px 12px 10px; display:flex; flex-direction:column; gap:8px; transition:filter .15s;
+  /* stesso vetro dei pulsanti Bubble Card della dashboard */
+  background:var(--desco-sfondo, rgba(12,20,34,0.62)); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--desco-bordo, rgba(79,195,247,0.16)); box-shadow:0 8px 24px rgba(0,0,0,0.35); }
 ha-card:hover { filter:brightness(1.08); }
 ha-card:focus-visible { outline:2px solid var(--primary-color); outline-offset:2px; }
 .testa, .riga { display:flex; align-items:center; gap:12px; }
 .riga { align-items:flex-start; }
 .badge { width:40px; height:40px; border-radius:50%; flex:none; display:grid; place-items:center;
-  background:var(--desco-badge, rgba(79,195,247,0.12)); color:var(--desco-accento, var(--state-icon-color, #4fc3f7)); }
+  background:var(--desco-badge, rgba(79,195,247,0.12)); color:var(--desco-accento, #4fc3f7); }
 .badge ha-icon { --mdc-icon-size:20px; }
 .tit { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; line-height:1.2; }
 .testa .tit { flex-direction:column; gap:0; }
