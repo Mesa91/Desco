@@ -20,9 +20,21 @@ from .const import (
 )
 
 
-def _schema(valori: dict[str, Any]) -> vol.Schema:
+def _lista_predefinita(hass, valori: dict[str, Any]) -> str | None:
+    """Una lista To-do che esiste davvero: quella salvata, la Lista della spesa di HA o la prima trovata."""
+    for eid in (valori.get(CONF_TODO_ENTITY), DEFAULT_TODO_ENTITY):
+        if eid and hass.states.get(eid):
+            return eid
+    liste = hass.states.async_entity_ids("todo")
+    return sorted(liste)[0] if liste else None
+
+
+def _schema(hass, valori: dict[str, Any]) -> vol.Schema:
+    predef = _lista_predefinita(hass, valori)
+    chiave_todo = (vol.Required(CONF_TODO_ENTITY, default=predef) if predef
+                   else vol.Required(CONF_TODO_ENTITY))
     return vol.Schema({
-        vol.Required(CONF_TODO_ENTITY, default=valori.get(CONF_TODO_ENTITY, DEFAULT_TODO_ENTITY)):
+        chiave_todo:
             selector.EntitySelector(selector.EntitySelectorConfig(domain="todo")),
         vol.Optional(CONF_GEMINI_KEY, description={"suggested_value": valori.get(CONF_GEMINI_KEY, "")}):
             selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)),
@@ -39,7 +51,7 @@ class DescoConfigFlow(ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="single_instance_allowed")
         if user_input is not None:
             return self.async_create_entry(title=NAME, data=user_input)
-        return self.async_show_form(step_id="user", data_schema=_schema({}))
+        return self.async_show_form(step_id="user", data_schema=_schema(self.hass, {}))
 
     @staticmethod
     @callback
@@ -52,4 +64,4 @@ class DescoOptionsFlow(OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(data=user_input)
         valori = {**self.config_entry.data, **self.config_entry.options}
-        return self.async_show_form(step_id="init", data_schema=_schema(valori))
+        return self.async_show_form(step_id="init", data_schema=_schema(self.hass, valori))

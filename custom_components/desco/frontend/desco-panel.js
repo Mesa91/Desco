@@ -539,8 +539,14 @@ class DescoPanel extends HTMLElement {
     return `<section class="intesta">
         <div><div class="sopra">Per la settimana del ${fmtData(this.s.piano.settimana)}</div><h1>Lista della spesa</h1>
         <div class="nota">${voci.length} prodotti · olio, sale, spezie ed erbe sono considerati in dispensa</div></div>
-        <div class="azioni"><button class="btn primario" data-act="spesa"><ha-icon icon="mdi:playlist-plus"></ha-icon>Invia a ${esc(this._nomeEntita(this.s.todo_entity))}</button></div>
+        <div class="azioni"><button class="btn primario" data-act="spesa" ${this.s.todo_ok ? "" : "disabled"}><ha-icon icon="mdi:playlist-plus"></ha-icon>Invia a ${esc(this._nomeEntita(this.s.todo_entity))}</button></div>
       </section>
+      ${this.s.todo_ok ? "" : `<div class="avviso"><ha-icon icon="mdi:alert-outline"></ha-icon><div>
+        <b>La lista «${esc(this.s.todo_entity)}» non esiste in Home Assistant.</b><br>
+        ${this.s.liste_todo?.length
+          ? `Scegli una delle tue liste (${this.s.liste_todo.map((e) => esc(this._nomeEntita(e))).join(", ")}) in <a href="/config/integrations/integration/desco">Impostazioni → Dispositivi e servizi → Desco → Configura</a>.`
+          : `Non hai ancora liste To-do: aggiungi l'integrazione <a href="/config/integrations/dashboard/add?domain=shopping_list">Lista della spesa</a> e Desco la userà subito.`}
+      </div></div>`}
       <section class="card lista-spesa">${voci.map((v) => `<div class="voce"><span>${esc(v.nome)}</span><span class="q">${esc(v.quantita)}</span></div>`).join("")}</section>
       <p class="nota">Se rigeneri e reinvii, le voci della volta prima non ancora spuntate vengono sostituite.</p>`;
   }
@@ -806,6 +812,7 @@ h1 { font-size:clamp(22px,3vw,30px); margin:2px 0 8px; font-weight:650; letter-s
 .hero p { color:var(--tenue); line-height:1.5; margin-bottom:24px; }
 .hero.piccolo { margin-top:4vh; }
 
+.avviso a { color:var(--primary-color); }
 .avviso { display:flex; gap:10px; padding:12px 14px; border-radius:12px; margin-bottom:16px; background:color-mix(in srgb, var(--warning-color,#f4b400) 14%, transparent); font-size:14px; }
 
 .griglia { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:14px; align-items:start; }

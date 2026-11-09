@@ -131,6 +131,8 @@ class DescoManager:
             "ricettario": sorted(self.lib.values(), key=lambda c: (ORDINE_CAT.get(c["cat"], 9), planner.normalizza(c["nome"]))),
             "gemini": self.gemini_attivo,
             "todo_entity": self.todo_entity,
+            "todo_ok": self.hass.states.get(self.todo_entity) is not None,
+            "liste_todo": sorted(self.hass.states.async_entity_ids("todo")),
             "spesa": planner.lista_spesa(self._pasti(), self.lib) if piano else [],
             "conteggi": planner.conta_macro(self._pasti(), self.lib) if piano else {},
             "obiettivi_scalati": planner.obiettivi_scalati(self.settings, len(self._pasti()) or 10),
@@ -387,7 +389,9 @@ class DescoManager:
             raise HomeAssistantError("Nessun menu: genera prima la settimana")
         entity = self.todo_entity
         if self.hass.states.get(entity) is None:
-            raise HomeAssistantError(f"Lista {entity} non trovata: controlla le opzioni di Desco")
+            raise HomeAssistantError(
+                f"La lista {entity} non esiste. Scegline una in Impostazioni → Dispositivi e servizi → "
+                "Desco → Configura, oppure aggiungi l'integrazione «Lista della spesa».")
         voci = [v["testo"] for v in planner.lista_spesa(self._pasti(), self.lib)]
 
         resp = await self.hass.services.async_call(
