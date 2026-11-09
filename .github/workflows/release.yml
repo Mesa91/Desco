@@ -1,0 +1,36 @@
+name: Release automatica
+
+# A ogni push su main legge la versione dal manifest.json e, se la release
+# vX.Y.Z non esiste ancora, crea tag e release su GitHub. Così il Marketplace
+# di Home Assistant mostra la versione 1.0.x invece del codice del commit.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "custom_components/desco/manifest.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Leggi la versione
+        id: v
+        run: echo "version=$(jq -r .version custom_components/desco/manifest.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Crea tag e release se mancano
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "La release v$VERSION esiste già"
+            exit 0
+          fi
+          NOTE=$(git log -1 --pretty=%B | sed '/^Co-Authored-By:/d;/^Claude-Session:/d')
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "Desco $VERSION" --notes "$NOTE"
