@@ -134,7 +134,8 @@ class DescoManager:
                 non_trasp = []
                 if p["tipo"] == "pranzo":
                     non_trasp = [d["nome"] for d in info["dettagli"]
-                                 if d["id"] and not planner.asporto_ok(self.lib[d["id"]], self.settings["microonde"])]
+                                 if d["id"] and (not planner.asporto_ok(self.lib[d["id"]], self.settings["microonde"])
+                                                 or not planner.pesce_ok_a_pranzo(self.lib[d["id"]], self.settings))]
                 pasti_info.append({
                     **p,
                     "idx": idx,
@@ -363,6 +364,7 @@ class DescoManager:
         if s["budget"] not in planner.PESO_COSTO:
             s["budget"] = "economico"
         s["cene_doppie"] = max(0, min(4, int(s.get("cene_doppie", 2) or 0)))
+        s["pranzo_solo_tonno"] = bool(s.get("pranzo_solo_tonno", True))
         s["obiettivi"] = {k: max(0, min(10, int(round(float(v)))))
                           for k, v in {**planner.OBIETTIVI_DEFAULT, **(s.get("obiettivi") or {})}.items()
                           if k in planner.OBIETTIVI_DEFAULT}

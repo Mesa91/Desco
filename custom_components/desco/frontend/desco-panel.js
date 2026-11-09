@@ -290,6 +290,7 @@ class DescoPanel extends HTMLElement {
       budget: this.bozzaPref?.budget || this.s.settings.budget,
       microonde: q("microonde").checked,
       solo_stagione: q("solo_stagione").checked,
+      pranzo_solo_tonno: q("pranzo_solo_tonno").checked,
       quota_piatti_unici: Number(q("quota").value),
       porzioni_pranzo: Number(q("porz_pranzo").value),
       porzioni_cena: Number(q("porz_cena").value),
@@ -445,7 +446,7 @@ class DescoPanel extends HTMLElement {
         <div class="p-tit"><b>${pranzo ? "Pranzo" : "Cena"}</b><span>${sotto}</span></div>
         <div class="p-meta"><span title="Tempo di preparazione"><ha-icon icon="mdi:timer-outline"></ha-icon>${m.minuti}′</span><b class="costo" title="Costo">${euro(m.costo)}</b></div>
       </div>
-      ${m.non_trasportabile?.length ? `<div class="avviso-mini"><ha-icon icon="mdi:alert-outline"></ha-icon>Poco adatto da portare: ${m.non_trasportabile.map(esc).join(", ")}</div>` : ""}
+      ${m.non_trasportabile?.length ? `<div class="avviso-mini"><ha-icon icon="mdi:alert-outline"></ha-icon>Non adatto al pranzo di Linda: ${m.non_trasportabile.map(esc).join(", ")}</div>` : ""}
       <ul class="comp">${m.dettagli.map((c, pos) => this._componente(m, c, pos)).join("")}</ul>
       <div class="p-azioni">
         <button class="ico ${m.bloccato ? "on" : ""}" data-act="blocca" data-idx="${m.idx}" data-val="${m.bloccato ? 0 : 1}" title="${m.bloccato ? "Sblocca" : "Blocca: resta uguale se rigeneri"}"><ha-icon icon="${m.bloccato ? "mdi:lock" : "mdi:lock-open-variant-outline"}"></ha-icon></button>
@@ -721,6 +722,7 @@ class DescoPanel extends HTMLElement {
     return (this.ric || []).filter((c) =>
       (cat === "tutti" || c.cat === cat) &&
       (!soloAsporto || c.asporto === "freddo" || (c.asporto === "caldo" && this.s.settings.microonde)) &&
+      (!soloAsporto || !this.s.settings.pranzo_solo_tonno || c.gruppo !== "pesce" || (c.ingredienti || []).some((i) => norm(i.nome).includes("tonno"))) &&
       (!t || norm(c.nome).includes(t) || (c.ingredienti || []).some((i) => norm(i.nome).includes(t))));
   }
 
@@ -826,6 +828,10 @@ class DescoPanel extends HTMLElement {
         <div class="campo riga">
           <div><label>Microonde al lavoro</label><div class="nota">Se no, a pranzo solo piatti buoni freddi.</div></div>
           <label class="switch"><input type="checkbox" id="microonde" ${s.microonde ? "checked" : ""}><span></span></label>
+        </div>
+        <div class="campo riga">
+          <div><label>A pranzo, come pesce solo tonno in scatola</label><div class="nota">Merluzzo, sgombro, salmone e gamberi solo a cena.</div></div>
+          <label class="switch"><input type="checkbox" id="pranzo_solo_tonno" ${s.pranzo_solo_tonno !== false ? "checked" : ""}><span></span></label>
         </div>
         <div class="campo riga">
           <div><label>Solo verdure di stagione</label><div class="nota">Costano meno e sono più buone.</div></div>

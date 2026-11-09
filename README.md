@@ -5,7 +5,7 @@ Menu settimanale equilibrato per Home Assistant: per ogni pasto **una proteina, 
 - **Lunedì–venerdì**: pranzo da portare al lavoro (1 porzione) e cena a casa (2 porzioni)
 - **Proporzioni settimanali** impostabili: di base 3 legumi, 3 pesce, 3 carne, 1 uova, 2 salumi/formaggi; salumi e formaggi sono l'ultima scelta e usano solo i posti che restano (carne rossa al massimo una volta). Non ripete i piatti nella settimana e varia rispetto alla settimana prima
 - **Costo e tempo**: budget economico/normale/libero, tempo massimo per piatto, verdure di stagione (filtrate e preferite rispetto a quelle «tutto l'anno»)
-- **Pranzi trasportabili**: a pranzo solo piatti buoni freddi o da scaldare (se c'è il microonde)
+- **Pranzi trasportabili**: a pranzo solo piatti buoni freddi o da scaldare (se c'è il microonde); come pesce solo tonno in scatola (impostabile)
 - **Alimenti da non usare**: basta una parola («funghi», «salmone») per escludere ogni piatto che li contiene
 - **Cena doppia → pranzo di domani**: un contorno della cena (cereali, verdure cotte) si cucina doppio e diventa il pranzo di Linda del giorno dopo
 - **Preparazione in anticipo**: cosa cucinare la domenica (per lun–mer) e il mercoledì sera (per gio–ven)

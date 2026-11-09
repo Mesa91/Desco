@@ -52,6 +52,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "giorni": [0, 1, 2, 3, 4],
     "obiettivi": dict(OBIETTIVI_DEFAULT),
     "cene_doppie": 2,  # volte a settimana in cui la cena fa anche il pranzo del giorno dopo
+    "pranzo_solo_tonno": True,  # a pranzo, come pesce, solo tonno in scatola
 }
 
 
@@ -186,6 +187,15 @@ def gruppo_carboidrato(comp: dict) -> str | None:
     if comp.get("cat") == "unico":
         return comp.get("gruppo_carbo")
     return None
+
+
+def pesce_ok_a_pranzo(comp: dict, settings: dict | None) -> bool:
+    """Con «solo tonno a pranzo», un piatto di pesce va bene a pranzo solo se il pesce è tonno."""
+    if not unisci_impostazioni(settings).get("pranzo_solo_tonno", True):
+        return True
+    if gruppo_proteico(comp) != "pesce":
+        return True
+    return any("tonno" in normalizza(i.get("nome", "")) for i in comp.get("ingredienti", []))
 
 
 def asporto_ok(comp: dict, microonde: bool) -> bool:
@@ -348,6 +358,8 @@ class Pianificatore:
             if comp["id"] in gia_nel_pasto:
                 continue
             if slot["tipo"] == "pranzo" and not asporto_ok(comp, bool(self.settings.get("microonde", True))):
+                continue
+            if slot["tipo"] == "pranzo" and not pesce_ok_a_pranzo(comp, self.settings):
                 continue
             if livello < 1 and comp["id"] in usati:
                 continue

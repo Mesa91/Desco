@@ -121,3 +121,18 @@ def test_rigenera_componente_cambia_solo_quello():
     random.seed(0)
     nuovi = P.rigenera_componente(L, {}, NOVEMBRE, pasti, 0, 2)
     assert nuovi[0]["componenti"][:2] == pasti[0]["componenti"][:2]
+
+
+def test_pranzo_pesce_solo_tonno():
+    L = lib()
+    for seed in range(30):
+        pasti, _ = P.genera_settimana(L, {}, NOVEMBRE, seed=seed, tentativi=10)
+        for p in pasti:
+            if p["tipo"] != "pranzo":
+                continue
+            for c in p["componenti"]:
+                if P.gruppo_proteico(L[c]) == "pesce":
+                    assert any("tonno" in i["nome"] for i in L[c]["ingredienti"]), L[c]["nome"]
+    assert not P.pesce_ok_a_pranzo(L["merluzzo_limone"], {})
+    assert P.pesce_ok_a_pranzo(L["u_riso_tonno"], {})
+    assert P.pesce_ok_a_pranzo(L["merluzzo_limone"], {"pranzo_solo_tonno": False})
