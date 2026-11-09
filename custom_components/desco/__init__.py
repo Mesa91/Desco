@@ -56,6 +56,27 @@ async def _registra_pannello(hass: HomeAssistant) -> None:
     )
 
 
+SCORCIATOIA_URL = "desco-marketplace"
+
+
+async def aggiorna_scorciatoia(hass: HomeAssistant, attiva: bool) -> None:
+    """Voce «Marketplace» nella barra laterale (il Marketplace integrato non ne ha una propria)."""
+    presente = SCORCIATOIA_URL in hass.data.get(frontend.DATA_PANELS, {})
+    if attiva and not presente:
+        await panel_custom.async_register_panel(
+            hass,
+            frontend_url_path=SCORCIATOIA_URL,
+            webcomponent_name="desco-scorciatoia",
+            sidebar_title="Marketplace",
+            sidebar_icon="mdi:store",
+            module_url=f"{STATIC_URL}/desco-scorciatoia.js?v={VERSION}",
+            require_admin=True,
+            config={"destinazione": "/marketplace"},
+        )
+    elif not attiva and presente:
+        frontend.async_remove_panel(hass, SCORCIATOIA_URL)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: DescoConfigEntry) -> bool:
     manager = DescoManager(hass, entry)
     await manager.async_load()
@@ -64,6 +85,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: DescoConfigEntry) -> boo
 
     async_register_websocket(hass)
     await _registra_pannello(hass)
+    await aggiorna_scorciatoia(hass, bool(manager.settings.get("scorciatoia_marketplace")))
+    manager.su_impostazioni = lambda s: aggiorna_scorciatoia(hass, bool(s.get("scorciatoia_marketplace")))
 
     async def _genera(call: ServiceCall) -> None:
         await manager.genera(call.data.get("settimana", "auto"))
@@ -111,5 +134,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: DescoConfigEntry) -> bo
         hass.services.async_remove(DOMAIN, "invia_lista_spesa")
         hass.services.async_remove(DOMAIN, "invia_promemoria")
         frontend.async_remove_panel(hass, PANEL_URL)
+        if SCORCIATOIA_URL in hass.data.get(frontend.DATA_PANELS, {}):
+            frontend.async_remove_panel(hass, SCORCIATOIA_URL)
         hass.data.pop(DOMAIN, None)
     return ok

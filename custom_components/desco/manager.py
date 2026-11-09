@@ -50,6 +50,7 @@ class DescoManager:
         self.lib: dict[str, dict] = {}
         self._listeners: list[Callable[[], None]] = []
         self._annulla: list[dict] = []  # istantanee del menu per «Annulla» (solo in memoria)
+        self.su_impostazioni = None  # richiamata dopo il salvataggio delle preferenze
 
     # ------------------------------------------------------------------ opzioni
 
@@ -366,6 +367,7 @@ class DescoManager:
         s["cene_doppie"] = max(0, min(4, int(s.get("cene_doppie", 2) or 0)))
         s["pranzo_solo_tonno"] = bool(s.get("pranzo_solo_tonno", True))
         s["pranzo_niente_brodi"] = bool(s.get("pranzo_niente_brodi", True))
+        s["scorciatoia_marketplace"] = bool(s.get("scorciatoia_marketplace", False))
         s["obiettivi"] = {k: max(0, min(10, int(round(float(v)))))
                           for k, v in {**planner.OBIETTIVI_DEFAULT, **(s.get("obiettivi") or {})}.items()
                           if k in planner.OBIETTIVI_DEFAULT}
@@ -374,6 +376,8 @@ class DescoManager:
         s["giorni"] = sorted({int(g) for g in s.get("giorni", []) if 0 <= int(g) <= 6}) or [0, 1, 2, 3, 4]
         self.data["settings"] = s
         await self._salva()
+        if self.su_impostazioni:
+            await self.su_impostazioni(s)
 
     async def salva_componente(self, comp: dict) -> dict:
         nome = str(comp.get("nome", "")).strip()

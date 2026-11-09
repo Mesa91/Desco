@@ -292,6 +292,7 @@ class DescoPanel extends HTMLElement {
       solo_stagione: q("solo_stagione").checked,
       pranzo_solo_tonno: q("pranzo_solo_tonno").checked,
       pranzo_niente_brodi: q("pranzo_niente_brodi").checked,
+      scorciatoia_marketplace: q("scorciatoia_marketplace").checked,
       quota_piatti_unici: Number(q("quota").value),
       porzioni_pranzo: Number(q("porz_pranzo").value),
       porzioni_cena: Number(q("porz_cena").value),
@@ -860,6 +861,10 @@ class DescoPanel extends HTMLElement {
             ? "Ogni sera arriva sul telefono cosa preparare per domani: pranzo, cene doppie, cosa scongelare e la preparazione in anticipo."
             : "Per ricevere ogni sera cosa preparare per domani, scegli i telefoni in Impostazioni → Dispositivi e servizi → Desco → Configura."}</div></div>
           ${this.s.notifiche ? `<button class="btn piccolo" data-act="prova-notifica"><ha-icon icon="mdi:bell-ring-outline"></ha-icon>Prova</button>` : ""}
+        </div>
+        <div class="campo riga">
+          <div><label>Marketplace nella barra laterale</label><div class="nota">Aggiunge la voce «Marketplace» alla barra laterale di Home Assistant (solo per gli amministratori).</div></div>
+          <label class="switch"><input type="checkbox" id="scorciatoia_marketplace" ${s.scorciatoia_marketplace ? "checked" : ""}><span></span></label>
         </div>
         <div class="campo due">
           <div><label>Porzioni a pranzo</label><input type="number" id="porz_pranzo" min="1" max="8" value="${s.porzioni_pranzo}"></div>
