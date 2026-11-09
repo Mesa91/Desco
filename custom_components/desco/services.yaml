@@ -1,0 +1,12 @@
+genera_settimana:
+  fields:
+    settimana:
+      required: false
+      default: auto
+      selector:
+        select:
+          options:
+            - auto
+            - corrente
+            - prossima
+invia_lista_spesa:

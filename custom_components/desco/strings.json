@@ -1,0 +1,56 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Desco",
+        "description": "Menu settimanale equilibrato: una proteina, un carboidrato e una verdura.",
+        "data": {
+          "todo_entity": "Lista della spesa",
+          "gemini_api_key": "Chiave API Gemini (facoltativa)",
+          "gemini_model": "Modello Gemini"
+        },
+        "data_description": {
+          "todo_entity": "Lista To-do dove inviare gli ingredienti della settimana.",
+          "gemini_api_key": "Da Google AI Studio (piano gratuito). Serve solo per farsi suggerire piatti nuovi.",
+          "gemini_model": "Per esempio gemini-2.5-flash"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Desco è già configurato."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni di Desco",
+        "data": {
+          "todo_entity": "Lista della spesa",
+          "gemini_api_key": "Chiave API Gemini (facoltativa)",
+          "gemini_model": "Modello Gemini"
+        },
+        "data_description": {
+          "todo_entity": "Lista To-do dove inviare gli ingredienti della settimana.",
+          "gemini_api_key": "Da Google AI Studio (piano gratuito). Serve solo per farsi suggerire piatti nuovi.",
+          "gemini_model": "Per esempio gemini-2.5-flash"
+        }
+      }
+    }
+  },
+  "services": {
+    "genera_settimana": {
+      "name": "Genera menu della settimana",
+      "description": "Crea il menu da lunedì a venerdì.",
+      "fields": {
+        "settimana": {
+          "name": "Settimana",
+          "description": "auto = settimana in corso da lunedì a venerdì, la prossima nel weekend"
+        }
+      }
+    },
+    "invia_lista_spesa": {
+      "name": "Invia lista della spesa",
+      "description": "Aggiunge gli ingredienti del menu alla lista To-do configurata."
+    }
+  }
+}

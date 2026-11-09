@@ -1,0 +1,14 @@
+{
+  "domain": "desco",
+  "name": "Desco",
+  "codeowners": ["@Mesa91"],
+  "config_flow": true,
+  "dependencies": ["frontend", "http", "panel_custom", "websocket_api", "todo"],
+  "documentation": "https://github.com/Mesa91/Desco",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/Mesa91/Desco/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "1.0.0"
+}

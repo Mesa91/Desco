@@ -1,0 +1,2155 @@
+{
+ "versione": 1,
+ "nota": "Quantità per 1 porzione. asporto: freddo = buono anche freddo, caldo = da riscaldare (microonde), no = non adatto al trasporto. costo: 1 = €, 2 = €€, 3 = €€€. stagione: mesi in cui la verdura è di stagione (assente = tutto l'anno). dispensa: ingredienti che non vanno in lista spesa.",
+ "componenti": [
+  {
+   "id": "ceci_rosmarino",
+   "nome": "Ceci saltati al rosmarino",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 10,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "ceci lessati",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "rosmarino",
+     "dispensa": true
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Scola e sciacqua i ceci, saltali 5-6 minuti in padella con olio, aglio e rosmarino. Ottimi anche freddi."
+  },
+  {
+   "id": "lenticchie_umido",
+   "nome": "Lenticchie in umido",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "lenticchie lessate",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Soffriggi la cipolla tritata, aggiungi passata e lenticchie scolate, cuoci 10 minuti e regola di sale."
+  },
+  {
+   "id": "polpette_ceci",
+   "nome": "Polpette di ceci al forno",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "ceci lessati",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 20,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Frulla ceci, pangrattato e parmigiano, forma le polpette e cuoci a 200 °C per 18-20 minuti girandole a metà."
+  },
+  {
+   "id": "cannellini_salvia",
+   "nome": "Cannellini all'olio e salvia",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 10,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "fagioli cannellini lessati",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "salvia",
+     "dispensa": true
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Scalda i cannellini in padella con olio, aglio e salvia per 5 minuti; pepe a crudo."
+  },
+  {
+   "id": "hummus",
+   "nome": "Hummus di ceci",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 10,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "ceci lessati",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Frulla i ceci con succo di limone, olio, un cucchiaio d'acqua, sale e (se ce l'hai) tahina o paprika."
+  },
+  {
+   "id": "piselli_cipolla",
+   "nome": "Piselli stufati con cipolla",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "piselli surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Stufa la cipolla con un filo d'olio, aggiungi i piselli surgelati e un mestolino d'acqua, cuoci 10 minuti."
+  },
+  {
+   "id": "tofu_piastra",
+   "nome": "Tofu alla piastra con salsa di soia",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 10,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "tofu",
+     "q": 125,
+     "u": "g"
+    },
+    {
+     "nome": "salsa di soia",
+     "dispensa": true
+    }
+   ],
+   "prep": "Taglia il tofu a fette, rosolalo 3 minuti per lato e sfuma con un cucchiaio di salsa di soia."
+  },
+  {
+   "id": "tonno_naturale",
+   "nome": "Tonno al naturale",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 2,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Scola il tonno (scatoletta da circa 80 g) e condisci con olio, limone e pepe."
+  },
+  {
+   "id": "merluzzo_limone",
+   "nome": "Merluzzo al limone in padella",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "filetti di merluzzo surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Cuoci i filetti in padella con olio e un goccio d'acqua, coperchio, 8-10 minuti. Finisci con limone e prezzemolo."
+  },
+  {
+   "id": "merluzzo_gratinato",
+   "nome": "Merluzzo gratinato al forno",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "filetti di merluzzo surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 15,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Copri i filetti con pangrattato, prezzemolo e olio; forno a 200 °C per 15 minuti."
+  },
+  {
+   "id": "sgombro",
+   "nome": "Sgombro all'olio",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 2,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "sgombro in scatola",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Scola lo sgombro e servilo con limone o qualche cappero."
+  },
+  {
+   "id": "salmone_forno",
+   "nome": "Salmone al forno",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 20,
+   "costo": 3,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "filetto di salmone",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Forno a 200 °C per 12-15 minuti con sale, pepe e una fettina di limone."
+  },
+  {
+   "id": "gamberi_padella",
+   "nome": "Gamberi in padella aglio e prezzemolo",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 10,
+   "costo": 3,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "gamberi surgelati sgusciati",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Saltali da surgelati in padella con olio e aglio per 5-6 minuti, prezzemolo alla fine."
+  },
+  {
+   "id": "pollo_piastra",
+   "nome": "Petto di pollo alla piastra",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "petto di pollo",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Batti leggermente le fette e cuocile sulla piastra ben calda 3-4 minuti per lato. Limone e sale a fine cottura."
+  },
+  {
+   "id": "straccetti_pollo",
+   "nome": "Straccetti di pollo al limone",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "petto di pollo",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "farina",
+     "dispensa": true
+    },
+    {
+     "nome": "limone",
+     "q": 0.5,
+     "u": "pz"
+    }
+   ],
+   "prep": "Infarina le striscioline di pollo, rosolale 5 minuti e sfuma con il succo di limone."
+  },
+  {
+   "id": "tacchino_salvia",
+   "nome": "Fesa di tacchino alla salvia",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 12,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "fesa di tacchino a fette",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "salvia",
+     "dispensa": true
+    }
+   ],
+   "prep": "Rosola le fette con burro o olio e salvia, 3 minuti per lato, sfuma con un goccio d'acqua."
+  },
+  {
+   "id": "pollo_insalata",
+   "nome": "Pollo lesso in insalata",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "petto di pollo",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Lessa il petto 15 minuti in acqua salata, sfilaccialo e condiscilo con olio, limone ed erbe."
+  },
+  {
+   "id": "polpette_sugo",
+   "nome": "Polpette al sugo",
+   "cat": "proteina",
+   "gruppo": "carne_rossa",
+   "minuti": 25,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "carne macinata",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 15,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Impasta macinato, pangrattato e parmigiano, forma le polpette e cuocile 15-18 minuti nella passata."
+  },
+  {
+   "id": "hamburger",
+   "nome": "Hamburger alla piastra",
+   "cat": "proteina",
+   "gruppo": "carne_rossa",
+   "minuti": 10,
+   "costo": 2,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "hamburger di manzo",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Piastra ben calda, 3-4 minuti per lato, sale solo alla fine."
+  },
+  {
+   "id": "straccetti_manzo",
+   "nome": "Straccetti di manzo con rucola",
+   "cat": "proteina",
+   "gruppo": "carne_rossa",
+   "minuti": 10,
+   "costo": 3,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "straccetti di manzo",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "rucola",
+     "q": 20,
+     "u": "g"
+    }
+   ],
+   "prep": "Scotta gli straccetti in padella rovente per 2-3 minuti, servili sulla rucola con olio e sale grosso."
+  },
+  {
+   "id": "frittata_forno",
+   "nome": "Frittata al forno",
+   "cat": "proteina",
+   "gruppo": "uova",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Sbatti le uova con parmigiano, sale e pepe, versale in una teglia con carta forno: 200 °C per 15 minuti."
+  },
+  {
+   "id": "uova_sode",
+   "nome": "Uova sode",
+   "cat": "proteina",
+   "gruppo": "uova",
+   "minuti": 12,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    }
+   ],
+   "prep": "Uova in acqua bollente per 9 minuti, poi in acqua fredda. Si preparano anche la sera prima."
+  },
+  {
+   "id": "uova_strapazzate",
+   "nome": "Uova strapazzate",
+   "cat": "proteina",
+   "gruppo": "uova",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    }
+   ],
+   "prep": "Fuoco basso, mescola continuamente e togli dal fuoco quando sono ancora cremose."
+  },
+  {
+   "id": "mozzarella",
+   "nome": "Mozzarella",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 0,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "mozzarella",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Una mozzarella da 125 g a testa; nel contenitore tienila separata dalla verdura condita."
+  },
+  {
+   "id": "ricotta",
+   "nome": "Ricotta alle erbe",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 3,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "ricotta",
+     "q": 120,
+     "u": "g"
+    }
+   ],
+   "prep": "Condisci la ricotta con olio, pepe, erba cipollina o scorza di limone."
+  },
+  {
+   "id": "feta",
+   "nome": "Feta",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 0,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "feta",
+     "q": 80,
+     "u": "g"
+    }
+   ],
+   "prep": "A cubetti, con origano e olio: perfetta da mescolare a cereali e verdure."
+  },
+  {
+   "id": "scamorza_piastra",
+   "nome": "Scamorza alla piastra",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 5,
+   "costo": 2,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "scamorza",
+     "q": 100,
+     "u": "g"
+    }
+   ],
+   "prep": "Fette spesse 1 cm su piastra rovente, un minuto per lato."
+  },
+  {
+   "id": "pasta",
+   "nome": "Pasta integrale",
+   "cat": "carboidrato",
+   "gruppo": "pasta",
+   "minuti": 12,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta integrale",
+     "q": 80,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci al dente e condiscila direttamente con la verdura del pasto."
+  },
+  {
+   "id": "pasta_fredda",
+   "nome": "Pasta corta (anche fredda)",
+   "cat": "carboidrato",
+   "gruppo": "pasta",
+   "minuti": 12,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "pasta corta",
+     "q": 80,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci al dente, raffredda sotto l'acqua, condisci con olio e unisci verdura e proteina."
+  },
+  {
+   "id": "riso_basmati",
+   "nome": "Riso basmati",
+   "cat": "carboidrato",
+   "gruppo": "riso",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "riso basmati",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci per assorbimento (1 parte di riso, 1,5 di acqua) a fuoco basso col coperchio, 12 minuti."
+  },
+  {
+   "id": "farro",
+   "nome": "Farro perlato",
+   "cat": "carboidrato",
+   "gruppo": "cereali",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "farro perlato",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Lessalo in acqua salata 15-20 minuti (controlla la confezione), scola e condisci con olio."
+  },
+  {
+   "id": "orzo",
+   "nome": "Orzo perlato",
+   "cat": "carboidrato",
+   "gruppo": "cereali",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "orzo perlato",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Lessalo in acqua salata circa 20-25 minuti, scola e condisci con olio. Si può cuocere la sera prima."
+  },
+  {
+   "id": "couscous",
+   "nome": "Couscous",
+   "cat": "carboidrato",
+   "gruppo": "cereali",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "couscous",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Versa pari peso di acqua bollente salata, copri 5 minuti e sgrana con la forchetta e un filo d'olio."
+  },
+  {
+   "id": "bulgur",
+   "nome": "Bulgur",
+   "cat": "carboidrato",
+   "gruppo": "cereali",
+   "minuti": 12,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "bulgur",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuocilo in acqua salata 10-12 minuti, poi sgranalo."
+  },
+  {
+   "id": "quinoa",
+   "nome": "Quinoa",
+   "cat": "carboidrato",
+   "gruppo": "cereali",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "quinoa",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Sciacquala bene e cuocila 12-15 minuti in doppio volume d'acqua salata."
+  },
+  {
+   "id": "pane_integrale",
+   "nome": "Pane integrale",
+   "cat": "carboidrato",
+   "gruppo": "pane",
+   "minuti": 0,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "pane integrale",
+     "q": 80,
+     "u": "g"
+    }
+   ],
+   "prep": "Due fette; se vuoi tostale un paio di minuti."
+  },
+  {
+   "id": "piadina",
+   "nome": "Piadina",
+   "cat": "carboidrato",
+   "gruppo": "pane",
+   "minuti": 3,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "piadine",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Scaldala 1 minuto per lato in padella e farciscila con proteina e verdura."
+  },
+  {
+   "id": "patate_forno",
+   "nome": "Patate al forno",
+   "cat": "carboidrato",
+   "gruppo": "patate",
+   "minuti": 30,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "patate",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "rosmarino",
+     "dispensa": true
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Spicchi sottili con olio, sale e rosmarino, forno ventilato a 220 °C per 25-30 minuti."
+  },
+  {
+   "id": "patate_lesse",
+   "nome": "Patate lesse prezzemolate",
+   "cat": "carboidrato",
+   "gruppo": "patate",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "patate",
+     "q": 200,
+     "u": "g"
+    }
+   ],
+   "prep": "A tocchetti in acqua salata 15-20 minuti, condisci con olio, prezzemolo e un pizzico di sale."
+  },
+  {
+   "id": "gnocchi",
+   "nome": "Gnocchi di patate",
+   "cat": "carboidrato",
+   "gruppo": "patate",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "gnocchi di patate",
+     "q": 150,
+     "u": "g"
+    }
+   ],
+   "prep": "Buttali in acqua bollente salata e scolali appena salgono a galla."
+  },
+  {
+   "id": "polenta",
+   "nome": "Polenta istantanea",
+   "cat": "carboidrato",
+   "gruppo": "cereali",
+   "minuti": 8,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "farina per polenta istantanea",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Versa la farina a pioggia in acqua salata bollente (circa 4 volte il peso) e mescola 5 minuti."
+  },
+  {
+   "id": "insalata_mista",
+   "nome": "Insalata mista con carote",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "insalata",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Lava l'insalata e grattugia la carota; per l'asporto porta il condimento a parte."
+  },
+  {
+   "id": "carote_julienne",
+   "nome": "Carote a julienne al limone",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "carote",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Grattugia le carote a julienne e condiscile con limone, olio e sale."
+  },
+  {
+   "id": "finocchi",
+   "nome": "Finocchi in insalata",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "ingredienti": [
+    {
+     "nome": "finocchi",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Affettali sottili e condisci con olio, sale e, se ti piace, qualche spicchio d'arancia."
+  },
+  {
+   "id": "cappuccio",
+   "nome": "Insalata di cavolo cappuccio",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "ingredienti": [
+    {
+     "nome": "cavolo cappuccio",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Affetta finissimo il cappuccio, unisci la carota grattugiata, condisci con olio, aceto e sale. Regge bene anche ore."
+  },
+  {
+   "id": "spinaci",
+   "nome": "Spinaci saltati",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 10,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "spinaci surgelati",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Saltali da surgelati in padella con olio e aglio per 8 minuti."
+  },
+  {
+   "id": "fagiolini",
+   "nome": "Fagiolini lessi",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "fagiolini surgelati",
+     "q": 180,
+     "u": "g"
+    }
+   ],
+   "prep": "Lessali 10-12 minuti, condisci con olio, sale e un goccio di limone."
+  },
+  {
+   "id": "broccoli",
+   "nome": "Broccoli al vapore",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "ingredienti": [
+    {
+     "nome": "broccoli",
+     "q": 250,
+     "u": "g"
+    }
+   ],
+   "prep": "Cimette al vapore (o in acqua bollente) per 8-10 minuti, condisci con olio e limone."
+  },
+  {
+   "id": "cavolfiore_forno",
+   "nome": "Cavolfiore arrosto",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "cavolfiore",
+     "q": 250,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Cimette con olio, sale e curcuma o paprika, forno a 220 °C per 20-25 minuti."
+  },
+  {
+   "id": "verza_stufata",
+   "nome": "Verza stufata",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "verza",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Verza a striscioline stufata con cipolla, un filo d'olio e un mestolo d'acqua, 15 minuti col coperchio."
+  },
+  {
+   "id": "radicchio_padella",
+   "nome": "Radicchio in padella",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 10,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "radicchio",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Tagliato a spicchi e scottato in padella 5-6 minuti con olio e un goccio di aceto balsamico."
+  },
+  {
+   "id": "zucca_forno",
+   "nome": "Zucca al forno",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "ingredienti": [
+    {
+     "nome": "zucca",
+     "q": 250,
+     "u": "g"
+    }
+   ],
+   "prep": "A fette sottili con olio, sale e rosmarino, forno a 200 °C per 20 minuti."
+  },
+  {
+   "id": "cavoletti",
+   "nome": "Cavoletti di Bruxelles in padella",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "caldo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2
+   ],
+   "ingredienti": [
+    {
+     "nome": "cavoletti di Bruxelles",
+     "q": 180,
+     "u": "g"
+    }
+   ],
+   "prep": "Tagliali a metà, sbollentali 5 minuti e poi rosolali in padella fino a dorarli."
+  },
+  {
+   "id": "bieta",
+   "nome": "Bieta saltata",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    3,
+    4,
+    5,
+    6,
+    9,
+    10,
+    11
+   ],
+   "ingredienti": [
+    {
+     "nome": "bieta",
+     "q": 250,
+     "u": "g"
+    }
+   ],
+   "prep": "Sbollentala 3 minuti, strizzala e saltala con olio e aglio."
+  },
+  {
+   "id": "carciofi",
+   "nome": "Carciofi trifolati",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "caldo",
+   "stagione": [
+    11,
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "ingredienti": [
+    {
+     "nome": "carciofi",
+     "q": 2,
+     "u": "pz"
+    }
+   ],
+   "prep": "Puliscili, tagliali a spicchi e cuocili in padella con olio, aglio e prezzemolo, 15 minuti col coperchio."
+  },
+  {
+   "id": "minestrone",
+   "nome": "Minestrone di verdure",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "minestrone surgelato",
+     "q": 250,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci il minestrone surgelato in acqua salata 15-20 minuti; ottimo nel termos."
+  },
+  {
+   "id": "zucchine_trifolate",
+   "nome": "Zucchine trifolate",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "ingredienti": [
+    {
+     "nome": "zucchine",
+     "q": 2,
+     "u": "pz"
+    }
+   ],
+   "prep": "A rondelle in padella con olio, aglio e prezzemolo, 10 minuti."
+  },
+  {
+   "id": "zucchine_grigliate",
+   "nome": "Zucchine grigliate",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "ingredienti": [
+    {
+     "nome": "zucchine",
+     "q": 2,
+     "u": "pz"
+    }
+   ],
+   "prep": "Fette per il lungo sulla piastra, poi olio, menta o basilico."
+  },
+  {
+   "id": "melanzane_grigliate",
+   "nome": "Melanzane grigliate",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "ingredienti": [
+    {
+     "nome": "melanzane",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Fette sottili sulla piastra, condite con olio, aglio e prezzemolo."
+  },
+  {
+   "id": "peperoni_padella",
+   "nome": "Peperoni in padella",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "freddo",
+   "stagione": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "ingredienti": [
+    {
+     "nome": "peperoni",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "A strisce in padella con olio e un pizzico di sale, coperchio, 15 minuti."
+  },
+  {
+   "id": "pomodori",
+   "nome": "Insalata di pomodori",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "ingredienti": [
+    {
+     "nome": "pomodori",
+     "q": 2,
+     "u": "pz"
+    }
+   ],
+   "prep": "A spicchi con olio, sale, origano o basilico."
+  },
+  {
+   "id": "cetrioli",
+   "nome": "Cetrioli allo yogurt",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "ingredienti": [
+    {
+     "nome": "cetrioli",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "yogurt bianco",
+     "q": 50,
+     "u": "g"
+    }
+   ],
+   "prep": "A rondelle sottili con yogurt, sale e menta."
+  },
+  {
+   "id": "u_farro_ceci",
+   "nome": "Insalata di farro, ceci e verdure",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "gruppo_carbo": "cereali",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "farro perlato",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "ceci lessati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "rucola",
+     "q": 25,
+     "u": "g"
+    }
+   ],
+   "prep": "Lessa il farro, raffreddalo e uniscilo a ceci, carota a dadini e rucola; olio, limone, sale."
+  },
+  {
+   "id": "u_pasta_lenticchie",
+   "nome": "Pasta e lenticchie",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "gruppo_carbo": "pasta",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta mista",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "lenticchie lessate",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 50,
+     "u": "g"
+    }
+   ],
+   "prep": "Soffritto di carota, aggiungi lenticchie, passata e acqua; cuoci la pasta direttamente dentro, 10-12 minuti."
+  },
+  {
+   "id": "u_pasta_fagioli",
+   "nome": "Pasta e fagioli veloce",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "gruppo_carbo": "pasta",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta mista",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "fagioli borlotti lessati",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "rosmarino",
+     "dispensa": true
+    }
+   ],
+   "prep": "Frulla metà dei fagioli, aggiungi il resto con carota e rosmarino, allunga con acqua e cuoci la pasta dentro."
+  },
+  {
+   "id": "u_riso_tonno",
+   "nome": "Riso freddo con tonno, piselli e carote",
+   "cat": "unico",
+   "gruppo": "pesce",
+   "gruppo_carbo": "riso",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "riso basmati",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "piselli surgelati",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Cuoci il riso e, negli ultimi 5 minuti, piselli e carota a dadini. Raffredda e unisci il tonno."
+  },
+  {
+   "id": "u_pasta_tonno_broccoli",
+   "nome": "Pasta tonno e broccoli",
+   "cat": "unico",
+   "gruppo": "pesce",
+   "gruppo_carbo": "pasta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "ingredienti": [
+    {
+     "nome": "pasta integrale",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "broccoli",
+     "q": 200,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci le cimette nell'acqua della pasta, scola insieme e salta in padella col tonno, aglio e olio."
+  },
+  {
+   "id": "u_couscous_pollo",
+   "nome": "Couscous con pollo e verdure",
+   "cat": "unico",
+   "gruppo": "carne_bianca",
+   "gruppo_carbo": "cereali",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "couscous",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "petto di pollo",
+     "q": 110,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "piselli surgelati",
+     "q": 60,
+     "u": "g"
+    }
+   ],
+   "prep": "Rosola il pollo a dadini con carota e piselli, unisci al couscous rinvenuto. Buono freddo."
+  },
+  {
+   "id": "u_wrap_pollo",
+   "nome": "Wrap di pollo e insalata",
+   "cat": "unico",
+   "gruppo": "carne_bianca",
+   "gruppo_carbo": "pane",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "piadine",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "petto di pollo",
+     "q": 110,
+     "u": "g"
+    },
+    {
+     "nome": "insalata",
+     "q": 40,
+     "u": "g"
+    },
+    {
+     "nome": "yogurt bianco",
+     "q": 40,
+     "u": "g"
+    }
+   ],
+   "prep": "Pollo alla piastra a striscioline, insalata e salsa yogurt con sale e limone; arrotola stretta nella carta forno."
+  },
+  {
+   "id": "u_vellutata_zucca",
+   "nome": "Vellutata di zucca con ceci e crostini",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "gruppo_carbo": "pane",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "ingredienti": [
+    {
+     "nome": "zucca",
+     "q": 250,
+     "u": "g"
+    },
+    {
+     "nome": "ceci lessati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "pane integrale",
+     "q": 50,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Cuoci zucca e cipolla in poca acqua 15 minuti e frulla; servi con ceci saltati e crostini."
+  },
+  {
+   "id": "u_uova_pomodoro",
+   "nome": "Uova al pomodoro con pane",
+   "cat": "unico",
+   "gruppo": "uova",
+   "gruppo_carbo": "pane",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "pane integrale",
+     "q": 60,
+     "u": "g"
+    }
+   ],
+   "prep": "Sugo veloce con cipolla e passata, fai 2 incavi e rompi le uova; coperchio 6-8 minuti. Con pane per la scarpetta."
+  },
+  {
+   "id": "u_orzo_feta",
+   "nome": "Insalata d'orzo con feta e cetrioli",
+   "cat": "unico",
+   "gruppo": "latticini",
+   "gruppo_carbo": "cereali",
+   "minuti": 25,
+   "costo": 2,
+   "asporto": "freddo",
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "ingredienti": [
+    {
+     "nome": "orzo perlato",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "feta",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "cetrioli",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "pomodori",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Lessa l'orzo, raffreddalo e unisci feta, cetriolo e pomodoro a dadini; olio e origano."
+  },
+  {
+   "id": "u_risotto_zucca",
+   "nome": "Risotto veloce alla zucca",
+   "cat": "unico",
+   "gruppo": "latticini",
+   "gruppo_carbo": "riso",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "no",
+   "stagione": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "ingredienti": [
+    {
+     "nome": "riso carnaroli",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "zucca",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 25,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Tosta il riso con cipolla, aggiungi la zucca a cubetti e brodo poco alla volta, 18 minuti; manteca col parmigiano."
+  },
+  {
+   "id": "porri_stufati",
+   "nome": "Porri stufati",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "porri",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "A rondelle, stufati in padella con un filo d'olio e un goccio d'acqua per 10-12 minuti."
+  },
+  {
+   "id": "cavolo_nero",
+   "nome": "Cavolo nero saltato",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "cavolo nero",
+     "q": 200,
+     "u": "g"
+    }
+   ],
+   "prep": "Togli la costa centrale, sbollenta 4 minuti e salta in padella con olio, aglio e peperoncino."
+  },
+  {
+   "id": "finocchi_arance",
+   "nome": "Insalata di finocchi e arance",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 8,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "finocchi",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "arance",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Finocchio a fette sottili e arancia a spicchi pelati al vivo; olio, sale e pepe."
+  },
+  {
+   "id": "cavolfiore_insalata",
+   "nome": "Insalata di cavolfiore e olive",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "cavolfiore",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "olive",
+     "q": 20,
+     "u": "g"
+    }
+   ],
+   "prep": "Cimette lessate 8 minuti, raffreddate e condite con olive, olio, aceto e prezzemolo. Regge bene in schiscetta."
+  },
+  {
+   "id": "asparagi",
+   "nome": "Asparagi al forno",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "freddo",
+   "stagione": [
+    3,
+    4,
+    5
+   ],
+   "ingredienti": [
+    {
+     "nome": "asparagi",
+     "q": 200,
+     "u": "g"
+    }
+   ],
+   "prep": "Elimina la parte dura, olio e sale, forno a 200 °C per 12 minuti."
+  },
+  {
+   "id": "u_zuppa_ceci_cavolo",
+   "nome": "Zuppa di ceci e cavolo nero con crostini",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "gruppo_carbo": "pane",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "ingredienti": [
+    {
+     "nome": "ceci lessati",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "cavolo nero",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "pane integrale",
+     "q": 50,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Soffriggi la cipolla, aggiungi cavolo nero a striscioline, ceci e acqua; 15 minuti, frulla metà e servi con il pane tostato. Perfetta nel termos o al microonde."
+  },
+  {
+   "id": "u_pasta_zucca_ceci",
+   "nome": "Pasta zucca e ceci",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "gruppo_carbo": "pasta",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "caldo",
+   "stagione": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "ingredienti": [
+    {
+     "nome": "pasta corta",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "zucca",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "ceci lessati",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "rosmarino",
+     "dispensa": true
+    }
+   ],
+   "prep": "Zucca a cubetti in padella con olio e rosmarino 10 minuti, aggiungi i ceci e un po' d'acqua di cottura; manteca la pasta."
+  },
+  {
+   "id": "u_orzo_broccoli",
+   "nome": "Orzo con broccoli e feta",
+   "cat": "unico",
+   "gruppo": "latticini",
+   "gruppo_carbo": "cereali",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "ingredienti": [
+    {
+     "nome": "orzo perlato",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "broccoli",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "feta",
+     "q": 50,
+     "u": "g"
+    }
+   ],
+   "prep": "Lessa l'orzo e, negli ultimi 6 minuti, le cimette di broccoli; scola, condisci con olio e limone e unisci la feta. Buono freddo o tiepido."
+  },
+  {
+   "id": "prosciutto_crudo",
+   "nome": "Prosciutto crudo",
+   "cat": "proteina",
+   "gruppo": "salumi",
+   "minuti": 0,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "prosciutto crudo",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Circa 70 g a testa; nel contenitore tienilo separato da verdure condite."
+  },
+  {
+   "id": "prosciutto_cotto",
+   "nome": "Prosciutto cotto",
+   "cat": "proteina",
+   "gruppo": "salumi",
+   "minuti": 0,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "prosciutto cotto",
+     "q": 80,
+     "u": "g"
+    }
+   ],
+   "prep": "Meglio un cotto di alta qualità senza polifosfati; circa 80 g a testa."
+  },
+  {
+   "id": "bresaola_rucola",
+   "nome": "Bresaola con rucola e grana",
+   "cat": "proteina",
+   "gruppo": "salumi",
+   "minuti": 3,
+   "costo": 3,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "bresaola",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "rucola",
+     "q": 20,
+     "u": "g"
+    },
+    {
+     "nome": "grana a scaglie",
+     "q": 15,
+     "u": "g"
+    }
+   ],
+   "prep": "Bresaola su un letto di rucola, scaglie di grana, olio e limone al momento."
+  },
+  {
+   "id": "speck",
+   "nome": "Speck",
+   "cat": "proteina",
+   "gruppo": "salumi",
+   "minuti": 0,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "speck",
+     "q": 60,
+     "u": "g"
+    }
+   ],
+   "prep": "Circa 60 g a testa; ottimo con pane integrale e cappuccio."
+  },
+  {
+   "id": "stracchino",
+   "nome": "Stracchino",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 0,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "stracchino",
+     "q": 100,
+     "u": "g"
+    }
+   ],
+   "prep": "Circa 100 g a testa, da spalmare su pane o piadina."
+  },
+  {
+   "id": "u_piadina_crudo",
+   "nome": "Piadina con crudo, stracchino e rucola",
+   "cat": "unico",
+   "gruppo": "salumi",
+   "gruppo_carbo": "pane",
+   "minuti": 5,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "piadine",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "prosciutto crudo",
+     "q": 40,
+     "u": "g"
+    },
+    {
+     "nome": "stracchino",
+     "q": 50,
+     "u": "g"
+    },
+    {
+     "nome": "rucola",
+     "q": 25,
+     "u": "g"
+    }
+   ],
+   "prep": "Scalda la piadina, spalma lo stracchino e aggiungi crudo e rucola; chiudila nella carta forno per il trasporto."
+  },
+  {
+   "id": "u_insalatona_cotto",
+   "nome": "Insalatona con cotto, mais e patate",
+   "cat": "unico",
+   "gruppo": "salumi",
+   "gruppo_carbo": "patate",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "patate",
+     "q": 180,
+     "u": "g"
+    },
+    {
+     "nome": "prosciutto cotto",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "insalata",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "mais in scatola",
+     "q": 40,
+     "u": "g"
+    }
+   ],
+   "prep": "Lessa le patate a cubetti 12 minuti e falle raffreddare; unisci insalata, mais e cotto a listarelle. Condimento a parte."
+  }
+ ]
+}

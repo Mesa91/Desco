@@ -1,0 +1,46 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Desco",
+        "description": "Balanced weekly menu: one protein, one carb and one vegetable.",
+        "data": {
+          "todo_entity": "Shopping list",
+          "gemini_api_key": "Gemini API key (optional)",
+          "gemini_model": "Gemini model"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Desco is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Desco options",
+        "data": {
+          "todo_entity": "Shopping list",
+          "gemini_api_key": "Gemini API key (optional)",
+          "gemini_model": "Gemini model"
+        }
+      }
+    }
+  },
+  "services": {
+    "genera_settimana": {
+      "name": "Generate weekly menu",
+      "description": "Creates the Monday-Friday menu.",
+      "fields": {
+        "settimana": {
+          "name": "Week",
+          "description": "auto, corrente (current) or prossima (next)"
+        }
+      }
+    },
+    "invia_lista_spesa": {
+      "name": "Send shopping list",
+      "description": "Adds the menu ingredients to the configured to-do list."
+    }
+  }
+}
