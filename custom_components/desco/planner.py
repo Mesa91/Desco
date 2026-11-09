@@ -29,8 +29,8 @@ MACRO = {
 }
 MACRO_ORDINE = ("legumi", "pesce", "carne", "uova", "salumi_formaggi")
 
-# Pasti a settimana per ciascun macro-gruppo. Se la somma non coincide con il
-# numero di pasti, gli obiettivi vengono scalati in proporzione.
+# Pasti a settimana per ciascun macro-gruppo. Salumi e formaggi sono l'ultima
+# scelta: prendono solo i posti che restano dopo gli altri gruppi.
 OBIETTIVI_DEFAULT = {"legumi": 3, "pesce": 3, "carne": 3, "uova": 1, "salumi_formaggi": 2}
 MAX_CARNE_ROSSA = 1  # dentro la "carne", al massimo una volta a settimana
 
@@ -86,10 +86,26 @@ def macro_di(gruppo: str | None) -> str | None:
     return MACRO.get(gruppo, gruppo) if gruppo else None
 
 
+ULTIMA_SCELTA = ("salumi_formaggi",)
+
+
 def obiettivi_scalati(settings: dict, n_pasti: int) -> dict[str, float]:
+    """Obiettivi adattati al numero di pasti.
+
+    Prima si assegnano i gruppi principali (scalati in proporzione solo se da
+    soli superano i pasti disponibili), poi salumi e formaggi ricevono i posti
+    rimasti, fino al loro obiettivo.
+    """
     ob = unisci_impostazioni(settings)["obiettivi"]
-    tot = sum(ob.values()) or 1.0
-    return {k: v * n_pasti / tot for k, v in ob.items()}
+    principali = {k: v for k, v in ob.items() if k not in ULTIMA_SCELTA}
+    tot = sum(principali.values())
+    fattore = min(1.0, n_pasti / tot) if tot else 1.0
+    out = {k: v * fattore for k, v in principali.items()}
+    resto = max(0.0, n_pasti - sum(out.values()))
+    for k in ULTIMA_SCELTA:
+        out[k] = min(float(ob.get(k, 0)), resto)
+        resto -= out[k]
+    return out
 
 
 # --------------------------------------------------------------------------- ricettario

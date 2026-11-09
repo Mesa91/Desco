@@ -678,7 +678,7 @@ class DescoPanel extends HTMLElement {
         </div>
         <div class="campo">
           <label>Proporzioni settimanali</label>
-          <div class="nota">Quanti pasti con ciascuna fonte di proteine. Se il totale non coincide con i pasti della settimana (${this.s.piano?.pasti?.length || 10}), vengono distribuiti in proporzione. La carne rossa resta al massimo una volta.</div>
+          <div class="nota">Quanti pasti con ciascuna fonte di proteine su ${this.s.piano?.pasti?.length || 10} pasti a settimana. Salumi e formaggi sono l'ultima scelta: usano solo i posti che restano (o quando nient'altro è compatibile). La carne rossa resta al massimo una volta.</div>
           <div class="proporzioni">${MACRO.map(([k, l, i]) => `<label class="prop"><ha-icon icon="${i}"></ha-icon><span>${l}</span><input type="number" min="0" max="10" id="ob-${k}" value="${s.obiettivi?.[k] ?? 0}"></label>`).join("")}</div>
         </div>
         <div class="campo">
