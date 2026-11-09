@@ -127,3 +127,62 @@ async def suggerisci(session: aiohttp.ClientSession, api_key: str, model: str, c
         lista = lista.get("piatti") or lista.get("items") or [lista]
     out = [c for c in (_pulisci(x, cat) for x in lista) if c]
     return out[:quanti]
+
+
+def _prompt_ricetta(dettagli: list[dict], porzioni: int, per_asporto: bool, microonde: bool, avanzi: list[str]) -> str:
+    righe = []
+    for d in dettagli:
+        ingr = ", ".join(
+            i["nome"] if i.get("dispensa") else f"{i['nome']} {round(float(i.get('q', 0)) * porzioni, 1):g} {i.get('u', '')}"
+            for i in d.get("ingredienti", [])
+        )
+        righe.append(f"- {d['nome']}: {ingr}. Note: {d.get('prep', '')}")
+    contesto = (
+        "È il pranzo di una persona da portare al lavoro in un contenitore"
+        + (" (al lavoro c'è il microonde)." if microonde else " (niente microonde: va mangiato freddo).")
+        if per_asporto else f"È la cena a casa per {porzioni} persone."
+    )
+    extra = f"\nQueste parti sono avanzi già cucinati la sera prima, vanno solo porzionati: {', '.join(avanzi)}." if avanzi else ""
+    return f"""Sei un cuoco italiano pratico. Scrivi UNA ricetta unica e completa per questo pasto, per {porzioni} porzione/i.
+{contesto}{extra}
+Componenti del pasto:
+{chr(10).join(righe)}
+Organizza il lavoro per finire prima possibile: indica cosa avviare per primo e cosa fare in parallelo.
+Rispondi SOLO con un oggetto JSON:
+{{"tempo_totale": minuti (int),
+ "ingredienti": ["quantità + ingrediente", ...],
+ "passaggi": ["passaggio 1", "passaggio 2", ...],
+ "contenitore": "come sistemare il pasto nel contenitore e come scaldarlo" oppure null se è la cena,
+ "consigli": "un consiglio breve"}}"""
+
+
+async def ricetta_pasto(session: aiohttp.ClientSession, api_key: str, model: str, dettagli: list[dict],
+                       porzioni: int, per_asporto: bool, microonde: bool, avanzi: list[str]) -> dict:
+    if not api_key:
+        raise GeminiError("Chiave API di Gemini non configurata (Impostazioni → Dispositivi e servizi → Desco → Configura).")
+    body = {
+        "contents": [{"role": "user", "parts": [{"text": _prompt_ricetta(dettagli, porzioni, per_asporto, microonde, avanzi)}]}],
+        "generationConfig": {"responseMimeType": "application/json", "temperature": 0.4},
+    }
+    try:
+        async with session.post(API_URL.format(model=model), params={"key": api_key}, json=body,
+                                timeout=aiohttp.ClientTimeout(total=90)) as resp:
+            data = await resp.json(content_type=None)
+            if resp.status != 200:
+                raise GeminiError(f"Gemini: {(data or {}).get('error', {}).get('message', f'HTTP {resp.status}')}")
+    except aiohttp.ClientError as err:
+        raise GeminiError(f"Gemini non raggiungibile: {err}") from err
+    try:
+        r = json.loads(data["candidates"][0]["content"]["parts"][0]["text"])
+        if isinstance(r, list):
+            r = r[0]
+    except (KeyError, IndexError, ValueError, TypeError) as err:
+        raise GeminiError("Risposta di Gemini non leggibile, riprova.") from err
+    testo = lambda x: str(x).strip()[:600]  # noqa: E731
+    return {
+        "tempo_totale": int(r.get("tempo_totale") or 0) if str(r.get("tempo_totale", "")).isdigit() else None,
+        "ingredienti": [testo(i) for i in (r.get("ingredienti") or [])][:30],
+        "passaggi": [testo(p) for p in (r.get("passaggi") or [])][:20],
+        "contenitore": testo(r["contenitore"]) if r.get("contenitore") else None,
+        "consigli": testo(r.get("consigli") or ""),
+    }

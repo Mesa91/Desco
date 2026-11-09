@@ -74,6 +74,11 @@ COMANDI = [
       vol.Optional("asporto", default=False): bool},
      lambda m, msg: m.suggerisci(msg["cat"], msg["quanti"], msg["asporto"])),
     ({vol.Required("type"): "desco/invia_spesa"}, lambda m, msg: m.invia_spesa()),
+    ({vol.Required("type"): "desco/vota", vol.Required("comp_id"): str, vol.Required("voto"): vol.In([-1, 0, 1])},
+     lambda m, msg: m.vota(msg["comp_id"], msg["voto"])),
+    ({vol.Required("type"): "desco/ricetta", vol.Required("idx"): int, vol.Optional("rifai", default=False): bool},
+     lambda m, msg: m.ricetta(msg["idx"], msg["rifai"])),
+    ({vol.Required("type"): "desco/prova_promemoria"}, lambda m, msg: m.invia_promemoria(forza=True)),
 ]
 
 

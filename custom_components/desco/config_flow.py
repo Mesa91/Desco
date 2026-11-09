@@ -12,7 +12,10 @@ from homeassistant.helpers import selector
 from .const import (
     CONF_GEMINI_KEY,
     CONF_GEMINI_MODEL,
+    CONF_NOTIFY,
+    CONF_NOTIFY_TIME,
     CONF_TODO_ENTITY,
+    DEFAULT_NOTIFY_TIME,
     DEFAULT_GEMINI_MODEL,
     DEFAULT_TODO_ENTITY,
     DOMAIN,
@@ -36,7 +39,18 @@ def _schema(hass, valori: dict[str, Any]) -> vol.Schema:
             selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)),
         vol.Required(CONF_GEMINI_MODEL, default=valori.get(CONF_GEMINI_MODEL, DEFAULT_GEMINI_MODEL)):
             selector.TextSelector(),
+        vol.Optional(CONF_NOTIFY, default=valori.get(CONF_NOTIFY, [])):
+            selector.SelectSelector(selector.SelectSelectorConfig(
+                options=_servizi_notifica(hass), multiple=True, custom_value=True,
+                mode=selector.SelectSelectorMode.DROPDOWN)),
+        vol.Required(CONF_NOTIFY_TIME, default=valori.get(CONF_NOTIFY_TIME, DEFAULT_NOTIFY_TIME)):
+            selector.TimeSelector(),
     })
+
+
+def _servizi_notifica(hass) -> list[str]:
+    servizi = hass.services.async_services().get("notify", {})
+    return sorted(f"notify.{s}" for s in servizi if s not in ("send_message", "persistent_notification"))
 
 
 class DescoConfigFlow(ConfigFlow, domain=DOMAIN):

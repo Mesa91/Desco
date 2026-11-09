@@ -11,8 +11,10 @@ from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
+from homeassistant.helpers.event import async_track_time_change
 
 from .const import (
+    CONF_NOTIFY,
     DOMAIN,
     PANEL_COMPONENT,
     PANEL_ICON,
@@ -72,6 +74,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: DescoConfigEntry) -> boo
     hass.services.async_register(
         DOMAIN, "invia_lista_spesa", _spesa, supports_response=SupportsResponse.OPTIONAL)
 
+    async def _promemoria(call: ServiceCall) -> ServiceResponse:
+        return await manager.invia_promemoria(forza=True)
+
+    hass.services.async_register(
+        DOMAIN, "invia_promemoria", _promemoria, supports_response=SupportsResponse.OPTIONAL)
+
+    if manager.opt(CONF_NOTIFY):
+        ora, minuto = manager.orario_promemoria()
+
+        async def _sera(_now) -> None:
+            try:
+                await manager.invia_promemoria()
+            except Exception as err:  # noqa: BLE001
+                _LOGGER.warning("Promemoria Desco non inviato: %s", err)
+
+        entry.async_on_unload(async_track_time_change(hass, _sera, hour=ora, minute=minuto, second=0))
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_ricarica))
     return True
@@ -86,6 +105,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: DescoConfigEntry) -> bo
     if ok:
         hass.services.async_remove(DOMAIN, "genera_settimana")
         hass.services.async_remove(DOMAIN, "invia_lista_spesa")
+        hass.services.async_remove(DOMAIN, "invia_promemoria")
         frontend.async_remove_panel(hass, PANEL_URL)
         hass.data.pop(DOMAIN, None)
     return ok

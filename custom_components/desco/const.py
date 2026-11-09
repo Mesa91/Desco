@@ -1,6 +1,6 @@
 """Costanti di Desco."""
 DOMAIN = "desco"
-VERSION = "1.0.5"
+VERSION = "1.0.6"
 NAME = "Desco"
 
 STORAGE_KEY = "desco.data"
@@ -9,6 +9,9 @@ STORAGE_VERSION = 1
 CONF_GEMINI_KEY = "gemini_api_key"
 CONF_GEMINI_MODEL = "gemini_model"
 CONF_TODO_ENTITY = "todo_entity"
+CONF_NOTIFY = "notify_services"
+CONF_NOTIFY_TIME = "notify_time"
+DEFAULT_NOTIFY_TIME = "20:30:00"
 
 DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 DEFAULT_TODO_ENTITY = "todo.shopping_list"

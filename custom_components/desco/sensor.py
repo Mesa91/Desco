@@ -22,7 +22,7 @@ SENSORI = [
 
 async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback) -> None:
     mgr: DescoManager = entry.runtime_data
-    entita = [PastoSensor(mgr, entry.entry_id, *s) for s in SENSORI]
+    entita = [PastoSensor(mgr, entry.entry_id, *s) for s in SENSORI] + [PromemoriaSensor(mgr, entry.entry_id)]
     async_add_entities(entita)
 
     @callback
@@ -75,3 +75,20 @@ class PastoSensor(SensorEntity):
             "porzioni": p.get("porzioni"),
             "bloccato": p.get("bloccato", False),
         }
+
+
+class PromemoriaSensor(PastoSensor):
+    """Cosa preparare stasera per domani (cena doppia, freezer, preparazione in anticipo)."""
+
+    def __init__(self, mgr: DescoManager, entry_id: str) -> None:
+        super().__init__(mgr, entry_id, "promemoria_sera", "Promemoria di stasera", "pranzo", 1, "mdi:bell-ring-outline")
+
+    @property
+    def native_value(self) -> str:
+        p = self._mgr.promemoria()
+        return (p["breve"] if p else "Niente da preparare stasera")[:250]
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        p = self._mgr.promemoria()
+        return {"testo": p["testo"], "titolo": p["titolo"]} if p else {}

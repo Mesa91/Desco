@@ -56,7 +56,8 @@
      "dispensa": true
     }
    ],
-   "prep": "Soffriggi la cipolla tritata, aggiungi passata e lenticchie scolate, cuoci 10 minuti e regola di sale."
+   "prep": "Soffriggi la cipolla tritata, aggiungi passata e lenticchie scolate, cuoci 10 minuti e regola di sale.",
+   "anticipo": true
   },
   {
    "id": "polpette_ceci",
@@ -87,7 +88,8 @@
      "dispensa": true
     }
    ],
-   "prep": "Frulla ceci, pangrattato e parmigiano, forma le polpette e cuoci a 200 °C per 18-20 minuti girandole a metà."
+   "prep": "Frulla ceci, pangrattato e parmigiano, forma le polpette e cuoci a 200 °C per 18-20 minuti girandole a metà.",
+   "anticipo": true
   },
   {
    "id": "cannellini_salvia",
@@ -138,7 +140,8 @@
      "dispensa": true
     }
    ],
-   "prep": "Frulla i ceci con succo di limone, olio, un cucchiaio d'acqua, sale e (se ce l'hai) tahina o paprika."
+   "prep": "Frulla i ceci con succo di limone, olio, un cucchiaio d'acqua, sale e (se ce l'hai) tahina o paprika.",
+   "anticipo": true
   },
   {
    "id": "piselli_cipolla",
@@ -228,7 +231,8 @@
      "dispensa": true
     }
    ],
-   "prep": "Cuoci i filetti in padella con olio e un goccio d'acqua, coperchio, 8-10 minuti. Finisci con limone e prezzemolo."
+   "prep": "Cuoci i filetti in padella con olio e un goccio d'acqua, coperchio, 8-10 minuti. Finisci con limone e prezzemolo.",
+   "scongela": "filetti di merluzzo"
   },
   {
    "id": "merluzzo_gratinato",
@@ -254,7 +258,8 @@
      "dispensa": true
     }
    ],
-   "prep": "Copri i filetti con pangrattato, prezzemolo e olio; forno a 200 °C per 15 minuti."
+   "prep": "Copri i filetti con pangrattato, prezzemolo e olio; forno a 200 °C per 15 minuti.",
+   "scongela": "filetti di merluzzo"
   },
   {
    "id": "sgombro",
@@ -405,7 +410,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Lessa il petto 15 minuti in acqua salata, sfilaccialo e condiscilo con olio, limone ed erbe."
+   "prep": "Lessa il petto 15 minuti in acqua salata, sfilaccialo e condiscilo con olio, limone ed erbe.",
+   "anticipo": true
   },
   {
    "id": "polpette_sugo",
@@ -437,7 +443,8 @@
      "u": "g"
     }
    ],
-   "prep": "Impasta macinato, pangrattato e parmigiano, forma le polpette e cuocile 15-18 minuti nella passata."
+   "prep": "Impasta macinato, pangrattato e parmigiano, forma le polpette e cuocile 15-18 minuti nella passata.",
+   "anticipo": true
   },
   {
    "id": "hamburger",
@@ -498,7 +505,8 @@
      "u": "g"
     }
    ],
-   "prep": "Sbatti le uova con parmigiano, sale e pepe, versale in una teglia con carta forno: 200 °C per 15 minuti."
+   "prep": "Sbatti le uova con parmigiano, sale e pepe, versale in una teglia con carta forno: 200 °C per 15 minuti.",
+   "anticipo": true
   },
   {
    "id": "uova_sode",
@@ -515,7 +523,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Uova in acqua bollente per 9 minuti, poi in acqua fredda. Si preparano anche la sera prima."
+   "prep": "Uova in acqua bollente per 9 minuti, poi in acqua fredda. Si preparano anche la sera prima.",
+   "anticipo": true
   },
   {
    "id": "uova_strapazzate",
@@ -651,7 +660,8 @@
      "u": "g"
     }
    ],
-   "prep": "Cuoci per assorbimento (1 parte di riso, 1,5 di acqua) a fuoco basso col coperchio, 12 minuti."
+   "prep": "Cuoci per assorbimento (1 parte di riso, 1,5 di acqua) a fuoco basso col coperchio, 12 minuti.",
+   "anticipo": true
   },
   {
    "id": "farro",
@@ -668,7 +678,8 @@
      "u": "g"
     }
    ],
-   "prep": "Lessalo in acqua salata 15-20 minuti (controlla la confezione), scola e condisci con olio."
+   "prep": "Lessalo in acqua salata 15-20 minuti (controlla la confezione), scola e condisci con olio.",
+   "anticipo": true
   },
   {
    "id": "orzo",
@@ -685,7 +696,8 @@
      "u": "g"
     }
    ],
-   "prep": "Lessalo in acqua salata circa 20-25 minuti, scola e condisci con olio. Si può cuocere la sera prima."
+   "prep": "Lessalo in acqua salata circa 20-25 minuti, scola e condisci con olio. Si può cuocere la sera prima.",
+   "anticipo": true
   },
   {
    "id": "couscous",
@@ -719,7 +731,8 @@
      "u": "g"
     }
    ],
-   "prep": "Cuocilo in acqua salata 10-12 minuti, poi sgranalo."
+   "prep": "Cuocilo in acqua salata 10-12 minuti, poi sgranalo.",
+   "anticipo": true
   },
   {
    "id": "quinoa",
@@ -736,7 +749,8 @@
      "u": "g"
     }
    ],
-   "prep": "Sciacquala bene e cuocila 12-15 minuti in doppio volume d'acqua salata."
+   "prep": "Sciacquala bene e cuocila 12-15 minuti in doppio volume d'acqua salata.",
+   "anticipo": true
   },
   {
    "id": "pane_integrale",
@@ -812,7 +826,8 @@
      "u": "g"
     }
    ],
-   "prep": "A tocchetti in acqua salata 15-20 minuti, condisci con olio, prezzemolo e un pizzico di sale."
+   "prep": "A tocchetti in acqua salata 15-20 minuti, condisci con olio, prezzemolo e un pizzico di sale.",
+   "anticipo": true
   },
   {
    "id": "gnocchi",
@@ -947,7 +962,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Affetta finissimo il cappuccio, unisci la carota grattugiata, condisci con olio, aceto e sale. Regge bene anche ore."
+   "prep": "Affetta finissimo il cappuccio, unisci la carota grattugiata, condisci con olio, aceto e sale. Regge bene anche ore.",
+   "anticipo": true
   },
   {
    "id": "spinaci",
@@ -985,7 +1001,8 @@
      "u": "g"
     }
    ],
-   "prep": "Lessali 10-12 minuti, condisci con olio, sale e un goccio di limone."
+   "prep": "Lessali 10-12 minuti, condisci con olio, sale e un goccio di limone.",
+   "anticipo": true
   },
   {
    "id": "broccoli",
@@ -1011,7 +1028,8 @@
      "u": "g"
     }
    ],
-   "prep": "Cimette al vapore (o in acqua bollente) per 8-10 minuti, condisci con olio e limone."
+   "prep": "Cimette al vapore (o in acqua bollente) per 8-10 minuti, condisci con olio e limone.",
+   "anticipo": true
   },
   {
    "id": "cavolfiore_forno",
@@ -1040,7 +1058,8 @@
      "dispensa": true
     }
    ],
-   "prep": "Cimette con olio, sale e curcuma o paprika, forno a 220 °C per 20-25 minuti."
+   "prep": "Cimette con olio, sale e curcuma o paprika, forno a 220 °C per 20-25 minuti.",
+   "anticipo": true
   },
   {
    "id": "verza_stufata",
@@ -1070,7 +1089,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Verza a striscioline stufata con cipolla, un filo d'olio e un mestolo d'acqua, 15 minuti col coperchio."
+   "prep": "Verza a striscioline stufata con cipolla, un filo d'olio e un mestolo d'acqua, 15 minuti col coperchio.",
+   "anticipo": true
   },
   {
    "id": "radicchio_padella",
@@ -1095,7 +1115,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Tagliato a spicchi e scottato in padella 5-6 minuti con olio e un goccio di aceto balsamico."
+   "prep": "Tagliato a spicchi e scottato in padella 5-6 minuti con olio e un goccio di aceto balsamico.",
+   "anticipo": true
   },
   {
    "id": "zucca_forno",
@@ -1118,7 +1139,8 @@
      "u": "g"
     }
    ],
-   "prep": "A fette sottili con olio, sale e rosmarino, forno a 200 °C per 20 minuti."
+   "prep": "A fette sottili con olio, sale e rosmarino, forno a 200 °C per 20 minuti.",
+   "anticipo": true
   },
   {
    "id": "cavoletti",
@@ -1210,7 +1232,8 @@
      "u": "g"
     }
    ],
-   "prep": "Cuoci il minestrone surgelato in acqua salata 15-20 minuti; ottimo nel termos."
+   "prep": "Cuoci il minestrone surgelato in acqua salata 15-20 minuti; ottimo nel termos.",
+   "anticipo": true
   },
   {
    "id": "zucchine_trifolate",
@@ -1258,7 +1281,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Fette per il lungo sulla piastra, poi olio, menta o basilico."
+   "prep": "Fette per il lungo sulla piastra, poi olio, menta o basilico.",
+   "anticipo": true
   },
   {
    "id": "melanzane_grigliate",
@@ -1281,7 +1305,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Fette sottili sulla piastra, condite con olio, aglio e prezzemolo."
+   "prep": "Fette sottili sulla piastra, condite con olio, aglio e prezzemolo.",
+   "anticipo": true
   },
   {
    "id": "peperoni_padella",
@@ -1304,7 +1329,8 @@
      "u": "pz"
     }
    ],
-   "prep": "A strisce in padella con olio e un pizzico di sale, coperchio, 15 minuti."
+   "prep": "A strisce in padella con olio e un pizzico di sale, coperchio, 15 minuti.",
+   "anticipo": true
   },
   {
    "id": "pomodori",
@@ -1389,7 +1415,8 @@
      "u": "g"
     }
    ],
-   "prep": "Lessa il farro, raffreddalo e uniscilo a ceci, carota a dadini e rucola; olio, limone, sale."
+   "prep": "Lessa il farro, raffreddalo e uniscilo a ceci, carota a dadini e rucola; olio, limone, sale.",
+   "anticipo": true
   },
   {
    "id": "u_pasta_lenticchie",
@@ -1487,7 +1514,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Cuoci il riso e, negli ultimi 5 minuti, piselli e carota a dadini. Raffredda e unisci il tonno."
+   "prep": "Cuoci il riso e, negli ultimi 5 minuti, piselli e carota a dadini. Raffredda e unisci il tonno.",
+   "anticipo": true
   },
   {
    "id": "u_pasta_tonno_broccoli",
@@ -1557,7 +1585,8 @@
      "u": "g"
     }
    ],
-   "prep": "Rosola il pollo a dadini con carota e piselli, unisci al couscous rinvenuto. Buono freddo."
+   "prep": "Rosola il pollo a dadini con carota e piselli, unisci al couscous rinvenuto. Buono freddo.",
+   "anticipo": true
   },
   {
    "id": "u_wrap_pollo",
@@ -1629,7 +1658,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Cuoci zucca e cipolla in poca acqua 15 minuti e frulla; servi con ceci saltati e crostini."
+   "prep": "Cuoci zucca e cipolla in poca acqua 15 minuti e frulla; servi con ceci saltati e crostini.",
+   "anticipo": true
   },
   {
    "id": "u_uova_pomodoro",
@@ -1702,7 +1732,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Lessa l'orzo, raffreddalo e unisci feta, cetriolo e pomodoro a dadini; olio e origano."
+   "prep": "Lessa l'orzo, raffreddalo e unisci feta, cetriolo e pomodoro a dadini; olio e origano.",
+   "anticipo": true
   },
   {
    "id": "u_risotto_zucca",
@@ -1766,7 +1797,8 @@
      "u": "pz"
     }
    ],
-   "prep": "A rondelle, stufati in padella con un filo d'olio e un goccio d'acqua per 10-12 minuti."
+   "prep": "A rondelle, stufati in padella con un filo d'olio e un goccio d'acqua per 10-12 minuti.",
+   "anticipo": true
   },
   {
    "id": "cavolo_nero",
@@ -1791,7 +1823,8 @@
      "u": "g"
     }
    ],
-   "prep": "Togli la costa centrale, sbollenta 4 minuti e salta in padella con olio, aglio e peperoncino."
+   "prep": "Togli la costa centrale, sbollenta 4 minuti e salta in padella con olio, aglio e peperoncino.",
+   "anticipo": true
   },
   {
    "id": "finocchi_arance",
@@ -1850,7 +1883,8 @@
      "u": "g"
     }
    ],
-   "prep": "Cimette lessate 8 minuti, raffreddate e condite con olive, olio, aceto e prezzemolo. Regge bene in schiscetta."
+   "prep": "Cimette lessate 8 minuti, raffreddate e condite con olive, olio, aceto e prezzemolo. Regge bene in schiscetta.",
+   "anticipo": true
   },
   {
    "id": "asparagi",
@@ -1913,7 +1947,8 @@
      "u": "pz"
     }
    ],
-   "prep": "Soffriggi la cipolla, aggiungi cavolo nero a striscioline, ceci e acqua; 15 minuti, frulla metà e servi con il pane tostato. Perfetta nel termos o al microonde."
+   "prep": "Soffriggi la cipolla, aggiungi cavolo nero a striscioline, ceci e acqua; 15 minuti, frulla metà e servi con il pane tostato. Perfetta nel termos o al microonde.",
+   "anticipo": true
   },
   {
    "id": "u_pasta_zucca_ceci",
@@ -1988,7 +2023,8 @@
      "u": "g"
     }
    ],
-   "prep": "Lessa l'orzo e, negli ultimi 6 minuti, le cimette di broccoli; scola, condisci con olio e limone e unisci la feta. Buono freddo o tiepido."
+   "prep": "Lessa l'orzo e, negli ultimi 6 minuti, le cimette di broccoli; scola, condisci con olio e limone e unisci la feta. Buono freddo o tiepido.",
+   "anticipo": true
   },
   {
    "id": "prosciutto_crudo",
@@ -2149,7 +2185,8 @@
      "u": "g"
     }
    ],
-   "prep": "Lessa le patate a cubetti 12 minuti e falle raffreddare; unisci insalata, mais e cotto a listarelle. Condimento a parte."
+   "prep": "Lessa le patate a cubetti 12 minuti e falle raffreddare; unisci insalata, mais e cotto a listarelle. Condimento a parte.",
+   "anticipo": true
   }
  ]
 }

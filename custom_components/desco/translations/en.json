@@ -7,7 +7,9 @@
         "data": {
           "todo_entity": "Shopping list",
           "gemini_api_key": "Gemini API key (optional)",
-          "gemini_model": "Gemini model"
+          "gemini_model": "Gemini model",
+          "notify_services": "Evening reminder notifications",
+          "notify_time": "Reminder time"
         }
       }
     },
@@ -22,7 +24,9 @@
         "data": {
           "todo_entity": "Shopping list",
           "gemini_api_key": "Gemini API key (optional)",
-          "gemini_model": "Gemini model"
+          "gemini_model": "Gemini model",
+          "notify_services": "Evening reminder notifications",
+          "notify_time": "Reminder time"
         }
       }
     }
@@ -41,6 +45,10 @@
     "invia_lista_spesa": {
       "name": "Send shopping list",
       "description": "Adds the menu ingredients to the configured to-do list."
+    },
+    "invia_promemoria": {
+      "name": "Send reminder",
+      "description": "Sends tonight's reminder to the configured phones now."
     }
   }
 }

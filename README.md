@@ -7,6 +7,11 @@ Menu settimanale equilibrato per Home Assistant: per ogni pasto **una proteina, 
 - **Costo e tempo**: budget economico/normale/libero, tempo massimo per piatto, verdure di stagione (filtrate e preferite rispetto a quelle «tutto l'anno»)
 - **Pranzi trasportabili**: a pranzo solo piatti buoni freddi o da scaldare (se c'è il microonde)
 - **Alimenti da non usare**: basta una parola («funghi», «salmone») per escludere ogni piatto che li contiene
+- **Cena doppia → pranzo di domani**: un contorno della cena (cereali, verdure cotte) si cucina doppio e diventa il pranzo di Linda del giorno dopo
+- **Preparazione in anticipo**: cosa cucinare la domenica (per lun–mer) e il mercoledì sera (per gio–ven)
+- **Ricetta completa con Gemini**: per ogni pasto ordine delle operazioni, tempi in parallelo e come sistemarlo nel contenitore
+- **👍 / 👎**: i piatti che vi piacciono escono più spesso, quelli bocciati non vengono più proposti
+- **Promemoria serale** sul telefono: pranzo di domani, cosa cucinare doppio, cosa scongelare, preparazione in anticipo
 - **Trascina e scambia**: sposta un pasto su un altro giorno o tra pranzo e cena (mouse e touch)
 - **Storico**: ogni settimana passata resta consultabile, divisa per mese, e si può riproporre
 - **Lista della spesa**: un tasto invia gli ingredienti della settimana alla To-do di Home Assistant
@@ -45,8 +50,11 @@ Gli aggiornamenti compaiono nella scheda **Installati** del Marketplace. Nella b
 | `sensor.desco_cena_di_oggi` | cena di oggi |
 | `sensor.desco_pranzo_di_domani` | pranzo di domani (utile per prepararlo la sera prima) |
 | `sensor.desco_cena_di_domani` | cena di domani |
+| `sensor.desco_promemoria_di_stasera` | cosa preparare stasera per domani; attributo `testo` con il messaggio completo |
 
-Servizi: `desco.genera_settimana` (`settimana: auto | corrente | prossima`) e `desco.invia_lista_spesa`. Evento `desco_piano_aggiornato` a ogni modifica del menu.
+Servizi: `desco.genera_settimana` (`settimana: auto | corrente | prossima`), `desco.invia_lista_spesa` e `desco.invia_promemoria`.
+
+Il promemoria serale si attiva da Impostazioni → Dispositivi e servizi → Desco → **Configura**: scegli i telefoni (`notify.mobile_app_…`) e l'orario. Non serve nessuna automazione. Evento `desco_piano_aggiornato` a ogni modifica del menu.
 
 ## Esempi
 

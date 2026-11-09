@@ -51,6 +51,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "porzioni_cena": 2,
     "giorni": [0, 1, 2, 3, 4],
     "obiettivi": dict(OBIETTIVI_DEFAULT),
+    "cene_doppie": 2,  # volte a settimana in cui la cena fa anche il pranzo del giorno dopo
 }
 
 
@@ -110,7 +111,8 @@ def obiettivi_scalati(settings: dict, n_pasti: int) -> dict[str, float]:
 
 # --------------------------------------------------------------------------- ricettario
 
-def costruisci_libreria(builtin: list[dict], custom: list[dict], disabilitati: list[str]) -> dict[str, dict]:
+def costruisci_libreria(builtin: list[dict], custom: list[dict], disabilitati: list[str],
+                        voti: dict[str, int] | None = None) -> dict[str, dict]:
     """Unisce componenti integrati e personali; i personali sovrascrivono a parità di id."""
     lib: dict[str, dict] = {}
     for comp in builtin:
@@ -118,8 +120,10 @@ def costruisci_libreria(builtin: list[dict], custom: list[dict], disabilitati: l
     for comp in custom:
         lib[comp["id"]] = {**comp, "origine": comp.get("origine", "personale")}
     off = set(disabilitati or [])
+    voti = voti or {}
     for cid, comp in lib.items():
         comp["attivo"] = cid not in off
+        comp["voto"] = int(voti.get(cid, 0))
     return lib
 
 
@@ -161,7 +165,7 @@ def filtro_base(lib: dict[str, dict], settings: dict, mese: int, rilassa_stagion
     pesi = PESO_COSTO.get(settings.get("budget", "economico"), PESO_COSTO["normale"])
     out = {}
     for cid, comp in lib.items():
-        if not comp.get("attivo", True):
+        if not comp.get("attivo", True) or comp.get("voto", 0) < 0:
             continue
         if _contiene_escluso(comp, esclusi):
             continue
@@ -264,6 +268,8 @@ class Pianificatore:
             peso *= max(0.03, residuo) ** 1.5 + 0.02
             if g == "carne_rossa" and gruppi_prot.get("_carne_rossa", 0) >= MAX_CARNE_ROSSA:
                 peso *= 0.02
+        if comp.get("voto", 0) > 0:
+            peso *= 2.0
         # di stagione: preferiti rispetto a quelli "tutto l'anno" (spesso surgelati)
         stagione = comp.get("stagione")
         if stagione and self.mese in stagione and self.settings.get("solo_stagione", True):
@@ -417,7 +423,8 @@ def genera_settimana(lib: dict[str, dict], settings: dict | None, settimana: dat
         pen = punteggio_piano(pasti, lib, settings)
         if pen < pen_m:
             migliore, avvisi_m, pen_m = pasti, pian.avvisi, pen
-    return migliore or [], sorted(set(avvisi_m))
+    pasti = applica_cene_doppie(migliore or [], lib, settings)
+    return pasti, sorted(set(avvisi_m))
 
 
 def rigenera_pasto(lib: dict[str, dict], settings: dict | None, settimana: date, pasti: list[dict],
@@ -453,7 +460,90 @@ def rigenera_componente(lib: dict[str, dict], settings: dict | None, settimana: 
     return pasti
 
 
-# --------------------------------------------------------------------------- descrizioni
+# --------------------------------------------------------------------------- cucinare una volta, mangiare due
+
+def _per_slot(pasti: list[dict]) -> dict[tuple[int, str], dict]:
+    return {(p["giorno"], p["tipo"]): p for p in pasti}
+
+
+def applica_cene_doppie(pasti: list[dict], lib: dict[str, dict], settings: dict | None) -> list[dict]:
+    """Fa coincidere un contorno (carboidrato o verdura) della cena con il pranzo del giorno dopo.
+
+    Si cucina il doppio a cena e una porzione va nel contenitore di Linda.
+    Le proteine non si toccano, così le proporzioni settimanali restano uguali.
+    """
+    st = unisci_impostazioni(settings)
+    massimo = int(st.get("cene_doppie", 2) or 0)
+    if massimo <= 0:
+        return pasti
+    pasti = [dict(p, componenti=list(p.get("componenti", []))) for p in pasti]
+    slot = _per_slot(pasti)
+    fatte = 0
+    for g in sorted({p["giorno"] for p in pasti}):
+        if fatte >= massimo:
+            break
+        cena, pranzo, cena_dopo = slot.get((g, "cena")), slot.get((g + 1, "pranzo")), slot.get((g + 1, "cena"))
+        if not cena or not pranzo or pranzo.get("bloccato"):
+            continue
+        if any(lib.get(c, {}).get("cat") == "unico" for c in cena["componenti"] + pranzo["componenti"] if c):
+            continue
+        if len(pranzo["componenti"]) != 3:
+            continue
+        carb_dopo = {gruppo_carboidrato(lib.get(c, {})) for c in (cena_dopo or {}).get("componenti", []) if c}
+        for cat in ("carboidrato", "verdura"):
+            pos = CATEGORIE.index(cat)
+            src = next((lib[c] for c in cena["componenti"] if c and lib.get(c, {}).get("cat") == cat), None)
+            if not src or not src.get("anticipo") or not asporto_ok(src, bool(st.get("microonde", True))):
+                continue
+            if cat == "carboidrato" and gruppo_carboidrato(src) in carb_dopo:
+                continue
+            if pranzo["componenti"][pos] == src["id"]:
+                break
+            pranzo["componenti"][pos] = src["id"]
+            fatte += 1
+            break
+    return pasti
+
+
+def legami_avanzi(pasti: list[dict]) -> dict[tuple[int, int], str]:
+    """Per ogni (idx pasto, posizione) indica "doppio" (cena da cucinare doppia) o "avanzo" (pranzo dal giorno prima)."""
+    out: dict[tuple[int, int], str] = {}
+    idx = {(p["giorno"], p["tipo"]): i for i, p in enumerate(pasti)}
+    for i, p in enumerate(pasti):
+        if p["tipo"] != "pranzo":
+            continue
+        j = idx.get((p["giorno"] - 1, "cena"))
+        if j is None:
+            continue
+        cena = pasti[j].get("componenti", [])
+        for pos, cid in enumerate(p.get("componenti", [])):
+            if cid and cid in cena:
+                out[(i, pos)] = "avanzo"
+                out[(j, cena.index(cid))] = "doppio"
+    return out
+
+
+def preparazioni(pasti: list[dict], lib: dict[str, dict]) -> list[dict]:
+    """Cosa si può preparare in anticipo: domenica per lun-mer, mercoledì sera per gio-ven."""
+    legami = legami_avanzi(pasti)
+    voci: dict[tuple[str, str], dict] = {}
+    for i, p in enumerate(pasti):
+        sessione = "domenica" if p["giorno"] <= 2 else "mercoledi"
+        for pos, cid in enumerate(p.get("componenti", [])):
+            comp = lib.get(cid) if cid else None
+            if not comp or not comp.get("anticipo") or int(comp.get("minuti", 0)) < 10:
+                continue
+            if legami.get((i, pos)):
+                continue  # si cucina doppio a cena per il pranzo del giorno dopo
+            porz = int(p.get("porzioni", 1))
+            v = voci.setdefault((sessione, cid), {"id": cid, "nome": comp["nome"], "sessione": sessione,
+                                                 "porzioni": 0, "pasti": [], "minuti": comp.get("minuti", 0)})
+            v["porzioni"] += porz
+            v["pasti"].append(f"{GIORNI[p['giorno']][:3]} {p['tipo']}")
+    return sorted(voci.values(), key=lambda v: (v["sessione"] != "domenica", -v["minuti"]))
+
+
+
 
 def info_pasto(pasto: dict, lib: dict[str, dict]) -> dict:
     """Dettagli leggibili di un pasto; "dettagli" è allineato a "componenti" (posizioni)."""

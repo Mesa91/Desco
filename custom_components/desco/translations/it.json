@@ -7,12 +7,16 @@
         "data": {
           "todo_entity": "Lista della spesa",
           "gemini_api_key": "Chiave API Gemini (facoltativa)",
-          "gemini_model": "Modello Gemini"
+          "gemini_model": "Modello Gemini",
+          "notify_services": "Notifiche del promemoria serale",
+          "notify_time": "Orario del promemoria"
         },
         "data_description": {
           "todo_entity": "Lista To-do dove inviare gli ingredienti della settimana.",
           "gemini_api_key": "Da Google AI Studio (piano gratuito). Serve solo per farsi suggerire piatti nuovi.",
-          "gemini_model": "Per esempio gemini-2.5-flash"
+          "gemini_model": "Per esempio gemini-2.5-flash",
+          "notify_services": "Telefoni a cui mandare ogni sera cosa preparare per domani (es. notify.mobile_app_telefono_di_linda). Lascia vuoto per non ricevere notifiche.",
+          "notify_time": "Ogni sera a quest'ora, se domani c'è qualcosa nel menu."
         }
       }
     },
@@ -27,12 +31,16 @@
         "data": {
           "todo_entity": "Lista della spesa",
           "gemini_api_key": "Chiave API Gemini (facoltativa)",
-          "gemini_model": "Modello Gemini"
+          "gemini_model": "Modello Gemini",
+          "notify_services": "Notifiche del promemoria serale",
+          "notify_time": "Orario del promemoria"
         },
         "data_description": {
           "todo_entity": "Lista To-do dove inviare gli ingredienti della settimana.",
           "gemini_api_key": "Da Google AI Studio (piano gratuito). Serve solo per farsi suggerire piatti nuovi.",
-          "gemini_model": "Per esempio gemini-2.5-flash"
+          "gemini_model": "Per esempio gemini-2.5-flash",
+          "notify_services": "Telefoni a cui mandare ogni sera cosa preparare per domani (es. notify.mobile_app_telefono_di_linda). Lascia vuoto per non ricevere notifiche.",
+          "notify_time": "Ogni sera a quest'ora, se domani c'è qualcosa nel menu."
         }
       }
     }
@@ -51,6 +59,10 @@
     "invia_lista_spesa": {
       "name": "Invia lista della spesa",
       "description": "Aggiunge gli ingredienti del menu alla lista To-do configurata."
+    },
+    "invia_promemoria": {
+      "name": "Invia promemoria",
+      "description": "Manda subito il promemoria di stasera ai telefoni configurati."
     }
   }
 }

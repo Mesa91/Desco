@@ -20,7 +20,10 @@ from . import gemini, planner
 from .const import (
     CONF_GEMINI_KEY,
     CONF_GEMINI_MODEL,
+    CONF_NOTIFY,
+    CONF_NOTIFY_TIME,
     CONF_TODO_ENTITY,
+    DEFAULT_NOTIFY_TIME,
     DEFAULT_GEMINI_MODEL,
     DEFAULT_TODO_ENTITY,
     EVENT_UPDATED,
@@ -78,10 +81,12 @@ class DescoManager:
         self.data.setdefault("storico", [])
         self.data.setdefault("spesa_inviata", [])
         self.data.setdefault("archivio", [])
+        self.data.setdefault("voti", {})
         self._ricostruisci()
 
     def _ricostruisci(self) -> None:
-        self.lib = planner.costruisci_libreria(self.builtin, self.data["custom"], self.data["disabilitati"])
+        self.lib = planner.costruisci_libreria(
+            self.builtin, self.data["custom"], self.data["disabilitati"], self.data.get("voti"))
 
     async def _salva(self, piano_cambiato: bool = False) -> None:
         await self._store.async_save(self.data)
@@ -109,9 +114,17 @@ class DescoManager:
         pasti_info = []
         if piano:
             lun = date.fromisoformat(piano["settimana"])
+            legami = planner.legami_avanzi(piano["pasti"])
             for idx, p in enumerate(piano["pasti"]):
                 g = lun + timedelta(days=p["giorno"])
                 info = planner.info_pasto(p, self.lib)
+                for pos, d in enumerate(info["dettagli"]):
+                    d["legame"] = legami.get((idx, pos))
+                    if d["id"]:
+                        d["voto"] = self.lib[d["id"]].get("voto", 0)
+                        d["scongela"] = self.lib[d["id"]].get("scongela")
+                ric = p.get("ricetta")
+                ricetta_valida = bool(ric and ric.get("firma") == self._firma(p))
                 non_trasp = []
                 if p["tipo"] == "pranzo":
                     non_trasp = [d["nome"] for d in info["dettagli"]
@@ -123,6 +136,7 @@ class DescoManager:
                     "nome_giorno": planner.GIORNI[p["giorno"]],
                     "non_trasportabile": non_trasp,
                     **info,
+                    "ricetta": ric if ricetta_valida else None,
                 })
         oggi = dt_util.now().date()
         return {
@@ -139,6 +153,8 @@ class DescoManager:
             "conteggi": planner.conta_macro(self._pasti(), self.lib) if piano else {},
             "obiettivi_scalati": planner.obiettivi_scalati(self.settings, len(self._pasti()) or 10),
             "archivio": self.data["archivio"],
+            "preparazioni": planner.preparazioni(self._pasti(), self.lib) if piano else [],
+            "notifiche": bool(self.opt(CONF_NOTIFY)),
         }
 
     def pasto_del(self, giorno: date, tipo: str) -> dict | None:
@@ -227,7 +243,7 @@ class DescoManager:
         if da == a:
             return
         pasti = self._pasti()
-        for campo in ("componenti", "bloccato"):
+        for campo in ("componenti", "bloccato", "ricetta"):
             pasti[da][campo], pasti[a][campo] = pasti[a].get(campo), pasti[da].get(campo)
         await self._salva(piano_cambiato=True)
 
@@ -309,6 +325,7 @@ class DescoManager:
         s["porzioni_cena"] = max(1, min(8, int(s["porzioni_cena"])))
         if s["budget"] not in planner.PESO_COSTO:
             s["budget"] = "economico"
+        s["cene_doppie"] = max(0, min(4, int(s.get("cene_doppie", 2) or 0)))
         s["obiettivi"] = {k: max(0, min(10, int(round(float(v)))))
                           for k, v in {**planner.OBIETTIVI_DEFAULT, **(s.get("obiettivi") or {})}.items()
                           if k in planner.OBIETTIVI_DEFAULT}
@@ -346,6 +363,10 @@ class DescoManager:
         }
         if cat == "unico":
             pulito["gruppo_carbo"] = comp.get("gruppo_carbo") or "cereali"
+        if comp.get("anticipo"):
+            pulito["anticipo"] = True
+        if comp.get("scongela"):
+            pulito["scongela"] = str(comp["scongela"])[:60] if isinstance(comp["scongela"], str) else nome.lower()
         if comp.get("stagione"):
             pulito["stagione"] = sorted({int(m) for m in comp["stagione"] if 1 <= int(m) <= 12})
         self.data["custom"] = [c for c in self.data["custom"] if c["id"] != cid] + [pulito]
@@ -364,6 +385,138 @@ class DescoManager:
         self.data["disabilitati"] = sorted(off)
         self._ricostruisci()
         await self._salva()
+
+    # ------------------------------------------------------------------ voti
+
+    async def vota(self, cid: str, voto: int) -> None:
+        if cid not in self.lib:
+            raise HomeAssistantError("Piatto sconosciuto")
+        voti = dict(self.data.get("voti", {}))
+        if voto:
+            voti[cid] = 1 if voto > 0 else -1
+        else:
+            voti.pop(cid, None)
+        self.data["voti"] = voti
+        self._ricostruisci()
+        await self._salva()
+
+    # ------------------------------------------------------------------ ricetta completa
+
+    @staticmethod
+    def _firma(p: dict) -> str:
+        return "|".join(str(c) for c in p.get("componenti", [])) + f"#{p.get('porzioni', 1)}"
+
+    async def ricetta(self, idx: int, rifai: bool = False) -> dict:
+        self._richiedi_piano(idx)
+        p = self._pasti()[idx]
+        vecchia = p.get("ricetta")
+        if vecchia and not rifai and vecchia.get("firma") == self._firma(p):
+            return vecchia
+        info = planner.info_pasto(p, self.lib)
+        legami = planner.legami_avanzi(self._pasti())
+        avanzi = [d["nome"] for pos, d in enumerate(info["dettagli"]) if legami.get((idx, pos)) == "avanzo"]
+        try:
+            r = await gemini.ricetta_pasto(
+                async_get_clientsession(self.hass), self.opt(CONF_GEMINI_KEY, ""),
+                self.opt(CONF_GEMINI_MODEL) or DEFAULT_GEMINI_MODEL,
+                [d for d in info["dettagli"] if d["id"]], int(p.get("porzioni", 1)),
+                p["tipo"] == "pranzo", bool(self.settings["microonde"]), avanzi,
+            )
+        except gemini.GeminiError as err:
+            raise HomeAssistantError(str(err)) from err
+        r["firma"] = self._firma(p)
+        p["ricetta"] = r
+        await self._salva()
+        return r
+
+    # ------------------------------------------------------------------ promemoria serale
+
+    def promemoria(self, oggi: date | None = None) -> dict | None:
+        """Cosa fare stasera per domani. None se domani non c'è nulla nel menu."""
+        oggi = oggi or dt_util.now().date()
+        domani = oggi + timedelta(days=1)
+        piano = self.data.get("piano")
+        if not piano:
+            return None
+        lun = date.fromisoformat(piano["settimana"])
+        pasti = piano["pasti"]
+        legami = planner.legami_avanzi(pasti)
+        idx_di = {(p["giorno"], p["tipo"]): i for i, p in enumerate(pasti)}
+        g_dom = (domani - lun).days
+        g_oggi = (oggi - lun).days
+        if (g_dom, "pranzo") not in idx_di and (g_dom, "cena") not in idx_di:
+            return None
+        righe: list[str] = []
+        breve: list[str] = []
+        nome = lambda cid: self.lib.get(cid, {}).get("nome", cid)  # noqa: E731
+
+        i_pr = idx_di.get((g_dom, "pranzo"))
+        if i_pr is not None:
+            pr = pasti[i_pr]
+            info = planner.info_pasto(pr, self.lib)
+            righe.append(f"🥡 Pranzo di domani: {info['titolo']}")
+            avanzi = [nome(c) for pos, c in enumerate(pr["componenti"]) if legami.get((i_pr, pos)) == "avanzo"]
+            if avanzi:
+                righe.append(f"🍲 Stasera cucina il doppio di: {', '.join(avanzi)} e mettine una porzione nel contenitore")
+                breve.append(f"doppio {', '.join(a.lower() for a in avanzi)}")
+            anticipabili = [nome(c) for pos, c in enumerate(pr["componenti"])
+                            if c and self.lib.get(c, {}).get("anticipo") and legami.get((i_pr, pos)) != "avanzo"]
+            sessione_domani = {0: "domenica", 3: "mercoledi"}.get(domani.weekday())
+            if anticipabili and not sessione_domani:
+                righe.append(f"⏱ Si può preparare già stasera: {', '.join(anticipabili)}")
+                if not breve:
+                    breve.append("prepara " + ", ".join(a.lower() for a in anticipabili))
+        cena_oggi = idx_di.get((g_oggi, "cena"))
+        if cena_oggi is not None:
+            doppi = [nome(c) for pos, c in enumerate(pasti[cena_oggi]["componenti"])
+                     if legami.get((cena_oggi, pos)) == "doppio"]
+            if doppi and not any("doppio" in b for b in breve):
+                righe.append(f"🍲 Stasera cucina il doppio di: {', '.join(doppi)}")
+        da_scongelare = []
+        for tipo in ("pranzo", "cena"):
+            i = idx_di.get((g_dom, tipo))
+            if i is None:
+                continue
+            for c in pasti[i]["componenti"]:
+                sc = self.lib.get(c, {}).get("scongela") if c else None
+                if sc:
+                    da_scongelare.append(f"{sc} (per {'il pranzo' if tipo == 'pranzo' else 'la cena'})")
+        if da_scongelare:
+            righe.append(f"🧊 Sposta dal freezer al frigo: {', '.join(da_scongelare)}")
+            breve.append("scongela " + ", ".join(s.split(" (")[0] for s in da_scongelare))
+        sessione = {0: "domenica", 3: "mercoledi"}.get(domani.weekday())
+        if sessione:
+            prep = [v for v in planner.preparazioni(pasti, self.lib) if v["sessione"] == sessione]
+            if prep:
+                righe.append("👩‍🍳 Preparazione in anticipo: " + ", ".join(
+                    f"{v['nome'].lower()} ({v['porzioni']} porz.)" for v in prep))
+                breve.append("preparazione in anticipo")
+        return {
+            "titolo": f"Desco · domani {planner.GIORNI[domani.weekday()].lower()}",
+            "testo": "\n".join(righe),
+            "breve": ("Stasera: " + " · ".join(breve)) if breve else "Niente da preparare stasera",
+        }
+
+    async def invia_promemoria(self, forza: bool = False) -> dict:
+        servizi = self.opt(CONF_NOTIFY) or []
+        if not servizi:
+            raise HomeAssistantError("Nessun servizio di notifica: sceglilo in Impostazioni → Dispositivi e servizi → Desco → Configura")
+        prom = self.promemoria()
+        if not prom:
+            if not forza:
+                return {"inviato": False}
+            prom = {"titolo": "Desco", "testo": "Domani non c'è nulla nel menu.", "breve": ""}
+        for srv in servizi:
+            dominio, _, nome = srv.partition(".")
+            if dominio != "notify" or not nome:
+                continue
+            await self.hass.services.async_call(
+                "notify", nome, {"title": prom["titolo"], "message": prom["testo"]}, blocking=True)
+        return {"inviato": True, "servizi": servizi}
+
+    def orario_promemoria(self) -> tuple[int, int]:
+        h, m, *_ = (str(self.opt(CONF_NOTIFY_TIME) or DEFAULT_NOTIFY_TIME) + ":0:0").split(":")
+        return int(h), int(m)
 
     # ------------------------------------------------------------------ Gemini
 

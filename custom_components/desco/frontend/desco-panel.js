@@ -190,6 +190,16 @@ class DescoPanel extends HTMLElement {
       case "elimina-arch":
         if (confirm("Eliminare questa settimana dallo storico?")) this._ws("desco/elimina_archivio", { settimana: el.dataset.sett });
         break;
+      case "vota": {
+        const v = Number(el.dataset.val);
+        this._ws("desco/vota", { comp_id: id, voto: v }, {
+          messaggio: v > 0 ? "👍 Lo proporrò più spesso" : v < 0 ? "👎 Non lo proporrò più (cambialo con ⇄ se è nel menu)" : "Voto tolto",
+        });
+        break;
+      }
+      case "ricetta": this._apriRicetta(idx, false); break;
+      case "rifai-ricetta": this._apriRicetta(this.modal?.idx, true); break;
+      case "prova-notifica": this._ws("desco/prova_promemoria", {}, { messaggio: "Promemoria inviato" }); break;
       case "svuota":
         if (confirm("Cancellare il menu della settimana?")) this._ws("desco/svuota");
         break;
@@ -205,7 +215,7 @@ class DescoPanel extends HTMLElement {
     if (t.id === "cerca-scegli" && this.modal) { this.modal.q = t.value; this._renderScegli(); }
     if (t.dataset.out) {
       const o = this.shadowRoot.getElementById(t.dataset.out);
-      if (o) o.textContent = t.dataset.fmt === "pct" ? `${Math.round(t.value * 100)}%` : `${t.value} min`;
+      if (o) o.textContent = t.dataset.fmt === "pct" ? `${Math.round(t.value * 100)}%` : t.dataset.fmt === "num" ? t.value : `${t.value} min`;
     }
   }
 
@@ -245,6 +255,7 @@ class DescoPanel extends HTMLElement {
       quota_piatti_unici: Number(q("quota").value),
       porzioni_pranzo: Number(q("porz_pranzo").value),
       porzioni_cena: Number(q("porz_cena").value),
+      cene_doppie: Number(q("cene_doppie").value),
       obiettivi: Object.fromEntries(MACRO.map(([k]) => [k, Number(q(`ob-${k}`).value) || 0])),
     };
     const r = await this._ws("desco/impostazioni", { settings }, { messaggio: "Preferenze salvate: valgono dalla prossima generazione" });
@@ -278,6 +289,8 @@ class DescoPanel extends HTMLElement {
     comp.costo = Number(q("p-costo").value);
     comp.asporto = q("p-asporto").value;
     comp.prep = q("p-prep").value;
+    comp.anticipo = q("p-anticipo").checked;
+    comp.scongela = q("p-scongela").checked ? (typeof comp.scongela === "string" ? comp.scongela : comp.nome || true) : false;
     comp.stagione = [...this.shadowRoot.querySelectorAll(".mese input:checked")].map((x) => Number(x.value));
     if (comp.stagione.length === 12) comp.stagione = [];
     comp.ingredienti = q("p-ingr").value.split("\n").map((r) => r.trim()).filter(Boolean).map((r) => {
@@ -369,6 +382,7 @@ class DescoPanel extends HTMLElement {
       ${p.avvisi?.length ? `<div class="avviso"><ha-icon icon="mdi:alert-outline"></ha-icon><div>${p.avvisi.map(esc).join("<br>")}<br><small>Prova ad allargare il tempo massimo o a riattivare qualche piatto.</small></div></div>` : ""}
       <div class="nota suggerimento"><ha-icon icon="mdi:gesture-swipe"></ha-icon>Trascina un pasto dalla maniglia <ha-icon icon="mdi:drag"></ha-icon> sopra un altro per scambiarli, anche tra pranzo e cena.</div>
       <section class="griglia">${giorni.map((g) => this._giorno(perGiorno[g])).join("")}</section>
+      ${this._preparazioni()}
       <div class="piede"><button class="link" data-act="svuota">Cancella menu</button></div>`;
   }
 
@@ -408,6 +422,7 @@ class DescoPanel extends HTMLElement {
       <div class="p-azioni">
         <button class="ico ${m.bloccato ? "on" : ""}" data-act="blocca" data-idx="${m.idx}" data-val="${m.bloccato ? 0 : 1}" title="${m.bloccato ? "Sblocca" : "Blocca: resta uguale se rigeneri"}"><ha-icon icon="${m.bloccato ? "mdi:lock" : "mdi:lock-open-variant-outline"}"></ha-icon></button>
         <button class="ico" data-act="rigenera" data-idx="${m.idx}" title="Cambia tutto il pasto" ${m.bloccato ? "disabled" : ""}><ha-icon icon="mdi:refresh"></ha-icon></button>
+        ${this.s.gemini ? `<button class="ico ${m.ricetta ? "on" : ""}" data-act="ricetta" data-idx="${m.idx}" title="Ricetta completa${m.ricetta ? "" : " (Gemini)"}"><ha-icon icon="mdi:chef-hat"></ha-icon></button>` : ""}
       </div>
     </div>`;
   }
@@ -420,7 +435,7 @@ class DescoPanel extends HTMLElement {
     return `<li class="c ${c.id ? "" : "manca"}" style="--cc:${info.color}">
       <div class="c-riga">
         <span class="punto" title="${info.label}"></span>
-        <button class="c-nome" data-act="apri" data-key="${k}">${esc(c.nome)}</button>
+        <button class="c-nome" data-act="apri" data-key="${k}">${esc(c.nome)}${c.legame === "doppio" ? ` <span class="legame" title="Cucinane ${m.porzioni + 1} porzioni: una va nel pranzo di domani">×${m.porzioni + 1}</span>` : ""}${c.legame === "avanzo" ? ` <span class="legame avanzo" title="Cucinato ieri sera insieme alla cena">da ieri sera</span>` : ""}${c.scongela ? ` <span class="legame gelo" title="Da scongelare la sera prima">🧊</span>` : ""}${c.voto > 0 ? ` <span class="cuore" title="Vi piace">👍</span>` : ""}</button>
         ${m.bloccato ? "" : `<span class="c-azioni">
           <button class="mini" data-act="cambia" data-idx="${m.idx}" data-pos="${pos}" title="Un'altra ${info.label.toLowerCase()}"><ha-icon icon="mdi:swap-horizontal"></ha-icon></button>
           <button class="mini" data-act="scegli" data-idx="${m.idx}" data-pos="${pos}" title="Scegli tu"><ha-icon icon="mdi:pencil-outline"></ha-icon></button>
@@ -429,8 +444,69 @@ class DescoPanel extends HTMLElement {
       ${aperto && c.id ? `<div class="c-dett">
         ${ingr ? `<div class="ingr"><ha-icon icon="mdi:basket-outline"></ha-icon><span>${ingr}</span></div>` : ""}
         <p>${esc(c.prep)}</p>
+        ${c.legame === "doppio" ? `<p class="evid">🍲 Cucinane ${m.porzioni + 1} porzioni: una va nel contenitore per il pranzo di domani.</p>` : ""}
+        ${c.legame === "avanzo" ? `<p class="evid">🍲 Avanzato dalla cena di ieri sera: solo da mettere nel contenitore.</p>` : ""}
+        ${c.scongela ? `<p class="evid">🧊 Sposta ${esc(c.scongela)} dal freezer al frigo la sera prima.</p>` : ""}
+        <div class="voti">Vi piace?
+          <button class="mini ${c.voto > 0 ? "on" : ""}" data-act="vota" data-id="${esc(c.id)}" data-val="${c.voto > 0 ? 0 : 1}" title="Sì, proponilo più spesso">👍</button>
+          <button class="mini" data-act="vota" data-id="${esc(c.id)}" data-val="-1" title="No, non proporlo più">👎</button>
+        </div>
       </div>` : ""}
     </li>`;
+  }
+
+  /* ---------- ricetta completa (Gemini) */
+
+  async _apriRicetta(idx, rifai) {
+    this.modal = { tipo: "ricetta", idx, carica: true };
+    this._render();
+    const pasto = this.s.piano.pasti[idx];
+    if (!pasto.ricetta || rifai) {
+      const r = await this._ws("desco/ricetta", { idx, rifai });
+      if (!r) { this.modal = null; this._render(); return; }
+    }
+    if (this.modal?.tipo === "ricetta") { this.modal.carica = false; this._render(); }
+  }
+
+  _modalRicetta() {
+    const m = this.s.piano.pasti[this.modal.idx];
+    const r = m.ricetta;
+    const testa = `<div class="d-testa"><b><ha-icon icon="mdi:chef-hat"></ha-icon> ${esc(m.nome_giorno)} · ${m.tipo === "pranzo" ? "pranzo da portare" : `cena per ${m.porzioni}`}</b><button class="ico" data-act="chiudi"><ha-icon icon="mdi:close"></ha-icon></button></div>`;
+    if (this.modal.carica || !r) {
+      return `<div class="velo"><div class="dialogo largo">${testa}<div class="vuoto piccolo"><div class="loader grande"></div><p class="nota">Gemini sta scrivendo la ricetta…</p></div></div></div>`;
+    }
+    return `<div class="velo"><div class="dialogo largo ric-modal">${testa}
+      <div class="r-titolo">${esc(m.titolo)}</div>
+      ${r.tempo_totale ? `<div class="nota"><ha-icon icon="mdi:timer-outline"></ha-icon> circa ${r.tempo_totale} minuti in tutto</div>` : ""}
+      <h3>Ingredienti</h3><ul class="r-ingr">${r.ingredienti.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+      <h3>Procedimento</h3><ol class="r-passi">${r.passaggi.map((p) => `<li>${esc(p)}</li>`).join("")}</ol>
+      ${r.contenitore ? `<div class="r-box"><ha-icon icon="mdi:food-takeout-box-outline"></ha-icon><div><b>Nel contenitore</b><br>${esc(r.contenitore)}</div></div>` : ""}
+      ${r.consigli ? `<div class="r-box tip"><ha-icon icon="mdi:lightbulb-on-outline"></ha-icon><div>${esc(r.consigli)}</div></div>` : ""}
+      <div class="row fine"><button class="btn piccolo" data-act="rifai-ricetta"><ha-icon icon="mdi:refresh"></ha-icon>Riscrivi</button><button class="btn piccolo primario" data-act="chiudi">Chiudi</button></div>
+    </div></div>`;
+  }
+
+  /* ---------- preparazione in anticipo */
+
+  _preparazioni() {
+    const prep = this.s.preparazioni || [];
+    if (!prep.length) return "";
+    const aperta = this.aperti.has("prep");
+    const sessioni = [["domenica", "Domenica", "per lunedì–mercoledì"], ["mercoledi", "Mercoledì sera", "per giovedì–venerdì"]];
+    return `<section class="card prep ${aperta ? "aperta" : ""}">
+      <button class="arch-testa" data-act="apri" data-key="prep">
+        <ha-icon icon="${aperta ? "mdi:chevron-down" : "mdi:chevron-right"}"></ha-icon>
+        <ha-icon icon="mdi:pot-steam-outline"></ha-icon><b>Preparazione in anticipo</b>
+        <span class="nota">${prep.length} cose da cucinare prima, si conservano in frigo</span>
+      </button>
+      ${aperta ? `<div class="arch-corpo prep-corpo">${sessioni.map(([k, l, sub]) => {
+        const voci = prep.filter((v) => v.sessione === k);
+        if (!voci.length) return "";
+        return `<div class="sessione"><div class="s-tit"><b>${l}</b> <span class="nota">${sub}</span></div>
+          ${voci.map((v) => `<div class="voce"><span>${esc(v.nome)} <span class="nota">· ${v.pasti.map(esc).join(", ")}</span></span><span class="q">${v.porzioni} porz.</span></div>`).join("")}</div>`;
+      }).join("")}
+      <p class="nota">I contorni da cucinare doppi a cena (badge «×») non sono in elenco: li fai la sera prima.</p></div>` : ""}
+    </section>`;
   }
 
   /* ---------- trascinamento (mouse e touch) */
@@ -606,7 +682,7 @@ class DescoPanel extends HTMLElement {
       const info = CAT[c.cat];
       const bloccatoDa = esclusi.find((e) => norm(c.nome).includes(e) || (c.ingredienti || []).some((i) => norm(i.nome).includes(e)));
       const mio = c.origine !== "integrato";
-      return `<div class="ricetta ${c.attivo ? "" : "spento"}" style="--cc:${info.color}">
+      return `<div class="ricetta ${c.attivo && c.voto >= 0 ? "" : "spento"}" style="--cc:${info.color}">
         <div class="r-testa">
           <span class="r-cat"><ha-icon icon="${info.icon}"></ha-icon>${info.label}${c.gruppo ? ` · ${GRUPPI[c.gruppo] || esc(c.gruppo)}` : ""}</span>
           <label class="switch" title="${c.attivo ? "Attivo" : "Disattivato"}"><input type="checkbox" ${c.attivo ? "checked" : ""} data-act="attiva" data-id="${esc(c.id)}" data-val="${c.attivo ? 0 : 1}"><span></span></label>
@@ -617,9 +693,15 @@ class DescoPanel extends HTMLElement {
           <span class="costo">${euro(c.costo)}</span>
           <span title="${ASPORTO[c.asporto]?.label}"><ha-icon icon="${ASPORTO[c.asporto]?.icon}"></ha-icon>${ASPORTO[c.asporto]?.label}</span>
           ${c.stagione?.length ? `<span><ha-icon icon="mdi:calendar-blank-outline"></ha-icon>${this._stagione(c.stagione)}</span>` : ""}
+          ${c.anticipo ? `<span title="Si può preparare in anticipo"><ha-icon icon="mdi:pot-steam-outline"></ha-icon>Anticipabile</span>` : ""}
+          ${c.scongela ? `<span title="Da scongelare la sera prima">🧊 Scongelare</span>` : ""}
         </div>
         ${bloccatoDa ? `<div class="r-escl"><ha-icon icon="mdi:cancel"></ha-icon>Escluso: contiene «${esc(bloccatoDa)}»</div>` : ""}
+        ${c.voto < 0 ? `<div class="r-escl"><ha-icon icon="mdi:thumb-down-outline"></ha-icon>Bocciato: non viene più proposto</div>` : ""}
         <div class="r-azioni">
+          <button class="mini ${c.voto > 0 ? "on" : ""}" data-act="vota" data-id="${esc(c.id)}" data-val="${c.voto > 0 ? 0 : 1}" title="Vi piace: proponilo più spesso">👍</button>
+          <button class="mini ${c.voto < 0 ? "on" : ""}" data-act="vota" data-id="${esc(c.id)}" data-val="${c.voto < 0 ? 0 : -1}" title="${c.voto < 0 ? "Togli il voto negativo" : "Non vi piace: non proporlo più"}">👎</button>
+          <span class="spazio"></span>
           ${mio ? `<button class="mini" data-act="modifica" data-id="${esc(c.id)}" title="Modifica"><ha-icon icon="mdi:pencil-outline"></ha-icon></button>
                    <button class="mini" data-act="elimina" data-id="${esc(c.id)}" title="Elimina"><ha-icon icon="mdi:delete-outline"></ha-icon></button>`
                 : `<button class="mini" data-act="duplica" data-id="${esc(c.id)}" title="Crea una tua versione"><ha-icon icon="mdi:content-copy"></ha-icon></button>`}
@@ -704,6 +786,17 @@ class DescoPanel extends HTMLElement {
           <div class="nota">Quanto spesso proporre un piatto unico (es. pasta e lenticchie) al posto di tre componenti.</div>
           <input type="range" id="quota" min="0" max="0.8" step="0.1" value="${s.quota_piatti_unici}" data-out="o-quota" data-fmt="pct">
         </div>
+        <div class="campo">
+          <label>Cene doppie a settimana <output id="o-doppie">${s.cene_doppie ?? 2}</output></label>
+          <div class="nota">Quante volte un contorno della cena (cereali, verdure cotte) si cucina doppio per diventare il pranzo del giorno dopo. 0 = mai.</div>
+          <input type="range" id="cene_doppie" min="0" max="4" step="1" value="${s.cene_doppie ?? 2}" data-out="o-doppie" data-fmt="num">
+        </div>
+        <div class="campo riga">
+          <div><label>Promemoria serale</label><div class="nota">${this.s.notifiche
+            ? "Ogni sera arriva sul telefono cosa preparare per domani: pranzo, cene doppie, cosa scongelare e la preparazione in anticipo."
+            : "Per ricevere ogni sera cosa preparare per domani, scegli i telefoni in Impostazioni → Dispositivi e servizi → Desco → Configura."}</div></div>
+          ${this.s.notifiche ? `<button class="btn piccolo" data-act="prova-notifica"><ha-icon icon="mdi:bell-ring-outline"></ha-icon>Prova</button>` : ""}
+        </div>
         <div class="campo due">
           <div><label>Porzioni a pranzo</label><input type="number" id="porz_pranzo" min="1" max="8" value="${s.porzioni_pranzo}"></div>
           <div><label>Porzioni a cena</label><input type="number" id="porz_cena" min="1" max="8" value="${s.porzioni_cena}"></div>
@@ -715,6 +808,7 @@ class DescoPanel extends HTMLElement {
   /* ---------- modali */
 
   _modal() {
+    if (this.modal.tipo === "ricetta") return this._modalRicetta();
     if (this.modal.tipo === "scegli") {
       const m = this.modal;
       return `<div class="velo"><div class="dialogo">
@@ -739,6 +833,10 @@ class DescoPanel extends HTMLElement {
         <label>Costo<select id="p-costo">${[1, 2, 3].map((n) => `<option value="${n}" ${n === c.costo ? "selected" : ""}>${euro(n)}</option>`).join("")}</select></label>
         <label>Asporto<select id="p-asporto">${Object.entries(ASPORTO).map(([k, v]) => `<option value="${k}" ${k === c.asporto ? "selected" : ""}>${v.label}</option>`).join("")}</select></label>
         <div class="full"><span class="lab">Stagione</span><div class="mesi">${MESI.map((m, i) => `<label class="mese"><input type="checkbox" value="${i + 1}" ${st.has(i + 1) ? "checked" : ""}><span>${m}</span></label>`).join("")}</div></div>
+        <div class="full flags">
+          <label class="check"><input type="checkbox" id="p-anticipo" ${c.anticipo ? "checked" : ""}> Si può preparare in anticipo (si conserva 3-4 giorni in frigo)</label>
+          <label class="check"><input type="checkbox" id="p-scongela" ${c.scongela ? "checked" : ""}> Va scongelato la sera prima</label>
+        </div>
         <label class="full">Ingredienti per 1 persona <small>— una riga per ingrediente: <code>nome; quantità; unità</code> (g, ml, pz) oppure <code>nome; dispensa</code></small>
           <textarea id="p-ingr" rows="5" placeholder="ceci lessati; 120; g&#10;olio extravergine; dispensa">${esc(ingr)}</textarea></label>
         <label class="full">Preparazione<textarea id="p-prep" rows="3">${esc(c.prep || "")}</textarea></label>
@@ -751,6 +849,7 @@ class DescoPanel extends HTMLElement {
     // conserva quanto scritto e ridisegna i campi che dipendono dalla categoria
     const q = (id) => this.shadowRoot.getElementById(id);
     Object.assign(this.modal.comp, {
+      anticipo: q("p-anticipo").checked, scongela: q("p-scongela").checked ? (this.modal.comp.scongela || true) : false,
       nome: q("p-nome").value, cat, gruppo: null, minuti: Number(q("p-minuti").value),
       costo: Number(q("p-costo").value), asporto: q("p-asporto").value, prep: q("p-prep").value,
       ingredienti: q("p-ingr").value.split("\n").filter((r) => r.trim()).map((r) => {
@@ -895,6 +994,27 @@ h1 { font-size:clamp(22px,3vw,30px); margin:2px 0 8px; font-weight:650; letter-s
 .arch th ha-icon { --mdc-icon-size:14px; }
 .arch td { padding:6px 8px; border-top:1px solid var(--linea); vertical-align:top; }
 .arch-c { display:flex; align-items:center; gap:6px; line-height:1.5; }
+.legame { font-size:11px; font-weight:700; padding:1px 6px; border-radius:6px; background:color-mix(in srgb, #e9a93b 22%, transparent); color:#c98a17; white-space:nowrap; }
+.legame.avanzo { background:color-mix(in srgb, #5fa86c 22%, transparent); color:#4a9157; }
+.legame.gelo { background:color-mix(in srgb, #4aa3df 22%, transparent); }
+.cuore { font-size:11px; }
+.evid { color:var(--testo); }
+.voti { display:flex; align-items:center; gap:2px; margin-top:6px; }
+.mini.on { background:color-mix(in srgb, var(--primary-color) 18%, transparent); }
+.spazio { flex:1; }
+.r-azioni { align-items:center; gap:2px; }
+.prep { margin-top:16px; padding:0; }
+.prep-corpo .sessione { margin-bottom:12px; }
+.s-tit { margin:6px 0 2px; }
+.flags { display:flex !important; flex-direction:column; gap:6px; font-weight:400 !important; }
+.flags .check { font-weight:400; flex-direction:row !important; }
+.vuoto.piccolo { height:auto; padding:40px 0; display:flex; flex-direction:column; align-items:center; gap:12px; }
+.ric-modal h3 { margin:14px 0 6px; font-size:15px; }
+.r-titolo { font-weight:650; font-size:16px; }
+.r-ingr, .r-passi { margin:0; padding-left:22px; line-height:1.55; font-size:14px; }
+.r-passi li { margin-bottom:6px; }
+.r-box { display:flex; gap:10px; margin-top:12px; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--primary-color) 10%, transparent); font-size:14px; line-height:1.45; }
+.r-box.tip { background:color-mix(in srgb, #e9a93b 14%, transparent); }
 .lista-spesa { columns:2 280px; column-gap:32px; }
 .voce { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--linea); break-inside:avoid; }
 
