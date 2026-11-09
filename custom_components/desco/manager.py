@@ -26,6 +26,7 @@ from .const import (
     EVENT_UPDATED,
     STORAGE_KEY,
     STORAGE_VERSION,
+    trova_lista_spesa,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -56,7 +57,8 @@ class DescoManager:
 
     @property
     def todo_entity(self) -> str:
-        return self.opt(CONF_TODO_ENTITY) or DEFAULT_TODO_ENTITY
+        scelta = self.opt(CONF_TODO_ENTITY) or DEFAULT_TODO_ENTITY
+        return trova_lista_spesa(self.hass, scelta) or scelta
 
     @property
     def settings(self) -> dict:

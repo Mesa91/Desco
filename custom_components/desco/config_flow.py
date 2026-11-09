@@ -17,16 +17,12 @@ from .const import (
     DEFAULT_TODO_ENTITY,
     DOMAIN,
     NAME,
+    trova_lista_spesa,
 )
 
 
 def _lista_predefinita(hass, valori: dict[str, Any]) -> str | None:
-    """Una lista To-do che esiste davvero: quella salvata, la Lista della spesa di HA o la prima trovata."""
-    for eid in (valori.get(CONF_TODO_ENTITY), DEFAULT_TODO_ENTITY):
-        if eid and hass.states.get(eid):
-            return eid
-    liste = hass.states.async_entity_ids("todo")
-    return sorted(liste)[0] if liste else None
+    return trova_lista_spesa(hass, valori.get(CONF_TODO_ENTITY))
 
 
 def _schema(hass, valori: dict[str, Any]) -> vol.Schema:
