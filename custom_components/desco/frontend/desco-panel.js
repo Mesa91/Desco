@@ -834,7 +834,7 @@ class DescoPanel extends HTMLElement {
           <label class="switch"><input type="checkbox" id="microonde" ${s.microonde ? "checked" : ""}><span></span></label>
         </div>
         <div class="campo riga">
-          <div><label>A pranzo niente zuppe e minestre</label><div class="nota">Minestrone, vellutate, pasta e fagioli: scomodi nel contenitore, solo a cena.</div></div>
+          <div><label>A pranzo niente piatti liquidi</label><div class="nota">Zuppe, minestre, vellutate, pasta e fagioli, piatti in umido o al sugo: scomodi nel contenitore, solo a cena.</div></div>
           <label class="switch"><input type="checkbox" id="pranzo_niente_brodi" ${s.pranzo_niente_brodi !== false ? "checked" : ""}><span></span></label>
         </div>
         <div class="campo riga">

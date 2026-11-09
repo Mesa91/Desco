@@ -57,7 +57,8 @@
     }
    ],
    "prep": "Soffriggi la cipolla tritata, aggiungi passata e lenticchie scolate, cuoci 10 minuti e regola di sale.",
-   "anticipo": true
+   "anticipo": true,
+   "brodoso": true
   },
   {
    "id": "polpette_ceci",
@@ -444,7 +445,8 @@
     }
    ],
    "prep": "Impasta macinato, pangrattato e parmigiano, forma le polpette e cuocile 15-18 minuti nella passata.",
-   "anticipo": true
+   "anticipo": true,
+   "brodoso": true
   },
   {
    "id": "hamburger",
