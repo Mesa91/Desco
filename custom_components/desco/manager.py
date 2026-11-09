@@ -155,6 +155,7 @@ class DescoManager:
             "archivio": self.data["archivio"],
             "preparazioni": planner.preparazioni(self._pasti(), self.lib) if piano else [],
             "notifiche": bool(self.opt(CONF_NOTIFY)),
+            "promemoria": self.promemoria() if piano else None,
         }
 
     def pasto_del(self, giorno: date, tipo: str) -> dict | None:

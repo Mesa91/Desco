@@ -1,10 +1,10 @@
 /* Desco — pannello Home Assistant per il menu settimanale. Nessuna dipendenza esterna. */
 
 const CAT = {
-  proteina: { label: "Proteina", color: "#e07a5f", icon: "mdi:food-drumstick" },
-  carboidrato: { label: "Carboidrato", color: "#e9a93b", icon: "mdi:barley" },
-  verdura: { label: "Verdura", color: "#5fa86c", icon: "mdi:leaf" },
-  unico: { label: "Piatto unico", color: "#8c7ae6", icon: "mdi:bowl-mix" },
+  proteina: { label: "Proteina", color: "#ff8a65", icon: "mdi:food-drumstick" },
+  carboidrato: { label: "Carboidrato", color: "#ffcc66", icon: "mdi:barley" },
+  verdura: { label: "Verdura", color: "#6ee7a8", icon: "mdi:leaf" },
+  unico: { label: "Piatto unico", color: "#b49cff", icon: "mdi:bowl-mix" },
 };
 const GRUPPI = {
   legumi: "Legumi", pesce: "Pesce", carne_bianca: "Carne bianca", carne_rossa: "Carne rossa",
@@ -18,12 +18,23 @@ const GRUPPI_CAT = {
   unico: ["legumi", "pesce", "carne_bianca", "carne_rossa", "uova", "latticini", "salumi"],
 };
 const MACRO = [
-  ["legumi", "Legumi", "mdi:seed-outline"],
-  ["pesce", "Pesce", "mdi:fish"],
-  ["carne", "Carne", "mdi:food-steak"],
-  ["uova", "Uova", "mdi:egg-outline"],
-  ["salumi_formaggi", "Salumi e formaggi", "mdi:cheese"],
+  ["legumi", "Legumi", "mdi:seed-outline", "#ff8a65"],
+  ["pesce", "Pesce", "mdi:fish", "#4fc3f7"],
+  ["carne", "Carne", "mdi:food-steak", "#ff6f91"],
+  ["uova", "Uova", "mdi:egg-outline", "#ffcc66"],
+  ["salumi_formaggi", "Salumi e formaggi", "mdi:cheese", "#c4d3df"],
 ];
+const TABS = [
+  ["settimana", "Settimana", "mdi:calendar-week"],
+  ["spesa", "Spesa", "mdi:cart-outline"],
+  ["storico", "Storico", "mdi:history"],
+  ["ricettario", "Ricettario", "mdi:book-open-variant"],
+  ["preferenze", "Preferenze", "mdi:tune-variant"],
+];
+/* titolo di sezione come nella dashboard: icona, maiuscolo, linea che sfuma */
+const sez = (icon, testo, extra = "") => `<div class="sez"><ha-icon icon="${icon}"></ha-icon><h2>${testo}</h2><span class="sez-linea"></span>${extra}</div>`;
+const pillBtn = (act, icon, testo, attrs = "", primario = false) =>
+  `<button class="pbtn ${primario ? "primario" : ""}" data-act="${act}" ${attrs}><span class="badge-ic"><ha-icon icon="${icon}"></ha-icon></span>${testo}</button>`;
 const ASPORTO = {
   freddo: { label: "Buono freddo", icon: "mdi:snowflake" },
   caldo: { label: "Da scaldare", icon: "mdi:microwave" },
@@ -310,21 +321,15 @@ class DescoPanel extends HTMLElement {
     if (this.drag) { this._renderDopo = true; return; }
     const r = this.shadowRoot;
     const scroll = r.querySelector(".contenuto")?.scrollTop || 0;
-    r.innerHTML = `<style>${STILE}</style>
+    r.innerHTML = `<style>${STILE}${STILE_A}</style>
       <div class="app">
         <header class="toolbar">
           <ha-menu-button></ha-menu-button>
-          <div class="logo"><ha-icon icon="mdi:silverware-fork-knife"></ha-icon><span>Desco</span></div>
-          <nav class="tabs">${[
-            ["settimana", "Settimana", "mdi:calendar-week"],
-            ["spesa", "Spesa", "mdi:cart-outline"],
-            ["storico", "Storico", "mdi:history"],
-            ["ricettario", "Ricettario", "mdi:book-open-variant"],
-            ["preferenze", "Preferenze", "mdi:tune-variant"],
-          ].map(([k, l, i]) => `<button class="tab ${this.tab === k ? "on" : ""}" data-act="tab" data-tab="${k}"><ha-icon icon="${i}"></ha-icon><span>${l}</span></button>`).join("")}</nav>
+          <div class="logo"><span>Desco</span></div>
           ${this.busy ? `<div class="loader"></div>` : ""}
         </header>
         <main class="contenuto">${this.s ? this._vista() : `<div class="vuoto"><div class="loader grande"></div></div>`}</main>
+        <nav class="dock" aria-label="Sezioni di Desco">${TABS.map(([k, l, i]) => `<button class="dock-b ${this.tab === k ? "on" : ""}" data-act="tab" data-tab="${k}" title="${l}" aria-label="${l}"><ha-icon icon="${i}"></ha-icon></button>`).join("")}</nav>
         ${this.modal ? this._modal() : ""}
         ${this.toast ? `<div class="toast ${this.toast.errore ? "err" : ""}">${esc(this.toast.testo)}</div>` : ""}
       </div>`;
@@ -366,19 +371,14 @@ class DescoPanel extends HTMLElement {
     p.pasti.forEach((m) => { (perGiorno[m.giorno] ||= []).push(m); });
     const giorni = Object.keys(perGiorno).map(Number).sort();
     const prossima = pred !== lun;
+    const settimana = `${fmtData(lun, { day: "numeric" })} – ${fmtData(ven, { day: "numeric", month: "short" })}`;
     return `
-      <section class="intesta">
-        <div>
-          <div class="sopra">Menu della settimana</div>
-          <h1>${fmtData(lun, { day: "numeric" })} – ${fmtData(ven, { day: "numeric", month: "long" })}</h1>
-          ${this._riepilogo()}
-        </div>
-        <div class="azioni">
-          <button class="btn" data-act="genera" data-sett="${lun}" title="Rigenera tutto tranne i pasti bloccati"><ha-icon icon="mdi:dice-multiple-outline"></ha-icon>Rigenera</button>
-          ${prossima ? `<button class="btn" data-act="genera" data-sett="${pred}"><ha-icon icon="mdi:calendar-arrow-right"></ha-icon>Settimana del ${fmtData(pred)}</button>` : ""}
-          <button class="btn primario" data-act="spesa"><ha-icon icon="mdi:cart-arrow-down"></ha-icon>Lista spesa</button>
-        </div>
-      </section>
+      ${this._chipsStato(settimana)}
+      ${sez("mdi:silverware-fork-knife", "Menu della settimana", `<div class="sez-azioni">
+        ${pillBtn("genera", "mdi:shuffle-variant", "Rigenera", `data-sett="${lun}" title="Rigenera tutto tranne i pasti bloccati"`)}
+        ${prossima ? pillBtn("genera", "mdi:calendar-arrow-right", `Settimana del ${fmtData(pred)}`, `data-sett="${pred}"`) : ""}
+        ${pillBtn("spesa", "mdi:cart-outline", `Lista spesa · ${(this.s.spesa || []).length}`, "", true)}
+      </div>`)}
       ${p.avvisi?.length ? `<div class="avviso"><ha-icon icon="mdi:alert-outline"></ha-icon><div>${p.avvisi.map(esc).join("<br>")}<br><small>Prova ad allargare il tempo massimo o a riattivare qualche piatto.</small></div></div>` : ""}
       <div class="nota suggerimento"><ha-icon icon="mdi:gesture-swipe"></ha-icon>Trascina un pasto dalla maniglia <ha-icon icon="mdi:drag"></ha-icon> sopra un altro per scambiarli, anche tra pranzo e cena.</div>
       <section class="griglia">${giorni.map((g) => this._giorno(perGiorno[g])).join("")}</section>
@@ -386,15 +386,16 @@ class DescoPanel extends HTMLElement {
       <div class="piede"><button class="link" data-act="svuota">Cancella menu</button></div>`;
   }
 
-  _riepilogo() {
+  _chipsStato(settimana) {
     const cont = this.s.conteggi || {};
     const ob = this.s.settings.obiettivi || {};
-    const sc = this.s.obiettivi_scalati || {};
-    return `<div class="pillole">${MACRO.map(([k, l, i]) => {
-      const n = cont[k] || 0;
-      const ok = Math.abs(n - (sc[k] || 0)) <= 0.6;
-      return `<span class="pill ${ok ? "" : "fuori"}" title="Obiettivo: ${ob[k] ?? 0} a settimana"><ha-icon icon="${i}"></ha-icon>${l} <b>${n}</b><small>/${ob[k] ?? 0}</small></span>`;
-    }).join("")}</div>`;
+    const chip = (col, label, val, title = "") => `<span class="chip-s" title="${esc(title)}"><span class="chip-ic" style="--cc:${col}"><span></span></span><span><small>${label}</small><b>${val}</b></span></span>`;
+    const prom = this.s.promemoria;
+    return `<div class="chips-stato">
+      <span class="chip-s"><span class="chip-ic ic"><ha-icon icon="mdi:calendar-week"></ha-icon></span><span><small>Settimana</small><b>${settimana}</b></span></span>
+      ${MACRO.filter(([k]) => (ob[k] || 0) > 0 || cont[k]).map(([k, l, , col]) => chip(col, l, `${cont[k] || 0} / ${ob[k] ?? 0}`, `Obiettivo: ${ob[k] ?? 0} a settimana`)).join("")}
+      ${prom && prom.breve && !/^Niente/.test(prom.breve) ? chip("#8fdcff", "Stasera", esc(prom.breve.replace(/^Stasera: /, "")), prom.testo) : ""}
+    </div>`;
   }
 
   _giorno(pasti) {
@@ -413,9 +414,9 @@ class DescoPanel extends HTMLElement {
     return `<div class="pasto ${m.bloccato ? "bloccato" : ""}" data-pasto="${m.idx}">
       <div class="p-testa">
         <span class="maniglia" data-drag="${m.idx}" title="Trascina per spostare"><ha-icon icon="mdi:drag"></ha-icon></span>
-        <ha-icon class="p-icona" icon="${pranzo ? "mdi:food-takeout-box-outline" : "mdi:silverware-variant"}"></ha-icon>
+        <span class="badge-ic"><ha-icon icon="${pranzo ? "mdi:food-takeout-box-outline" : "mdi:silverware-fork-knife"}"></ha-icon></span>
         <div class="p-tit"><b>${pranzo ? "Pranzo" : "Cena"}</b><span>${sotto}</span></div>
-        <div class="p-meta"><span title="Tempo di preparazione"><ha-icon icon="mdi:timer-outline"></ha-icon>${m.minuti}′</span><span class="costo" title="Costo">${euro(m.costo)}</span></div>
+        <div class="p-meta"><span title="Tempo di preparazione"><ha-icon icon="mdi:timer-outline"></ha-icon>${m.minuti}′</span><b class="costo" title="Costo">${euro(m.costo)}</b></div>
       </div>
       ${m.non_trasportabile?.length ? `<div class="avviso-mini"><ha-icon icon="mdi:alert-outline"></ha-icon>Poco adatto da portare: ${m.non_trasportabile.map(esc).join(", ")}</div>` : ""}
       <ul class="comp">${m.dettagli.map((c, pos) => this._componente(m, c, pos)).join("")}</ul>
@@ -491,22 +492,15 @@ class DescoPanel extends HTMLElement {
   _preparazioni() {
     const prep = this.s.preparazioni || [];
     if (!prep.length) return "";
-    const aperta = this.aperti.has("prep");
-    const sessioni = [["domenica", "Domenica", "per lunedì–mercoledì"], ["mercoledi", "Mercoledì sera", "per giovedì–venerdì"]];
-    return `<section class="card prep ${aperta ? "aperta" : ""}">
-      <button class="arch-testa" data-act="apri" data-key="prep">
-        <ha-icon icon="${aperta ? "mdi:chevron-down" : "mdi:chevron-right"}"></ha-icon>
-        <ha-icon icon="mdi:pot-steam-outline"></ha-icon><b>Preparazione in anticipo</b>
-        <span class="nota">${prep.length} cose da cucinare prima, si conservano in frigo</span>
-      </button>
-      ${aperta ? `<div class="arch-corpo prep-corpo">${sessioni.map(([k, l, sub]) => {
-        const voci = prep.filter((v) => v.sessione === k);
-        if (!voci.length) return "";
-        return `<div class="sessione"><div class="s-tit"><b>${l}</b> <span class="nota">${sub}</span></div>
-          ${voci.map((v) => `<div class="voce"><span>${esc(v.nome)} <span class="nota">· ${v.pasti.map(esc).join(", ")}</span></span><span class="q">${v.porzioni} porz.</span></div>`).join("")}</div>`;
-      }).join("")}
-      <p class="nota">I contorni da cucinare doppi a cena (badge «×») non sono in elenco: li fai la sera prima.</p></div>` : ""}
-    </section>`;
+    const nomi = { domenica: "Domenica", mercoledi: "Mercoledì sera" };
+    const colore = (id) => (CAT[this._comp(id)?.cat] || CAT.verdura).color;
+    return `${sez("mdi:pot-steam-outline", "Preparazione in anticipo")}
+      <div class="prep-griglia">${prep.map((v) => `<div class="prep-pill">
+        <span class="badge-ic"><span class="glow" style="--cc:${colore(v.id)}"></span></span>
+        <div class="prep-t"><b>${esc(v.nome)}</b><small>${nomi[v.sessione] || ""} · per ${v.pasti.map(esc).join(", ").toLowerCase()}</small></div>
+        <span class="prep-q">${v.porzioni} porz.</span>
+      </div>`).join("")}</div>
+      <p class="nota">Si conservano in frigo 3-4 giorni. I contorni con «×» non sono in elenco: si cucinano doppi a cena la sera prima.</p>`;
   }
 
   /* ---------- trascinamento (mouse e touch) */
@@ -926,8 +920,8 @@ h1 { font-size:clamp(22px,3vw,30px); margin:2px 0 8px; font-weight:650; letter-s
 .avviso a { color:var(--primary-color); }
 .avviso { display:flex; gap:10px; padding:12px 14px; border-radius:12px; margin-bottom:16px; background:color-mix(in srgb, var(--warning-color,#f4b400) 14%, transparent); font-size:14px; }
 
-.griglia { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:14px; align-items:start; }
-@media (min-width:1400px) { .griglia { grid-template-columns:repeat(5, 1fr); } }
+.griglia { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap:14px; align-items:start; }
+@media (min-width:1400px) { .griglia { grid-template-columns:repeat(5, minmax(0, 1fr)); } }
 .giorno { background:var(--carta); border:1px solid var(--linea); border-radius:var(--raggio); padding:14px; display:flex; flex-direction:column; gap:10px; }
 .giorno.oggi { border-color:var(--primary-color); box-shadow:0 0 0 1px var(--primary-color), 0 6px 20px color-mix(in srgb, var(--primary-color) 18%, transparent); }
 .g-testa { display:flex; align-items:baseline; gap:8px; }
@@ -1101,6 +1095,77 @@ input.inline { border:1px dashed var(--linea); border-radius:999px; padding:6px 
   .tab { padding:8px 10px; }
   .intesta .azioni { width:100%; }
   .cerca { min-width:0; width:100%; }
+}
+`;
+
+/* ---------- stile «Vetro blu» come la dashboard Home 3D ---------- */
+const STILE_A = `
+:host { --sfondo:#071321; --carta:rgba(9,24,39,0.78); --testo:#e8f1f8; --tenue:#8aa4b8; --linea:rgba(120,190,255,0.13);
+  --primary-color:#3fb8f5; --accento:#4fc3f7; --badge:#0d2b45; --pill:rgba(5,15,26,0.82); --raggio:26px; }
+.app { background: radial-gradient(120% 90% at 50% 0%, #0d2d48 0%, #0a1f33 45%, #071321 100%); color:var(--testo); }
+.toolbar { background:#141a21; border-bottom:1px solid rgba(255,255,255,0.06); color:#e8f1f8; min-height:52px; }
+.logo { font-weight:500; font-size:20px; }
+.contenuto { padding-bottom:120px; }
+.card, .giorno, .ricetta, .dialogo, .cerca, .chip, .btn, select, input[type=number], .form input, textarea { border-color:var(--linea); }
+.card, .ricetta { background:var(--carta); border-radius:var(--raggio); }
+.dialogo { background:#0b1c2d; border:1px solid var(--linea); }
+.btn { background:var(--pill); border-radius:999px; color:var(--testo); }
+.btn.primario, .pbtn.primario { background:#12557f; border-color:#2b8fcc; color:#fff; }
+.sopra { color:var(--accento); }
+.chips-stato { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:22px; }
+.chip-s { display:inline-flex; align-items:center; gap:8px; padding:6px 14px 6px 7px; border-radius:999px; background:rgba(8,22,36,0.88); border:1px solid rgba(120,190,255,0.14); font-size:12px; line-height:1.15; max-width:360px; }
+.chip-s small { display:block; color:var(--tenue); font-size:10px; }
+.chip-s b { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chip-ic { width:24px; height:24px; border-radius:50%; background:color-mix(in srgb, var(--cc) 16%, transparent); display:grid; place-items:center; flex:none; }
+.chip-ic span { width:8px; height:8px; border-radius:50%; background:var(--cc); box-shadow:0 0 8px var(--cc); }
+.chip-ic.ic { background:var(--badge); color:var(--accento); } .chip-ic ha-icon { --mdc-icon-size:14px; }
+.sez { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:6px 0 16px; }
+.sez > ha-icon { color:var(--accento); --mdc-icon-size:22px; }
+.sez h2 { margin:0; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.sez-linea { flex:1 1 80px; height:4px; border-radius:4px; background:linear-gradient(90deg, #2b7fb8 0%, rgba(43,127,184,0.12) 100%); }
+.sez-azioni { display:flex; gap:8px; flex-wrap:wrap; }
+.pbtn { display:inline-flex; align-items:center; gap:8px; padding:6px 16px 6px 6px; min-height:44px; border-radius:999px; background:var(--pill); border:1px solid rgba(120,190,255,0.16); color:var(--testo); font-weight:600; font-size:14px; }
+.pbtn:hover { border-color:rgba(120,190,255,0.35); }
+.badge-ic { width:36px; height:36px; border-radius:50%; background:var(--badge); color:var(--accento); display:grid; place-items:center; flex:none; }
+.badge-ic ha-icon { --mdc-icon-size:19px; }
+.pbtn .badge-ic { width:32px; height:32px; } .pbtn.primario .badge-ic { background:#1b6fa3; color:#fff; }
+.badge-ic .glow { width:10px; height:10px; border-radius:50%; background:var(--cc); box-shadow:0 0 10px var(--cc); }
+.griglia { gap:16px; }
+.giorno { background:rgba(9,24,39,0.72); border-radius:26px; padding:16px 14px 14px; }
+.giorno.oggi { border-color:#3fb8f5; box-shadow:0 0 0 1px rgba(63,184,245,0.4), 0 10px 40px rgba(63,184,245,0.18); }
+.g-testa { padding:0 6px; } .g-nome { font-weight:800; } .badge-oggi { color:var(--accento); font-weight:800; }
+.pasto { background:var(--pill); border:1px solid rgba(120,190,255,0.10); border-radius:22px; padding:10px 10px 4px; }
+.pasto.bloccato { background:color-mix(in srgb, #3fb8f5 10%, var(--pill)); border-color:rgba(63,184,245,0.35); }
+.p-testa { gap:10px; } .p-tit b { font-size:14px; }
+.costo { color:#6ee7a8; }
+.punto { box-shadow:0 0 8px var(--cc); }
+.legame { background:rgba(255,204,102,0.16); color:#ffd27a; border-radius:999px; }
+.legame.avanzo { background:rgba(110,231,168,0.14); color:#7ff0b6; }
+.prep-griglia { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
+.prep-pill { display:flex; align-items:center; gap:12px; padding:9px 16px 9px 9px; border-radius:999px; background:var(--carta); border:1px solid var(--linea); }
+.prep-t { display:flex; flex-direction:column; line-height:1.25; min-width:0; } .prep-t small { color:var(--tenue); font-size:12px; }
+.prep-q { margin-left:auto; color:var(--accento); font-weight:700; font-size:13px; white-space:nowrap; }
+.dock { position:absolute; left:50%; bottom:16px; transform:translateX(-50%); display:flex; gap:8px; padding:10px; border-radius:22px; background:rgba(16,21,28,0.95); border:1px solid rgba(255,255,255,0.06); box-shadow:0 10px 30px rgba(0,0,0,0.4); z-index:5; }
+.dock-b { width:56px; height:56px; border-radius:16px; border:0; background:none; color:#c4d3df; display:grid; place-items:center; }
+.dock-b ha-icon { --mdc-icon-size:24px; }
+.dock-b:hover { background:rgba(255,255,255,0.05); }
+.dock-b.on { background:#135a80; color:#8fdcff; }
+.app { position:relative; }
+.p-tit { min-width:0; flex:1 1 auto; } .p-tit span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.p-meta { margin-left:0; flex:none; white-space:nowrap; display:flex; align-items:center; gap:8px; }
+.p-meta span { display:inline-flex; align-items:center; }
+.costo { white-space:nowrap; }
+.suggerimento { flex-wrap:wrap; }
+@media (hover:none) { .suggerimento { display:block; } .suggerimento ha-icon { vertical-align:middle; } }
+.pill { background:rgba(8,22,36,0.85); }
+.avviso { background:rgba(255,204,102,0.10); border:1px solid rgba(255,204,102,0.25); border-radius:18px; }
+.toast { background:#0d2b45; border:1px solid var(--linea); }
+.segmenti button, .prop { background:var(--pill); border-color:var(--linea); }
+.switch span { background:rgba(255,255,255,0.15); }
+@media (max-width:700px) {
+  .dock { left:12px; right:12px; transform:none; justify-content:space-between; }
+  .dock-b { width:50px; height:50px; }
+  .sez-azioni { width:100%; }
 }
 `;
 
