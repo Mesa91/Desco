@@ -365,6 +365,7 @@ class DescoManager:
             s["budget"] = "economico"
         s["cene_doppie"] = max(0, min(4, int(s.get("cene_doppie", 2) or 0)))
         s["pranzo_solo_tonno"] = bool(s.get("pranzo_solo_tonno", True))
+        s["pranzo_niente_brodi"] = bool(s.get("pranzo_niente_brodi", True))
         s["obiettivi"] = {k: max(0, min(10, int(round(float(v)))))
                           for k, v in {**planner.OBIETTIVI_DEFAULT, **(s.get("obiettivi") or {})}.items()
                           if k in planner.OBIETTIVI_DEFAULT}
@@ -404,6 +405,8 @@ class DescoManager:
             pulito["gruppo_carbo"] = comp.get("gruppo_carbo") or "cereali"
         if comp.get("anticipo"):
             pulito["anticipo"] = True
+        if comp.get("brodoso"):
+            pulito["brodoso"] = True
         if comp.get("scongela"):
             pulito["scongela"] = str(comp["scongela"])[:60] if isinstance(comp["scongela"], str) else nome.lower()
         if comp.get("stagione"):

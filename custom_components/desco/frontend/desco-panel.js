@@ -291,6 +291,7 @@ class DescoPanel extends HTMLElement {
       microonde: q("microonde").checked,
       solo_stagione: q("solo_stagione").checked,
       pranzo_solo_tonno: q("pranzo_solo_tonno").checked,
+      pranzo_niente_brodi: q("pranzo_niente_brodi").checked,
       quota_piatti_unici: Number(q("quota").value),
       porzioni_pranzo: Number(q("porz_pranzo").value),
       porzioni_cena: Number(q("porz_cena").value),
@@ -329,6 +330,7 @@ class DescoPanel extends HTMLElement {
     comp.asporto = q("p-asporto").value;
     comp.prep = q("p-prep").value;
     comp.anticipo = q("p-anticipo").checked;
+    comp.brodoso = q("p-brodoso").checked;
     comp.scongela = q("p-scongela").checked ? (typeof comp.scongela === "string" ? comp.scongela : comp.nome || true) : false;
     comp.stagione = [...this.shadowRoot.querySelectorAll(".mese input:checked")].map((x) => Number(x.value));
     if (comp.stagione.length === 12) comp.stagione = [];
@@ -723,6 +725,7 @@ class DescoPanel extends HTMLElement {
       (cat === "tutti" || c.cat === cat) &&
       (!soloAsporto || c.asporto === "freddo" || (c.asporto === "caldo" && this.s.settings.microonde)) &&
       (!soloAsporto || !this.s.settings.pranzo_solo_tonno || c.gruppo !== "pesce" || (c.ingredienti || []).some((i) => norm(i.nome).includes("tonno"))) &&
+      (!soloAsporto || !c.brodoso || this.s.settings.pranzo_niente_brodi === false) &&
       (!t || norm(c.nome).includes(t) || (c.ingredienti || []).some((i) => norm(i.nome).includes(t))));
   }
 
@@ -746,6 +749,7 @@ class DescoPanel extends HTMLElement {
           <span title="${ASPORTO[c.asporto]?.label}"><ha-icon icon="${ASPORTO[c.asporto]?.icon}"></ha-icon>${ASPORTO[c.asporto]?.label}</span>
           ${c.stagione?.length ? `<span><ha-icon icon="mdi:calendar-blank-outline"></ha-icon>${this._stagione(c.stagione)}</span>` : ""}
           ${c.anticipo ? `<span title="Si può preparare in anticipo"><ha-icon icon="mdi:pot-steam-outline"></ha-icon>Anticipabile</span>` : ""}
+          ${c.brodoso ? `<span title="Zuppa o piatto brodoso: solo a cena"><ha-icon icon="mdi:bowl-outline"></ha-icon>Brodoso</span>` : ""}
           ${c.scongela ? `<span title="Da scongelare la sera prima">🧊 Scongelare</span>` : ""}
         </div>
         ${bloccatoDa ? `<div class="r-escl"><ha-icon icon="mdi:cancel"></ha-icon>Escluso: contiene «${esc(bloccatoDa)}»</div>` : ""}
@@ -830,6 +834,10 @@ class DescoPanel extends HTMLElement {
           <label class="switch"><input type="checkbox" id="microonde" ${s.microonde ? "checked" : ""}><span></span></label>
         </div>
         <div class="campo riga">
+          <div><label>A pranzo niente zuppe e minestre</label><div class="nota">Minestrone, vellutate, pasta e fagioli: scomodi nel contenitore, solo a cena.</div></div>
+          <label class="switch"><input type="checkbox" id="pranzo_niente_brodi" ${s.pranzo_niente_brodi !== false ? "checked" : ""}><span></span></label>
+        </div>
+        <div class="campo riga">
           <div><label>A pranzo, come pesce solo tonno in scatola</label><div class="nota">Merluzzo, sgombro, salmone e gamberi solo a cena.</div></div>
           <label class="switch"><input type="checkbox" id="pranzo_solo_tonno" ${s.pranzo_solo_tonno !== false ? "checked" : ""}><span></span></label>
         </div>
@@ -892,6 +900,7 @@ class DescoPanel extends HTMLElement {
         <div class="full flags">
           <label class="check"><input type="checkbox" id="p-anticipo" ${c.anticipo ? "checked" : ""}> Si può preparare in anticipo (si conserva 3-4 giorni in frigo)</label>
           <label class="check"><input type="checkbox" id="p-scongela" ${c.scongela ? "checked" : ""}> Va scongelato la sera prima</label>
+          <label class="check"><input type="checkbox" id="p-brodoso" ${c.brodoso ? "checked" : ""}> È una zuppa o un piatto brodoso (non per il pranzo da portare)</label>
         </div>
         <label class="full">Ingredienti per 1 persona <small>— una riga per ingrediente: <code>nome; quantità; unità</code> (g, ml, pz) oppure <code>nome; dispensa</code></small>
           <textarea id="p-ingr" rows="5" placeholder="ceci lessati; 120; g&#10;olio extravergine; dispensa">${esc(ingr)}</textarea></label>
@@ -905,7 +914,7 @@ class DescoPanel extends HTMLElement {
     // conserva quanto scritto e ridisegna i campi che dipendono dalla categoria
     const q = (id) => this.shadowRoot.getElementById(id);
     Object.assign(this.modal.comp, {
-      anticipo: q("p-anticipo").checked, scongela: q("p-scongela").checked ? (this.modal.comp.scongela || true) : false,
+      anticipo: q("p-anticipo").checked, brodoso: q("p-brodoso").checked, scongela: q("p-scongela").checked ? (this.modal.comp.scongela || true) : false,
       nome: q("p-nome").value, cat, gruppo: null, minuti: Number(q("p-minuti").value),
       costo: Number(q("p-costo").value), asporto: q("p-asporto").value, prep: q("p-prep").value,
       ingredienti: q("p-ingr").value.split("\n").filter((r) => r.trim()).map((r) => {

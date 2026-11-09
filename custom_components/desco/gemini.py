@@ -40,7 +40,7 @@ def _prompt(cat: str, quanti: int, settings: dict, mese: int, esistenti: list[st
         settings.get("budget", "economico"), "economico")
     gruppi = GRUPPI.get(cat, GRUPPI["proteina"])
     asporto = (
-        "Devono essere adatti a un pranzo da portare al lavoro in un contenitore "
+        "Devono essere adatti a un pranzo da portare al lavoro in un contenitore, quindi niente zuppe, minestre o piatti brodosi "
         + ("(c'è il microonde)." if settings.get("microonde", True) else "(NON c'è il microonde: solo cose buone fredde).")
         if per_asporto else "Sono per la cena a casa."
     )
@@ -55,7 +55,7 @@ Vincoli:
 Quantità degli ingredienti PER UNA PERSONA, in g, ml o pz. Olio, sale, spezie ed erbe vanno marcati "dispensa": true senza quantità.
 Rispondi SOLO con un array JSON di oggetti con questi campi:
 {{"nome": str, "gruppo": uno tra {gruppi}{', "gruppo_carbo": uno tra ' + str(GRUPPI['carboidrato']) if cat == 'unico' else ''},
- "minuti": int, "costo": 1|2|3, "asporto": "freddo"|"caldo"|"no",
+ "minuti": int, "costo": 1|2|3, "asporto": "freddo"|"caldo"|"no", "brodoso": true se è una zuppa/minestra/vellutata,
  "ingredienti": [{{"nome": str, "q": number, "u": "g"|"ml"|"pz"}} oppure {{"nome": str, "dispensa": true}}],
  "prep": "istruzioni in 1-2 frasi"}}"""
 
@@ -91,6 +91,8 @@ def _pulisci(raw: Any, cat: str) -> dict | None:
         "prep": str(raw.get("prep", ""))[:500],
         "origine": "gemini",
     }
+    if raw.get("brodoso"):
+        comp["brodoso"] = True
     if cat == "unico":
         comp["gruppo_carbo"] = raw.get("gruppo_carbo") if raw.get("gruppo_carbo") in GRUPPI["carboidrato"] else "cereali"
     return comp

@@ -136,3 +136,14 @@ def test_pranzo_pesce_solo_tonno():
     assert not P.pesce_ok_a_pranzo(L["merluzzo_limone"], {})
     assert P.pesce_ok_a_pranzo(L["u_riso_tonno"], {})
     assert P.pesce_ok_a_pranzo(L["merluzzo_limone"], {"pranzo_solo_tonno": False})
+
+
+def test_pranzo_niente_brodi():
+    L = lib()
+    for seed in range(30):
+        pasti, _ = P.genera_settimana(L, {}, NOVEMBRE, seed=seed, tentativi=10)
+        for p in pasti:
+            if p["tipo"] == "pranzo":
+                assert not any(L[c].get("brodoso") for c in p["componenti"]), p
+    assert not P.pesce_ok_a_pranzo(L["minestrone"], {})
+    assert P.pesce_ok_a_pranzo(L["minestrone"], {"pranzo_niente_brodi": False})

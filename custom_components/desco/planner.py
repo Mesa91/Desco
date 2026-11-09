@@ -53,6 +53,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "obiettivi": dict(OBIETTIVI_DEFAULT),
     "cene_doppie": 2,  # volte a settimana in cui la cena fa anche il pranzo del giorno dopo
     "pranzo_solo_tonno": True,  # a pranzo, come pesce, solo tonno in scatola
+    "pranzo_niente_brodi": True,  # a pranzo niente zuppe, minestre e piatti brodosi
 }
 
 
@@ -190,8 +191,11 @@ def gruppo_carboidrato(comp: dict) -> str | None:
 
 
 def pesce_ok_a_pranzo(comp: dict, settings: dict | None) -> bool:
-    """Con «solo tonno a pranzo», un piatto di pesce va bene a pranzo solo se il pesce è tonno."""
-    if not unisci_impostazioni(settings).get("pranzo_solo_tonno", True):
+    """Regole extra per il pranzo da portare: niente brodi e, come pesce, solo tonno."""
+    st = unisci_impostazioni(settings)
+    if comp.get("brodoso") and st.get("pranzo_niente_brodi", True):
+        return False
+    if not st.get("pranzo_solo_tonno", True):
         return True
     if gruppo_proteico(comp) != "pesce":
         return True
@@ -542,7 +546,8 @@ def applica_cene_doppie(pasti: list[dict], lib: dict[str, dict], settings: dict 
         for cat in ("carboidrato", "verdura"):
             pos = CATEGORIE.index(cat)
             src = next((lib[c] for c in cena["componenti"] if c and lib.get(c, {}).get("cat") == cat), None)
-            if not src or not src.get("anticipo") or not asporto_ok(src, bool(st.get("microonde", True))):
+            if (not src or not src.get("anticipo") or not asporto_ok(src, bool(st.get("microonde", True)))
+                    or not pesce_ok_a_pranzo(src, st)):
                 continue
             if cat == "carboidrato" and gruppo_carboidrato(src) in carb_dopo:
                 continue
