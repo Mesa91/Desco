@@ -29,8 +29,14 @@ jobs:
           VERSION: ${{ steps.v.outputs.version }}
         run: |
           if gh release view "v$VERSION" >/dev/null 2>&1; then
-            echo "La release v$VERSION esiste già"
-            exit 0
+            TAG_SHA=$(git ls-remote origin "refs/tags/v$VERSION" | cut -f1)
+            if [ "$TAG_SHA" = "$GITHUB_SHA" ]; then
+              echo "La release v$VERSION esiste già"
+              exit 0
+            fi
+            # stesso numero di versione ma codice nuovo (es. una versione ritirata e rifatta): la release si sostituisce
+            echo "Sostituisco la release v$VERSION (era su $TAG_SHA)"
+            gh release delete "v$VERSION" --yes --cleanup-tag
           fi
           NOTE=$(git log -1 --pretty=%B | sed '/^Co-Authored-By:/d;/^Claude-Session:/d')
           gh release create "v$VERSION" --target "$GITHUB_SHA" --title "Desco $VERSION" --notes "$NOTE"

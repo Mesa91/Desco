@@ -145,7 +145,12 @@ class DescoPanel extends HTMLElement {
       case "annulla": this.toast = null; this._ws("desco/annulla", {}, { messaggio: "Annullato: menu com'era prima" }); break;
       case "in-casa": this._ws("desco/dispensa", { azione: el.dataset.val === "1" ? "aggiungi" : "togli", nome: el.dataset.nome }); break;
       case "togli-dispensa": this._ws("desco/dispensa", { azione: "togli", nome: el.dataset.nome }); break;
-      case "svuota-dispensa": if (confirm("Svuotare la dispensa?")) this._ws("desco/dispensa", { azione: "svuota" }); break;
+      case "svuota-dispensa": this._conferma("Vuoi svuotare la dispensa?").then((ok) => ok && this._ws("desco/dispensa", { azione: "svuota" })); break;
+      case "conferma-si": case "conferma-no": {
+        const r = this._risolvi; this._risolvi = null; this.modal = null; this._render();
+        if (r) r(a === "conferma-si");
+        break;
+      }
       case "genera": {
         const piano = this.s.piano;
         if (piano && el.dataset.sett === piano.settimana) {
@@ -154,7 +159,9 @@ class DescoPanel extends HTMLElement {
           if (!liberi) { this._toast("Tutti i pasti sono bloccati: sblocca quelli da cambiare", true); break; }
           const msg = `Rigenerare ${liberi} pasti della settimana?` +
             (bloccati ? `\n${bloccati} ${bloccati === 1 ? "pasto bloccato resta" : "pasti bloccati restano"} uguali.` : "\nPer tenerne qualcuno, bloccalo prima con il lucchetto.");
-          if (!confirm(msg)) break;
+          const sett = el.dataset.sett;
+          this._conferma(`Vuoi rigenerare ${liberi} pasti?`, msg.split("\n")[1] || "").then((ok) => ok && this._ws("desco/genera", { settimana: sett }, { messaggio: "Menu generato", annullabile: true }));
+          break;
         }
         this._ws("desco/genera", { settimana: el.dataset.sett }, { messaggio: "Menu generato", annullabile: true });
         break;
@@ -198,7 +205,7 @@ class DescoPanel extends HTMLElement {
         break;
       }
       case "elimina":
-        if (confirm("Eliminare questo piatto dal ricettario?")) this._ws("desco/elimina_componente", { comp_id: id }, { messaggio: "Piatto eliminato" });
+        this._conferma("Vuoi eliminare questo piatto dal ricettario?").then((ok) => ok && this._ws("desco/elimina_componente", { comp_id: id }, { messaggio: "Piatto eliminato" }));
         break;
       case "salva-piatto": this._salvaPiatto(); break;
       case "suggerisci": this._suggerisci(); break;
@@ -216,12 +223,14 @@ class DescoPanel extends HTMLElement {
       case "budget": this._bozzaSet("budget", el.dataset.val); break;
       case "salva-pref": this._salvaPreferenze(); break;
       case "riusa":
-        if (confirm(`Riproporre questa settimana come menu del ${fmtData(this.s.settimana_predefinita)}? Il menu attuale di quella settimana verrà sostituito.`)) {
-          this._ws("desco/riusa", { settimana: el.dataset.sett }, { messaggio: "Settimana riproposta", annullabile: true }).then((r) => { if (r) { this.tab = "settimana"; this._render(); } });
+        {
+          const sett = el.dataset.sett;
+          this._conferma(`Vuoi riproporre questa settimana per il ${fmtData(this.s.settimana_predefinita)}?`, "Il menu attuale di quella settimana verrà sostituito.").then((ok) => ok &&
+            this._ws("desco/riusa", { settimana: sett }, { messaggio: "Settimana riproposta", annullabile: true }).then((r) => { if (r) { this.tab = "settimana"; this._render(); } }));
         }
         break;
       case "elimina-arch":
-        if (confirm("Eliminare questa settimana dallo storico?")) this._ws("desco/elimina_archivio", { settimana: el.dataset.sett });
+        { const sett = el.dataset.sett; this._conferma("Vuoi eliminare questa settimana dallo storico?").then((ok) => ok && this._ws("desco/elimina_archivio", { settimana: sett })); }
         break;
       case "vota": {
         const v = Number(el.dataset.val);
@@ -234,9 +243,18 @@ class DescoPanel extends HTMLElement {
       case "rifai-ricetta": this._apriRicetta(this.modal?.idx, true); break;
       case "prova-notifica": this._ws("desco/prova_promemoria", {}, { messaggio: "Promemoria inviato" }); break;
       case "svuota":
-        if (confirm("Cancellare il menu della settimana?")) this._ws("desco/svuota", {}, { messaggio: "Menu cancellato", annullabile: true });
+        this._conferma("Vuoi cancellare il menu della settimana?").then((ok) => ok && this._ws("desco/svuota", {}, { messaggio: "Menu cancellato", annullabile: true }));
         break;
     }
+  }
+
+  /* finestra di conferma come quella nativa di Home Assistant (es. «Vuoi aprire il cancello?») */
+  _conferma(testo, dettaglio = "") {
+    if (this._risolvi) this._risolvi(false);
+    this.modal = { tipo: "conferma", testo, dettaglio };
+    this._render();
+    this.shadowRoot.querySelector(".conf-si")?.focus();
+    return new Promise((r) => { this._risolvi = r; });
   }
 
   get modalIdx() { return this.modal?.idx; }
@@ -253,6 +271,7 @@ class DescoPanel extends HTMLElement {
   }
 
   _keydown(e) {
+    if (this.modal?.tipo === "conferma" && e.key === "Escape") { this._click({ target: { closest: () => ({ dataset: { act: "conferma-no" } }) } }); return; }
     if (e.target.id === "nuova-dispensa" && e.key === "Enter") {
       const v = e.target.value.trim();
       if (v) { this._focus = "nuova-dispensa"; this._ws("desco/dispensa", { azione: "aggiungi", nome: v }); }
@@ -872,6 +891,13 @@ class DescoPanel extends HTMLElement {
   /* ---------- modali */
 
   _modal() {
+    if (this.modal.tipo === "conferma") {
+      return `<div class="velo conf-velo" data-act="conferma-no"><div class="conf" data-act="noop" role="alertdialog" aria-modal="true" aria-labelledby="conf-t">
+        <div id="conf-t" class="conf-testo">${esc(this.modal.testo)}</div>
+        ${this.modal.dettaglio ? `<div class="conf-sotto">${esc(this.modal.dettaglio)}</div>` : ""}
+        <div class="conf-azioni"><button class="conf-btn" data-act="conferma-no">No</button><button class="conf-btn conf-si" data-act="conferma-si">Sì</button></div>
+      </div></div>`;
+    }
     if (this.modal.tipo === "ricetta") return this._modalRicetta();
     if (this.modal.tipo === "scegli") {
       const m = this.modal;
@@ -1222,6 +1248,14 @@ const STILE_A = `
 .dock-b:hover { background:rgba(255,255,255,0.05); }
 .dock-b.on { background:#135a80; color:#8fdcff; }
 .app { position:relative; }
+.conf-velo { background:rgba(0,0,0,0.55); z-index:40; }
+.conf { width:min(400px, calc(100vw - 32px)); background:var(--ha-dialog-surface-background, var(--mdc-theme-surface, #1e2228)); color:var(--primary-text-color, #e8f1f8);
+  border-radius:var(--ha-dialog-border-radius, 28px); padding:24px 24px 16px; box-shadow:0 12px 40px rgba(0,0,0,0.5); font-family:var(--ha-font-family-body, inherit); }
+.conf-testo { font-size:16px; line-height:1.5; }
+.conf-sotto { font-size:14px; line-height:1.45; color:var(--secondary-text-color, #9aa4ad); margin-top:8px; }
+.conf-azioni { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
+.conf-btn { border:0; background:none; color:var(--ha-primary, #03a9f4); font-weight:500; font-size:14px; letter-spacing:.02em; padding:10px 14px; min-width:64px; border-radius:20px; }
+.conf-btn:hover, .conf-btn:focus-visible { background:rgba(3,169,244,0.10); outline:none; }
 .toast { display:flex; align-items:center; gap:12px; bottom:104px; }
 .toast-btn { border:0; background:rgba(79,195,247,0.18); color:#8fdcff; border-radius:999px; padding:6px 12px 6px 8px; font-weight:700; display:inline-flex; align-items:center; gap:4px; }
 .toast-btn ha-icon { --mdc-icon-size:16px; }
