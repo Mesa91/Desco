@@ -15,13 +15,18 @@ Menu settimanale equilibrato per Home Assistant: per ogni pasto **una proteina, 
 
 ## Installazione
 
-1. HACS → menu ⋮ → **Repository personalizzati** → aggiungi l'URL di questo repository, categoria **Integrazione**
-2. Installa **Desco** e riavvia Home Assistant
-3. Impostazioni → Dispositivi e servizi → **Aggiungi integrazione** → Desco
-   - scegli la lista To-do per la spesa (di solito `todo.shopping_list`)
+Da Home Assistant 2026.11 (Marketplace integrato):
+
+1. Impostazioni → **Marketplace** → **Aggiungi da link** (in alto a destra)
+2. Incolla `https://github.com/Mesa91/Desco` (tipo **Integrazione**; serve il collegamento a GitHub)
+3. Apri **Desco** → **Installa** e riavvia Home Assistant
+4. Impostazioni → Dispositivi e servizi → **Aggiungi integrazione** → Desco
+   - la lista della spesa viene trovata da sola (si può cambiare da **Configura**)
    - la chiave Gemini è facoltativa (si può aggiungere dopo da **Configura**)
 
-Nella barra laterale compare **Desco**.
+Su Home Assistant 2026.10 o precedenti: HACS → Repository personalizzati → stesso URL, categoria Integrazione.
+
+Gli aggiornamenti compaiono nella scheda **Installati** del Marketplace. Nella barra laterale compare **Desco**.
 
 ## Uso
 
