@@ -41,6 +41,7 @@ class PastoSensor(SensorEntity):
         self._mgr = mgr
         self._tipo = tipo
         self._offset = offset
+        self._chiave = chiave
         self._attr_unique_id = f"{entry_id}_{chiave}"
         self._attr_name = nome
         self._attr_icon = icona
@@ -66,8 +67,10 @@ class PastoSensor(SensorEntity):
     def extra_state_attributes(self) -> dict:
         p = self._pasto()
         if not p:
-            return {}
+            return {"desco": self._chiave}
         return {
+            "desco": self._chiave,
+            "voci": [{"nome": c["nome"], "cat": c["cat"], "legame": None} for c in p["dettagli"] if c["id"]],
             "componenti": [c["nome"] for c in p["dettagli"] if c["id"]],
             "preparazione": {c["nome"]: c["prep"] for c in p["dettagli"] if c["id"]},
             "minuti": p["minuti"],
@@ -91,4 +94,4 @@ class PromemoriaSensor(PastoSensor):
     @property
     def extra_state_attributes(self) -> dict:
         p = self._mgr.promemoria()
-        return {"testo": p["testo"], "titolo": p["titolo"]} if p else {}
+        return {"desco": "promemoria_sera", **({"testo": p["testo"], "titolo": p["titolo"]} if p else {})}

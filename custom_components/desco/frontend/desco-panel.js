@@ -85,14 +85,28 @@ class DescoPanel extends HTMLElement {
 
   /* ------------------------------------------------------------------ dati */
 
-  async _ws(type, payload = {}, { messaggio } = {}) {
+  /* ricettario e storico sono pesanti: si chiedono al server solo quando servono */
+  _servono() {
+    const con = [];
+    if (this.tab === "ricettario" || this.modal?.tipo === "scegli" || this.modal?.tipo === "piatto") con.push("ricettario");
+    if (this.tab === "storico") con.push("archivio");
+    return con;
+  }
+
+  async _ws(type, payload = {}, { messaggio, annullabile } = {}) {
     if (!this._hass) return null;
     this.busy = true;
     this._render();
     try {
-      const r = await this._hass.callWS({ type, ...payload });
+      const r = await this._hass.callWS({ type, ...payload, con: this._servono() });
+      if (r.ricettario) this.ric = r.ricettario;
+      else if (type !== "desco/stato" && this.ric && /vota|attiva|componente|elimina|dispensa/.test(type)) this.ric = null;
+      if (r.archivio) this.arch = r.archivio;
       this.s = r;
-      if (messaggio) this._toast(typeof messaggio === "function" ? messaggio(r.risultato) : messaggio);
+      if (messaggio || annullabile) {
+        const t = messaggio ? (typeof messaggio === "function" ? messaggio(r.risultato) : messaggio) : "Menu cambiato";
+        this._toast(t, false, !!annullabile);
+      }
       return r;
     } catch (err) {
       this._toast(err?.message || String(err), true);
@@ -103,10 +117,10 @@ class DescoPanel extends HTMLElement {
     }
   }
 
-  _toast(testo, errore = false) {
-    this.toast = { testo, errore };
+  _toast(testo, errore = false, annulla = false) {
+    this.toast = { testo, errore, annulla };
     clearTimeout(this._tt);
-    this._tt = setTimeout(() => { this.toast = null; this._render(); }, errore ? 6000 : 3500);
+    this._tt = setTimeout(() => { this.toast = null; this._render(); }, errore ? 6000 : annulla ? 8000 : 3500);
     this._render();
   }
 
@@ -123,7 +137,15 @@ class DescoPanel extends HTMLElement {
     const pos = el.dataset.pos !== undefined ? Number(el.dataset.pos) : null;
     const id = el.dataset.id;
     switch (a) {
-      case "tab": this.tab = el.dataset.tab; this.modal = null; this._render(); break;
+      case "tab":
+        this.tab = el.dataset.tab; this.modal = null;
+        if ((this.tab === "ricettario" && !this.ric) || this.tab === "storico") this._ws("desco/stato");
+        else this._render();
+        break;
+      case "annulla": this.toast = null; this._ws("desco/annulla", {}, { messaggio: "Annullato: menu com'era prima" }); break;
+      case "in-casa": this._ws("desco/dispensa", { azione: el.dataset.val === "1" ? "aggiungi" : "togli", nome: el.dataset.nome }); break;
+      case "togli-dispensa": this._ws("desco/dispensa", { azione: "togli", nome: el.dataset.nome }); break;
+      case "svuota-dispensa": if (confirm("Svuotare la dispensa?")) this._ws("desco/dispensa", { azione: "svuota" }); break;
       case "genera": {
         const piano = this.s.piano;
         if (piano && el.dataset.sett === piano.settimana) {
@@ -134,11 +156,11 @@ class DescoPanel extends HTMLElement {
             (bloccati ? `\n${bloccati} ${bloccati === 1 ? "pasto bloccato resta" : "pasti bloccati restano"} uguali.` : "\nPer tenerne qualcuno, bloccalo prima con il lucchetto.");
           if (!confirm(msg)) break;
         }
-        this._ws("desco/genera", { settimana: el.dataset.sett }, { messaggio: "Menu generato" });
+        this._ws("desco/genera", { settimana: el.dataset.sett }, { messaggio: "Menu generato", annullabile: true });
         break;
       }
-      case "rigenera": this._ws("desco/rigenera_pasto", { idx }); break;
-      case "cambia": this._ws("desco/rigenera_componente", { idx, pos }); break;
+      case "rigenera": this._ws("desco/rigenera_pasto", { idx }, { messaggio: "Pasto cambiato", annullabile: true }); break;
+      case "cambia": this._ws("desco/rigenera_componente", { idx, pos }, { messaggio: "Piatto cambiato", annullabile: true }); break;
       case "blocca": this._ws("desco/blocca", { idx, bloccato: el.dataset.val === "1" }); break;
       case "apri": {
         const k = el.dataset.key;
@@ -149,13 +171,13 @@ class DescoPanel extends HTMLElement {
       case "scegli": {
         const pasto = this.s.piano.pasti[idx];
         this.modal = { tipo: "scegli", idx, pos, cat: pasto.dettagli[pos]?.cat || "proteina", pranzo: pasto.tipo === "pranzo", q: "" };
-        this._render();
+        if (!this.ric) this._ws("desco/stato"); else this._render();
         break;
       }
       case "scelto": {
         const { idx: mi, pos: mp } = this.modal;
         this.modal = null;
-        this._ws("desco/imposta_componente", { idx: mi, pos: mp, comp_id: id });
+        this._ws("desco/imposta_componente", { idx: mi, pos: mp, comp_id: id }, { messaggio: "Piatto scelto", annullabile: true });
         break;
       }
       case "chiudi": this.modal = null; this._render(); break;
@@ -195,7 +217,7 @@ class DescoPanel extends HTMLElement {
       case "salva-pref": this._salvaPreferenze(); break;
       case "riusa":
         if (confirm(`Riproporre questa settimana come menu del ${fmtData(this.s.settimana_predefinita)}? Il menu attuale di quella settimana verrà sostituito.`)) {
-          this._ws("desco/riusa", { settimana: el.dataset.sett }, { messaggio: "Settimana riproposta" }).then((r) => { if (r) { this.tab = "settimana"; this._render(); } });
+          this._ws("desco/riusa", { settimana: el.dataset.sett }, { messaggio: "Settimana riproposta", annullabile: true }).then((r) => { if (r) { this.tab = "settimana"; this._render(); } });
         }
         break;
       case "elimina-arch":
@@ -212,7 +234,7 @@ class DescoPanel extends HTMLElement {
       case "rifai-ricetta": this._apriRicetta(this.modal?.idx, true); break;
       case "prova-notifica": this._ws("desco/prova_promemoria", {}, { messaggio: "Promemoria inviato" }); break;
       case "svuota":
-        if (confirm("Cancellare il menu della settimana?")) this._ws("desco/svuota");
+        if (confirm("Cancellare il menu della settimana?")) this._ws("desco/svuota", {}, { messaggio: "Menu cancellato", annullabile: true });
         break;
     }
   }
@@ -231,6 +253,11 @@ class DescoPanel extends HTMLElement {
   }
 
   _keydown(e) {
+    if (e.target.id === "nuova-dispensa" && e.key === "Enter") {
+      const v = e.target.value.trim();
+      if (v) { this._focus = "nuova-dispensa"; this._ws("desco/dispensa", { azione: "aggiungi", nome: v }); }
+      return;
+    }
     if (e.target.id === "nuovo-escluso" && e.key === "Enter") {
       const v = e.target.value.trim().toLowerCase();
       if (v) {
@@ -241,7 +268,7 @@ class DescoPanel extends HTMLElement {
     }
   }
 
-  _comp(id) { return (this.s?.ricettario || []).find((c) => c.id === id); }
+  _comp(id) { return (this.ric || []).find((c) => c.id === id); }
 
   _bozza() {
     if (!this.bozzaEsclusi) this.bozzaEsclusi = [...(this.s?.settings?.esclusi || [])];
@@ -331,7 +358,7 @@ class DescoPanel extends HTMLElement {
         <main class="contenuto">${this.s ? this._vista() : `<div class="vuoto"><div class="loader grande"></div></div>`}</main>
         <nav class="dock" aria-label="Sezioni di Desco">${TABS.map(([k, l, i]) => `<button class="dock-b ${this.tab === k ? "on" : ""}" data-act="tab" data-tab="${k}" title="${l}" aria-label="${l}"><ha-icon icon="${i}"></ha-icon></button>`).join("")}</nav>
         ${this.modal ? this._modal() : ""}
-        ${this.toast ? `<div class="toast ${this.toast.errore ? "err" : ""}">${esc(this.toast.testo)}</div>` : ""}
+        ${this.toast ? `<div class="toast ${this.toast.errore ? "err" : ""}"><span>${esc(this.toast.testo)}</span>${this.toast.annulla ? `<button class="toast-btn" data-act="annulla"><ha-icon icon="mdi:undo-variant"></ha-icon>Annulla</button>` : ""}</div>` : ""}
       </div>`;
     const mb = r.querySelector("ha-menu-button");
     if (mb) { mb.hass = this._hass; mb.narrow = this._narrow; }
@@ -410,7 +437,7 @@ class DescoPanel extends HTMLElement {
 
   _pasto(m) {
     const pranzo = m.tipo === "pranzo";
-    const sotto = pranzo ? `Linda · da portare` : `per ${m.porzioni}`;
+    const sotto = pranzo ? `Linda · asporto` : `per ${m.porzioni}`;
     return `<div class="pasto ${m.bloccato ? "bloccato" : ""}" data-pasto="${m.idx}">
       <div class="p-testa">
         <span class="maniglia" data-drag="${m.idx}" title="Trascina per spostare"><ha-icon icon="mdi:drag"></ha-icon></span>
@@ -493,10 +520,10 @@ class DescoPanel extends HTMLElement {
     const prep = this.s.preparazioni || [];
     if (!prep.length) return "";
     const nomi = { domenica: "Domenica", mercoledi: "Mercoledì sera" };
-    const colore = (id) => (CAT[this._comp(id)?.cat] || CAT.verdura).color;
+    const colore = (v) => (CAT[v.cat] || CAT.verdura).color;
     return `${sez("mdi:pot-steam-outline", "Preparazione in anticipo")}
       <div class="prep-griglia">${prep.map((v) => `<div class="prep-pill">
-        <span class="badge-ic"><span class="glow" style="--cc:${colore(v.id)}"></span></span>
+        <span class="badge-ic"><span class="glow" style="--cc:${colore(v)}"></span></span>
         <div class="prep-t"><b>${esc(v.nome)}</b><small>${nomi[v.sessione] || ""} · per ${v.pasti.map(esc).join(", ").toLowerCase()}</small></div>
         <span class="prep-q">${v.porzioni} porz.</span>
       </div>`).join("")}</div>
@@ -559,7 +586,7 @@ class DescoPanel extends HTMLElement {
     if (d.target !== null && d.target !== d.da) {
       const a = this.s.piano.pasti[d.da], b = this.s.piano.pasti[d.target];
       this._ws("desco/sposta", { da: d.da, a: d.target }, {
-        messaggio: `${a.nome_giorno} ${a.tipo} ⇄ ${b.nome_giorno} ${b.tipo}`,
+        messaggio: `${a.nome_giorno} ${a.tipo} ⇄ ${b.nome_giorno} ${b.tipo}`, annullabile: true,
       });
     } else if (this._renderDopo) {
       this._renderDopo = false;
@@ -570,7 +597,8 @@ class DescoPanel extends HTMLElement {
   /* ---------- storico */
 
   _vistaStorico() {
-    const arch = this.s.archivio || [];
+    if (!this.arch && this.s.n_archivio) return `<div class="vuoto"><div class="loader grande"></div></div>`;
+    const arch = this.arch || [];
     const corrente = this.s.piano;
     if (!arch.length) {
       return `<section class="hero piccolo"><ha-icon icon="mdi:history"></ha-icon><h1>Ancora niente storico</h1>
@@ -629,8 +657,35 @@ class DescoPanel extends HTMLElement {
           ? `Scegli una delle tue liste (${this.s.liste_todo.map((e) => esc(this._nomeEntita(e))).join(", ")}) in <a href="/config/integrations/integration/desco">Impostazioni → Dispositivi e servizi → Desco → Configura</a>.`
           : `Non hai ancora liste To-do: aggiungi l'integrazione <a href="/config/integrations/dashboard/add?domain=shopping_list">Lista della spesa</a> e Desco la userà subito.`}
       </div></div>`}
-      <section class="card lista-spesa">${voci.map((v) => `<div class="voce"><span>${esc(v.nome)}</span><span class="q">${esc(v.quantita)}</span></div>`).join("")}</section>
-      <p class="nota">Se rigeneri e reinvii, le voci della volta prima non ancora spuntate vengono sostituite.</p>`;
+      ${this._listaPerReparto(voci)}
+      ${this._dispensa()}`;
+  }
+
+  _listaPerReparto(voci) {
+    const reparti = [];
+    voci.forEach((v) => { let r = reparti.find((x) => x.nome === v.reparto); if (!r) reparti.push(r = { nome: v.reparto, voci: [] }); r.voci.push(v); });
+    const icone = { "Frutta e verdura": "mdi:carrot", "Pane": "mdi:baguette", "Carne e pesce": "mdi:food-steak", "Banco frigo": "mdi:fridge-outline", "Surgelati": "mdi:snowflake", "Scaffale": "mdi:package-variant-closed" };
+    const daComprare = voci.filter((v) => !v.in_casa).length;
+    return `${sez("mdi:cart-outline", `Da comprare · ${daComprare}`)}
+      <div class="reparti">${reparti.map((r) => `<section class="card reparto">
+        <div class="rep-testa"><span class="badge-ic"><ha-icon icon="${icone[r.nome] || "mdi:shopping-outline"}"></ha-icon></span><b>${esc(r.nome)}</b></div>
+        ${r.voci.map((v) => `<div class="voce ${v.in_casa ? "in-casa" : ""}">
+          <span class="v-nome">${esc(v.nome)}</span><span class="q">${esc(v.quantita)}</span>
+          <button class="casa-btn ${v.in_casa ? "on" : ""}" data-act="in-casa" data-nome="${esc(v.nome)}" data-val="${v.in_casa ? 0 : 1}" title="${v.in_casa ? "Non ce l'ho più" : "Ce l'ho già in casa"}"><ha-icon icon="${v.in_casa ? "mdi:home-check" : "mdi:home-plus-outline"}"></ha-icon></button>
+        </div>`).join("")}
+      </section>`).join("")}</div>
+      <p class="nota">Tocca <ha-icon icon="mdi:home-plus-outline"></ha-icon> sulle cose che hai già: non vengono inviate alla lista e finiscono nella dispensa. Se rigeneri e reinvii, le voci della volta prima non ancora spuntate vengono sostituite.</p>`;
+  }
+
+  _dispensa() {
+    const d = this.s.dispensa || [];
+    return `${sez("mdi:fridge-outline", "Dispensa e freezer", d.length ? `<button class="link" data-act="svuota-dispensa">Svuota</button>` : "")}
+      <section class="card dispensa">
+        <div class="nota">Quello che avete già in casa: Desco lo toglie dalla spesa e, quando genera il menu, preferisce i piatti che lo usano.</div>
+        <div class="chips">${d.map((v) => `<span class="chip on dispo">${esc(v)}<button data-act="togli-dispensa" data-nome="${esc(v)}" aria-label="Togli ${esc(v)}"><ha-icon icon="mdi:close"></ha-icon></button></span>`).join("")}
+          <input id="nuova-dispensa" class="inline" placeholder="Aggiungi (es. ceci lessati, merluzzo surgelato) e Invio">
+        </div>
+      </section>`;
   }
 
   _nomeEntita(eid) {
@@ -640,9 +695,10 @@ class DescoPanel extends HTMLElement {
   /* ---------- ricettario */
 
   _vistaRicettario() {
-    const n = (cat) => this.s.ricettario.filter((c) => cat === "tutti" || c.cat === cat).length;
+    if (!this.ric) return `<div class="vuoto"><div class="loader grande"></div></div>`;
+    const n = (cat) => this.ric.filter((c) => cat === "tutti" || c.cat === cat).length;
     return `<section class="intesta">
-        <div><div class="sopra">${this.s.ricettario.length} piatti</div><h1>Ricettario</h1>
+        <div><div class="sopra">${this.ric.length} piatti</div><h1>Ricettario</h1>
         <div class="nota">Disattiva quello che non vi piace, aggiungi i vostri piatti o fatti suggerire idee da Gemini.</div></div>
         <div class="azioni"><button class="btn primario" data-act="nuovo"><ha-icon icon="mdi:plus"></ha-icon>Nuovo piatto</button></div>
       </section>
@@ -662,7 +718,7 @@ class DescoPanel extends HTMLElement {
 
   _filtraRicette(cat, q, soloAsporto = false) {
     const t = norm(q);
-    return this.s.ricettario.filter((c) =>
+    return (this.ric || []).filter((c) =>
       (cat === "tutti" || c.cat === cat) &&
       (!soloAsporto || c.asporto === "freddo" || (c.asporto === "caldo" && this.s.settings.microonde)) &&
       (!t || norm(c.nome).includes(t) || (c.ingredienti || []).some((i) => norm(i.nome).includes(t))));
@@ -1151,6 +1207,23 @@ const STILE_A = `
 .dock-b:hover { background:rgba(255,255,255,0.05); }
 .dock-b.on { background:#135a80; color:#8fdcff; }
 .app { position:relative; }
+.toast { display:flex; align-items:center; gap:12px; bottom:104px; }
+.toast-btn { border:0; background:rgba(79,195,247,0.18); color:#8fdcff; border-radius:999px; padding:6px 12px 6px 8px; font-weight:700; display:inline-flex; align-items:center; gap:4px; }
+.toast-btn ha-icon { --mdc-icon-size:16px; }
+.reparti { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap:14px; align-items:start; }
+.reparto { padding:14px 16px; }
+.rep-testa { display:flex; align-items:center; gap:10px; margin-bottom:6px; font-size:15px; }
+.reparto .voce { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px dashed var(--linea); }
+.reparto .voce:last-child { border-bottom:0; }
+.v-nome { flex:1; min-width:0; }
+.voce.in-casa .v-nome, .voce.in-casa .q { text-decoration:line-through; opacity:.5; }
+.casa-btn { border:0; background:none; color:var(--tenue); border-radius:10px; width:36px; height:36px; display:grid; place-items:center; }
+.casa-btn:hover { background:rgba(255,255,255,0.06); color:var(--testo); }
+.casa-btn.on { color:#6ee7a8; }
+.dispensa { margin-bottom:20px; display:flex; flex-direction:column; gap:10px; }
+.chip.dispo { --cc:#6ee7a8; padding-right:4px; }
+.chip.dispo button { border:0; background:none; display:inline-flex; padding:2px; border-radius:50%; color:inherit; }
+.chip.dispo ha-icon { --mdc-icon-size:14px; }
 .p-tit { min-width:0; flex:1 1 auto; } .p-tit span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .p-meta { margin-left:0; flex:none; white-space:nowrap; display:flex; align-items:center; gap:8px; }
 .p-meta span { display:inline-flex; align-items:center; }

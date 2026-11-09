@@ -14,6 +14,8 @@ Menu settimanale equilibrato per Home Assistant: per ogni pasto **una proteina, 
 - **Promemoria serale** sul telefono: pranzo di domani, cosa cucinare doppio, cosa scongelare, preparazione in anticipo
 - **Trascina e scambia**: sposta un pasto su un altro giorno o tra pranzo e cena (mouse e touch)
 - **Storico**: ogni settimana passata resta consultabile, divisa per mese, e si può riproporre
+- **Annulla**: dopo un cambio indesiderato (rigenera, ⇄, trascinamento) un tasto riporta il menu com'era
+- **Dispensa e freezer**: quello che avete già in casa esce dalla spesa e il menu preferisce i piatti che lo usano
 - **Lista della spesa**: un tasto invia gli ingredienti della settimana alla To-do di Home Assistant
 - **Gemini (facoltativo)**: suggerisce piatti nuovi da aggiungere al ricettario con il piano gratuito di Google AI Studio
 - Ricettario integrato con 88 piatti; puoi disattivarli, modificarne una tua versione o aggiungerne di tuoi
@@ -41,6 +43,17 @@ Gli aggiornamenti compaiono nella scheda **Installati** del Marketplace. Nella b
 - **Spesa**: elenco ingredienti con quantità; *Invia* li aggiunge alla To-do. Reinviando, le voci della volta prima non ancora spuntate vengono sostituite.
 - **Ricettario**: attiva/disattiva piatti, crea i tuoi, *Idee con Gemini*.
 - **Preferenze**: alimenti esclusi, tempo massimo, budget, microonde, verdure di stagione, quota di piatti unici, porzioni.
+
+## Scheda per la dashboard
+
+Desco aggiunge da solo la scheda `custom:desco-card`: mostra il pranzo e la cena di oggi e il promemoria della sera; un tocco apre l'app.
+
+```yaml
+type: custom:desco-card
+# opzionali:
+titolo: Desco
+mostra_promemoria: true
+```
 
 ## Entità
 

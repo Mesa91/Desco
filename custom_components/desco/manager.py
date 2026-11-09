@@ -1,6 +1,7 @@
 """Stato e operazioni di Desco."""
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import re
@@ -48,6 +49,7 @@ class DescoManager:
         self.builtin: list[dict] = []
         self.lib: dict[str, dict] = {}
         self._listeners: list[Callable[[], None]] = []
+        self._annulla: list[dict] = []  # istantanee del menu per «Annulla» (solo in memoria)
 
     # ------------------------------------------------------------------ opzioni
 
@@ -82,11 +84,13 @@ class DescoManager:
         self.data.setdefault("spesa_inviata", [])
         self.data.setdefault("archivio", [])
         self.data.setdefault("voti", {})
+        self.data.setdefault("dispensa", [])
         self._ricostruisci()
 
     def _ricostruisci(self) -> None:
         self.lib = planner.costruisci_libreria(
-            self.builtin, self.data["custom"], self.data["disabilitati"], self.data.get("voti"))
+            self.builtin, self.data["custom"], self.data["disabilitati"], self.data.get("voti"),
+            self.data.get("dispensa"))
 
     async def _salva(self, piano_cambiato: bool = False) -> None:
         await self._store.async_save(self.data)
@@ -109,7 +113,9 @@ class DescoManager:
     def _pasti(self) -> list[dict]:
         return (self.data.get("piano") or {}).get("pasti", [])
 
-    def stato(self) -> dict:
+    def stato(self, con: list[str] | None = None) -> dict:
+        """Stato per il pannello. Ricettario e storico (pesanti) solo se richiesti in `con`."""
+        con = set(con or [])
         piano = self.data.get("piano")
         pasti_info = []
         if piano:
@@ -144,15 +150,20 @@ class DescoManager:
             "piano": {**piano, "pasti": pasti_info} if piano else None,
             "settimana_predefinita": planner.settimana_predefinita(oggi).isoformat(),
             "oggi": oggi.isoformat(),
-            "ricettario": sorted(self.lib.values(), key=lambda c: (ORDINE_CAT.get(c["cat"], 9), planner.normalizza(c["nome"]))),
+            "ricettario": sorted(self.lib.values(), key=lambda c: (ORDINE_CAT.get(c["cat"], 9), planner.normalizza(c["nome"])))
+            if "ricettario" in con else None,
+            "n_ricettario": len(self.lib),
             "gemini": self.gemini_attivo,
             "todo_entity": self.todo_entity,
             "todo_ok": self.hass.states.get(self.todo_entity) is not None,
             "liste_todo": sorted(self.hass.states.async_entity_ids("todo")),
-            "spesa": planner.lista_spesa(self._pasti(), self.lib) if piano else [],
+            "spesa": planner.lista_spesa(self._pasti(), self.lib, dispensa=self.data["dispensa"]) if piano else [],
+            "dispensa": self.data["dispensa"],
+            "annullabile": len(self._annulla),
             "conteggi": planner.conta_macro(self._pasti(), self.lib) if piano else {},
             "obiettivi_scalati": planner.obiettivi_scalati(self.settings, len(self._pasti()) or 10),
-            "archivio": self.data["archivio"],
+            "archivio": self.data["archivio"] if "archivio" in con else None,
+            "n_archivio": len(self.data["archivio"]),
             "preparazioni": planner.preparazioni(self._pasti(), self.lib) if piano else [],
             "notifiche": bool(self.opt(CONF_NOTIFY)),
             "promemoria": self.promemoria() if piano else None,
@@ -171,6 +182,24 @@ class DescoManager:
 
     # ------------------------------------------------------------------ piano
 
+    # ------------------------------------------------------------------ annulla
+
+    def _foto(self) -> None:
+        """Salva il menu com'è ora, prima di cambiarlo."""
+        self._annulla.append({"piano": copy.deepcopy(self.data.get("piano")),
+                              "storico": list(self.data.get("storico", [])),
+                              "archivio": copy.deepcopy(self.data.get("archivio", []))})
+        del self._annulla[:-15]
+
+    async def annulla(self) -> None:
+        if not self._annulla:
+            raise HomeAssistantError("Niente da annullare")
+        foto = self._annulla.pop()
+        self.data["piano"] = foto["piano"]
+        self.data["storico"] = foto["storico"]
+        self.data["archivio"] = foto["archivio"]
+        await self._salva(piano_cambiato=True)
+
     async def genera(self, settimana: str | None = None) -> None:
         oggi = dt_util.now().date()
         if settimana in (None, "", "auto"):
@@ -182,6 +211,7 @@ class DescoManager:
         else:
             lun = planner.lunedi_di(date.fromisoformat(settimana))
         precedente = self.data.get("piano")
+        self._foto()
         bloccati = []
         if precedente and precedente.get("settimana") == lun.isoformat():
             # rigenerando la stessa settimana si tengono i pasti bloccati
@@ -208,12 +238,14 @@ class DescoManager:
 
     async def rigenera_pasto(self, idx: int) -> None:
         self._richiedi_piano(idx)
+        self._foto()
         self.data["piano"]["pasti"] = planner.rigenera_pasto(
             self.lib, self.settings, self._settimana(), self._pasti(), idx, self.data["storico"])
         await self._salva(piano_cambiato=True)
 
     async def rigenera_componente(self, idx: int, pos: int) -> None:
         self._richiedi_piano(idx)
+        self._foto()
         self.data["piano"]["pasti"] = planner.rigenera_componente(
             self.lib, self.settings, self._settimana(), self._pasti(), idx, pos, self.data["storico"])
         await self._salva(piano_cambiato=True)
@@ -223,6 +255,7 @@ class DescoManager:
         self._richiedi_piano(idx)
         if comp_id not in self.lib:
             raise HomeAssistantError("Piatto sconosciuto")
+        self._foto()
         pasto = self._pasti()[idx]
         if self.lib[comp_id]["cat"] == "unico":
             pasto["componenti"] = [comp_id]
@@ -243,6 +276,7 @@ class DescoManager:
         self._richiedi_piano(a)
         if da == a:
             return
+        self._foto()
         pasti = self._pasti()
         for campo in ("componenti", "bloccato", "ricetta"):
             pasti[da][campo], pasti[a][campo] = pasti[a].get(campo), pasti[da].get(campo)
@@ -283,6 +317,7 @@ class DescoManager:
         if not vecchia:
             raise HomeAssistantError("Settimana non trovata nello storico")
         lun = planner.settimana_predefinita(dt_util.now().date())
+        self._foto()
         attuale = self.data.get("piano")
         if attuale and attuale.get("settimana") != lun.isoformat():
             self._archivia(attuale)
@@ -309,6 +344,7 @@ class DescoManager:
         await self._salva()
 
     async def svuota(self) -> None:
+        self._foto()
         self.data["piano"] = None
         await self._salva(piano_cambiato=True)
 
@@ -384,6 +420,22 @@ class DescoManager:
         off = set(self.data["disabilitati"])
         (off.discard if attivo else off.add)(cid)
         self.data["disabilitati"] = sorted(off)
+        self._ricostruisci()
+        await self._salva()
+
+    # ------------------------------------------------------------------ dispensa
+
+    async def dispensa(self, azione: str, nome: str = "") -> None:
+        voci = list(self.data.get("dispensa", []))
+        nome = " ".join(str(nome).strip().lower().split())[:60]
+        if azione == "aggiungi" and nome:
+            if not any(planner.normalizza(v) == planner.normalizza(nome) for v in voci):
+                voci.append(nome)
+        elif azione == "togli":
+            voci = [v for v in voci if planner.normalizza(v) != planner.normalizza(nome)]
+        elif azione == "svuota":
+            voci = []
+        self.data["dispensa"] = sorted(voci)
         self._ricostruisci()
         await self._salva()
 
@@ -548,7 +600,8 @@ class DescoManager:
             raise HomeAssistantError(
                 f"La lista {entity} non esiste. Scegline una in Impostazioni → Dispositivi e servizi → "
                 "Desco → Configura, oppure aggiungi l'integrazione «Lista della spesa».")
-        voci = [v["testo"] for v in planner.lista_spesa(self._pasti(), self.lib)]
+        voci = [v["testo"] for v in planner.lista_spesa(self._pasti(), self.lib, dispensa=self.data["dispensa"])
+                if not v["in_casa"]]
 
         resp = await self.hass.services.async_call(
             "todo", "get_items", {"status": ["needs_action"]},

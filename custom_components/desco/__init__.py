@@ -38,6 +38,10 @@ async def _registra_pannello(hass: HomeAssistant) -> None:
             [StaticPathConfig(STATIC_URL, str(Path(__file__).parent / "frontend"), cache_headers=False)]
         )
         hass.data[f"{DOMAIN}_static"] = True
+    if not hass.data.get(f"{DOMAIN}_card"):
+        # scheda per le dashboard (type: custom:desco-card), caricata in automatico
+        frontend.add_extra_js_url(hass, f"{STATIC_URL}/desco-card.js?v={VERSION}")
+        hass.data[f"{DOMAIN}_card"] = True
     if PANEL_URL in hass.data.get(frontend.DATA_PANELS, {}):
         return
     await panel_custom.async_register_panel(

@@ -1,0 +1,36 @@
+name: Controlli
+
+# A ogni push e pull request: validazione ufficiale di Home Assistant (hassfest),
+# validazione per il Marketplace/HACS e test del motore dei pasti.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  hassfest:
+    name: Home Assistant (hassfest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  marketplace:
+    name: Marketplace (HACS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hacs/action@main
+        with:
+          category: integration
+          ignore: brands topics description
+
+  test:
+    name: Test del motore dei pasti
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install pytest
+      - run: pytest -q tests

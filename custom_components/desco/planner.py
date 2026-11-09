@@ -111,8 +111,41 @@ def obiettivi_scalati(settings: dict, n_pasti: int) -> dict[str, float]:
 
 # --------------------------------------------------------------------------- ricettario
 
+REPARTI = [
+    ("Frutta e verdura", ("insalata", "carot", "cipoll", "finocch", "cavol", "broccol", "verza", "radicch", "zucca",
+                          "bieta", "carciof", "zucchin", "melanzan", "peperon", "pomodor", "cetriol", "rucola",
+                          "limon", "aranc", "porri", "patat", "asparag", "spinacini")),
+    ("Pane", ("pane", "piadin")),
+    ("Carne e pesce", ("pollo", "tacchino", "manzo", "macinat", "hamburger", "salmone", "straccetti")),
+    ("Banco frigo", ("uova", "mozzarell", "ricotta", "feta", "parmigian", "grana", "scamorz", "stracchin", "yogurt",
+                     "prosciutt", "bresaol", "speck", "tofu", "gnocchi")),
+    ("Surgelati", ("surgelat", "minestrone")),
+]
+ORDINE_REPARTI = ["Frutta e verdura", "Pane", "Carne e pesce", "Banco frigo", "Surgelati", "Scaffale"]
+_PRIORITA = ("Banco frigo", "Carne e pesce", "Pane", "Frutta e verdura", "Surgelati")  # ordine di riconoscimento
+
+
+def reparto_di(nome: str) -> str:
+    n = normalizza(nome)
+    if "surgelat" in n:
+        return "Surgelati"
+    if any(k in n for k in ("passata", "pelati", "in scatola", "olive", "salsa", "lessat", "pangrattato")):
+        return "Scaffale"
+    chiavi_di = dict(REPARTI)
+    for rep in _PRIORITA:
+        if any(k in n for k in chiavi_di[rep]):
+            return rep
+    return "Scaffale"
+
+
+def in_dispensa(nome: str, dispensa: list[str] | None) -> bool:
+    """Un ingrediente è in casa se il suo nome contiene una voce della dispensa (o viceversa)."""
+    n = normalizza(nome)
+    return any(d and (d in n or n in d) for d in (normalizza(x) for x in (dispensa or [])))
+
+
 def costruisci_libreria(builtin: list[dict], custom: list[dict], disabilitati: list[str],
-                        voti: dict[str, int] | None = None) -> dict[str, dict]:
+                        voti: dict[str, int] | None = None, dispensa: list[str] | None = None) -> dict[str, dict]:
     """Unisce componenti integrati e personali; i personali sovrascrivono a parità di id."""
     lib: dict[str, dict] = {}
     for comp in builtin:
@@ -124,6 +157,8 @@ def costruisci_libreria(builtin: list[dict], custom: list[dict], disabilitati: l
     for cid, comp in lib.items():
         comp["attivo"] = cid not in off
         comp["voto"] = int(voti.get(cid, 0))
+        comp["usa_dispensa"] = bool(dispensa) and any(
+            in_dispensa(i.get("nome", ""), dispensa) for i in comp.get("ingredienti", []) if not i.get("dispensa"))
     return lib
 
 
@@ -270,6 +305,8 @@ class Pianificatore:
                 peso *= 0.02
         if comp.get("voto", 0) > 0:
             peso *= 2.0
+        if comp.get("usa_dispensa"):
+            peso *= 1.8  # usa quello che c'è già in casa
         # di stagione: preferiti rispetto a quelli "tutto l'anno" (spesso surgelati)
         stagione = comp.get("stagione")
         if stagione and self.mese in stagione and self.settings.get("solo_stagione", True):
@@ -536,7 +573,7 @@ def preparazioni(pasti: list[dict], lib: dict[str, dict]) -> list[dict]:
             if legami.get((i, pos)):
                 continue  # si cucina doppio a cena per il pranzo del giorno dopo
             porz = int(p.get("porzioni", 1))
-            v = voci.setdefault((sessione, cid), {"id": cid, "nome": comp["nome"], "sessione": sessione,
+            v = voci.setdefault((sessione, cid), {"id": cid, "nome": comp["nome"], "cat": comp.get("cat"), "sessione": sessione,
                                                  "porzioni": 0, "pasti": [], "minuti": comp.get("minuti", 0)})
             v["porzioni"] += porz
             v["pasti"].append(f"{GIORNI[p['giorno']][:3]} {p['tipo']}")
@@ -581,7 +618,8 @@ def _fmt_quantita(q: float, u: str) -> str:
     return f"{q:g} {u}".strip()
 
 
-def lista_spesa(pasti: list[dict], lib: dict[str, dict], esclusi_dispensa: bool = True) -> list[dict]:
+def lista_spesa(pasti: list[dict], lib: dict[str, dict], esclusi_dispensa: bool = True,
+                dispensa: list[str] | None = None) -> list[dict]:
     tot: dict[tuple[str, str], dict] = {}
     for p in pasti:
         porz = int(p.get("porzioni", 1))
@@ -600,8 +638,11 @@ def lista_spesa(pasti: list[dict], lib: dict[str, dict], esclusi_dispensa: bool 
                 voce = tot.setdefault(chiave, {"nome": nome, "u": u, "q": 0.0})
                 voce["q"] += float(ing.get("q", 0) or 0) * porz
     out = []
-    for voce in sorted(tot.values(), key=lambda v: normalizza(v["nome"])):
+    for voce in tot.values():
         q = _fmt_quantita(voce["q"], voce["u"]) if voce["q"] else ""
         nome = voce["nome"][:1].upper() + voce["nome"][1:]
-        out.append({"nome": nome, "quantita": q, "testo": f"{nome} ({q})" if q else nome})
+        rep = reparto_di(voce["nome"])
+        out.append({"nome": nome, "quantita": q, "testo": f"{nome} ({q})" if q else nome,
+                    "reparto": rep, "in_casa": in_dispensa(voce["nome"], dispensa)})
+    out.sort(key=lambda v: (ORDINE_REPARTI.index(v["reparto"]), normalizza(v["nome"])))
     return out

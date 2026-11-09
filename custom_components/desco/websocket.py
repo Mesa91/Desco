@@ -21,6 +21,7 @@ def _mgr(hass: HomeAssistant):
 
 def _comando(schema: dict, azione):
     """Crea un comando che esegue `azione(mgr, msg)` e risponde con lo stato aggiornato."""
+    schema = {**schema, vol.Optional("con", default=[]): [vol.In(["ricettario", "archivio"])]}
 
     @websocket_api.websocket_command(schema)
     @websocket_api.async_response
@@ -28,7 +29,7 @@ def _comando(schema: dict, azione):
         try:
             mgr = _mgr(hass)
             extra = await azione(mgr, msg)
-            risposta = mgr.stato()
+            risposta = mgr.stato(msg.get("con"))
             if extra is not None:
                 risposta["risultato"] = extra
             conn.send_result(msg["id"], risposta)
@@ -74,6 +75,10 @@ COMANDI = [
       vol.Optional("asporto", default=False): bool},
      lambda m, msg: m.suggerisci(msg["cat"], msg["quanti"], msg["asporto"])),
     ({vol.Required("type"): "desco/invia_spesa"}, lambda m, msg: m.invia_spesa()),
+    ({vol.Required("type"): "desco/annulla"}, lambda m, msg: m.annulla()),
+    ({vol.Required("type"): "desco/dispensa", vol.Required("azione"): vol.In(["aggiungi", "togli", "svuota"]),
+      vol.Optional("nome", default=""): str},
+     lambda m, msg: m.dispensa(msg["azione"], msg["nome"])),
     ({vol.Required("type"): "desco/vota", vol.Required("comp_id"): str, vol.Required("voto"): vol.In([-1, 0, 1])},
      lambda m, msg: m.vota(msg["comp_id"], msg["voto"])),
     ({vol.Required("type"): "desco/ricetta", vol.Required("idx"): int, vol.Optional("rifai", default=False): bool},
