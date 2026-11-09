@@ -113,7 +113,19 @@ class DescoPanel extends HTMLElement {
     const id = el.dataset.id;
     switch (a) {
       case "tab": this.tab = el.dataset.tab; this.modal = null; this._render(); break;
-      case "genera": this._ws("desco/genera", { settimana: el.dataset.sett }, { messaggio: "Menu generato" }); break;
+      case "genera": {
+        const piano = this.s.piano;
+        if (piano && el.dataset.sett === piano.settimana) {
+          const liberi = piano.pasti.filter((m) => !m.bloccato).length;
+          const bloccati = piano.pasti.length - liberi;
+          if (!liberi) { this._toast("Tutti i pasti sono bloccati: sblocca quelli da cambiare", true); break; }
+          const msg = `Rigenerare ${liberi} pasti della settimana?` +
+            (bloccati ? `\n${bloccati} ${bloccati === 1 ? "pasto bloccato resta" : "pasti bloccati restano"} uguali.` : "\nPer tenerne qualcuno, bloccalo prima con il lucchetto.");
+          if (!confirm(msg)) break;
+        }
+        this._ws("desco/genera", { settimana: el.dataset.sett }, { messaggio: "Menu generato" });
+        break;
+      }
       case "rigenera": this._ws("desco/rigenera_pasto", { idx }); break;
       case "cambia": this._ws("desco/rigenera_componente", { idx, pos }); break;
       case "blocca": this._ws("desco/blocca", { idx, bloccato: el.dataset.val === "1" }); break;
