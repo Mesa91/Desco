@@ -679,15 +679,12 @@ class DescoManager:
         fine = lun + timedelta(days=max(p["giorno"] for p in piano["pasti"]))
         await self._notifica(
             f"Menu dal {lun.day:02d}/{lun.month:02d} al {fine.day:02d}/{fine.month:02d} da approvare",
-            "Toccate per controllare i pasti. Con «Va bene così» la lista della spesa si compila da sola.",
+            "Tocca per aprire Desco e controllare i pasti.",
             {
                 "tag": "desco-menu",
-                "url": "/desco",
-                "clickAction": "/desco",
-                "actions": [
-                    {"action": "DESCO_APPROVA", "title": "Va bene così"},
-                    {"action": "URI", "title": "Apri Desco", "uri": "/desco"},
-                ],
+                "url": "/desco",  # iPhone
+                "clickAction": "/desco",  # Android: il tocco apre Desco a schermo intero
+                "actions": [{"action": "DESCO_APPROVA", "title": "Va bene così"}],
             },
         )
 
