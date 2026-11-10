@@ -57,6 +57,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "auto_genera": True,  # genera da solo il menu della settimana dopo
     "auto_giorno": 4,  # 0 = lunedì … 4 = venerdì
     "auto_ora": "21:00",
+    "promemoria_serale": True,  # ogni sera: cosa preparare per domani
 }
 
 

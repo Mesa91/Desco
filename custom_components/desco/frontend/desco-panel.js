@@ -320,6 +320,7 @@ class DescoPanel extends HTMLElement {
       porzioni_cena: Number(q("porz_cena").value),
       cene_doppie: Number(q("cene_doppie").value),
       auto_genera: q("auto_genera").checked,
+      promemoria_serale: q("promemoria_serale").checked,
       auto_giorno: Number(q("auto_giorno").value),
       auto_ora: q("auto_ora").value || "21:00",
       obiettivi: Object.fromEntries(MACRO.map(([k]) => [k, Number(q(`ob-${k}`).value) || 0])),
@@ -914,7 +915,7 @@ class DescoPanel extends HTMLElement {
           <input type="range" id="cene_doppie" min="0" max="4" step="1" value="${s.cene_doppie ?? 2}" data-out="o-doppie" data-fmt="num">
         </div>
         <div class="campo riga">
-          <div><label>Promemoria serale</label><div class="nota">${this.s.notifiche
+          <div><label class="lab-switch"><input type="checkbox" id="promemoria_serale" ${s.promemoria_serale !== false ? "checked" : ""}> Promemoria serale</label><div class="nota">${this.s.notifiche
             ? "Ogni sera arriva sul telefono cosa preparare per domani: pranzo, cene doppie, cosa scongelare e la preparazione in anticipo."
             : "Per ricevere ogni sera cosa preparare per domani, scegli i telefoni in Impostazioni → Dispositivi e servizi → Desco → Configura."}</div></div>
           ${this.s.notifiche ? `<button class="btn piccolo" data-act="prova-notifica"><ha-icon icon="mdi:bell-ring-outline"></ha-icon>Prova</button>` : ""}
@@ -1293,6 +1294,8 @@ const STILE_A = `
 .badge-ic.grande { width:44px; height:44px; } .badge-ic.grande ha-icon { --mdc-icon-size:22px; }
 .b-testo { flex:1 1 260px; display:flex; flex-direction:column; gap:2px; line-height:1.35; }
 .b-testo span { color:var(--tenue); font-size:13px; }
+.lab-switch { display:inline-flex !important; align-items:center; gap:8px; justify-content:flex-start !important; }
+.lab-switch input { width:18px; height:18px; accent-color:var(--primary-color); }
 .riga-flex { display:flex; justify-content:space-between; align-items:center; }
 .auto-quando { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0 6px; }
 .auto-quando select, .auto-quando input { font:inherit; color:var(--testo); background:var(--pill); border:1px solid var(--linea); border-radius:12px; padding:8px 12px; color-scheme:dark; }

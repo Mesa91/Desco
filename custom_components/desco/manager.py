@@ -373,6 +373,7 @@ class DescoManager:
         s["pranzo_solo_tonno"] = bool(s.get("pranzo_solo_tonno", True))
         s["pranzo_niente_brodi"] = bool(s.get("pranzo_niente_brodi", True))
         s["auto_genera"] = bool(s.get("auto_genera", True))
+        s["promemoria_serale"] = bool(s.get("promemoria_serale", True))
         s["auto_giorno"] = max(0, min(6, int(s.get("auto_giorno", 4))))
         try:
             hh, mm = str(s.get("auto_ora", "21:00")).split(":")[:2]
@@ -572,6 +573,8 @@ class DescoManager:
 
     async def invia_promemoria(self, forza: bool = False) -> dict:
         servizi = self.opt(CONF_NOTIFY) or []
+        if not forza and not self.settings.get("promemoria_serale", True):
+            return {"inviato": False}
         if not servizi:
             raise HomeAssistantError("Nessun servizio di notifica: sceglilo in Impostazioni → Dispositivi e servizi → Desco → Configura")
         prom = self.promemoria()
@@ -660,7 +663,7 @@ class DescoManager:
             if dominio != "notify" or not nome:
                 continue
             msg = {"title": titolo, "message": testo}
-            if dati and nome.startswith("mobile_app"):
+            if dati and nome not in ("persistent_notification", "send_message"):  # anche ai gruppi (es. notify.famiglia)
                 msg["data"] = dati
             try:
                 await self.hass.services.async_call("notify", nome, msg, blocking=True)
