@@ -14,7 +14,7 @@ Menu settimanale equilibrato per Home Assistant: per ogni pasto **una proteina, 
 - **Promemoria serale** sul telefono: pranzo di domani, cosa cucinare doppio, cosa scongelare, preparazione in anticipo
 - **Trascina e scambia**: sposta un pasto su un altro giorno o tra pranzo e cena (mouse e touch)
 - **Storico**: ogni settimana passata resta consultabile, divisa per mese, e si può riproporre
-- **Menu automatico con approvazione**: il giorno e l'ora scelti (di base venerdì alle 21) Desco prepara il menu della settimana dopo e manda ai telefoni la notifica «Menu dal … al … da approvare» (il tocco apre Desco); con «Approva e crea la spesa» compila la lista della spesa e avvisa tutti
+- **Menu automatico con approvazione**: il giorno e l'ora scelti (di base venerdì alle 21) Desco prepara il menu della settimana dopo e manda ai telefoni la notifica «Menu dal … al … da approvare» (il tocco apre Desco); con «Approva e crea la spesa» compila la lista della spesa e mostra la conferma nel pannello
 - **Annulla**: dopo un cambio indesiderato (rigenera, ⇄, trascinamento) un tasto riporta il menu com'era
 - **Dispensa e freezer**: quello che avete già in casa esce dalla spesa e il menu preferisce i piatti che lo usano
 - **Lista della spesa**: un tasto invia gli ingredienti della settimana alla To-do di Home Assistant

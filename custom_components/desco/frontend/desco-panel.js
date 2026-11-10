@@ -188,6 +188,7 @@ class DescoPanel extends HTMLElement {
         break;
       }
       case "chiudi": this.modal = null; this._render(); break;
+      case "vai-spesa": this.modal = null; this.tab = "spesa"; this._render(); break;
       case "spesa":
         this._ws("desco/invia_spesa", {}, {
           messaggio: (r) => r ? `Lista spesa aggiornata: ${r.aggiunte} voci aggiunte${r.rimosse ? `, ${r.rimosse} vecchie tolte` : ""}` : "Fatto",
@@ -243,7 +244,7 @@ class DescoPanel extends HTMLElement {
       case "rifai-ricetta": this._apriRicetta(this.modal?.idx, true); break;
       case "approva":
         this._conferma("Approvate il menu della settimana?", "Desco compila subito la lista della spesa e avvisa la famiglia.").then((ok) => ok &&
-          this._ws("desco/approva", {}, { messaggio: (r) => r ? `Menu approvato: ${r.totale} prodotti nella lista della spesa` : "Menu approvato" }));
+          this._ws("desco/approva").then((r) => { if (r?.risultato) { this.modal = { tipo: "approvato", ...r.risultato }; this._render(); } }));
         break;
       case "prova-notifica": this._ws("desco/prova_promemoria", {}, { messaggio: "Promemoria inviato" }); break;
       case "svuota":
@@ -931,6 +932,24 @@ class DescoPanel extends HTMLElement {
   /* ---------- modali */
 
   _modal() {
+    if (this.modal.tipo === "approvato") {
+      const m = this.modal;
+      return `<div class="velo pop-velo"><div class="pop" role="dialog" aria-modal="true" aria-labelledby="pop-t" data-act="noop">
+        <div class="pop-testa">
+          <div class="pop-pill"><span class="badge-ic"><ha-icon icon="mdi:clipboard-check-outline"></ha-icon></span><b id="pop-t">Menu della settimana</b></div>
+          <button class="pop-x" data-act="chiudi" aria-label="Chiudi"><ha-icon icon="mdi:close"></ha-icon></button>
+        </div>
+        <div class="pop-corpo">
+          <span class="spunta"><ha-icon icon="mdi:check-bold"></ha-icon></span>
+          <div class="pop-tit">Menu approvato</div>
+          <div class="pop-sotto">${m.totale} prodotti nella lista della spesa${m.aggiunte !== undefined && m.aggiunte !== m.totale ? ` (${m.aggiunte} nuovi)` : ""}</div>
+        </div>
+        <div class="pop-azioni">
+          ${pillBtn("vai-spesa", "mdi:cart-outline", "Vedi la spesa")}
+          ${pillBtn("chiudi", "mdi:check", "Ok", "", true)}
+        </div>
+      </div></div>`;
+    }
     if (this.modal.tipo === "conferma") {
       return `<div class="velo conf-velo" data-act="conferma-no"><div class="conf" data-act="noop" role="alertdialog" aria-modal="true" aria-labelledby="conf-t">
         <div id="conf-t" class="conf-testo">${esc(this.modal.testo)}</div>
@@ -1288,6 +1307,21 @@ const STILE_A = `
 .dock-b:hover { background:rgba(255,255,255,0.05); }
 .dock-b.on { background:#135a80; color:#8fdcff; }
 .app { position:relative; }
+.pop-velo { background:rgba(4,10,18,0.6); z-index:40; }
+.pop { width:min(440px, calc(100vw - 32px)); border-radius:34px; padding:14px; display:flex; flex-direction:column; gap:14px;
+  background:rgba(12,20,34,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(79,195,247,0.16); box-shadow:0 18px 50px rgba(0,0,0,0.5); }
+.pop-testa { display:flex; align-items:center; gap:10px; }
+.pop-pill { flex:1; display:flex; align-items:center; gap:12px; padding:6px 16px 6px 6px; border-radius:999px; background:rgba(255,255,255,0.07); font-size:15px; }
+.pop-x { width:52px; height:52px; border-radius:50%; border:0; background:rgba(255,255,255,0.07); color:var(--testo); display:grid; place-items:center; flex:none; }
+.pop-x:hover { background:rgba(255,255,255,0.12); }
+.pop-corpo { display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 10px 8px; text-align:center; }
+.spunta { width:76px; height:76px; border-radius:50%; display:grid; place-items:center; background:rgba(110,231,168,0.14); color:#6ee7a8;
+  border:1px solid rgba(110,231,168,0.35); box-shadow:0 0 30px rgba(110,231,168,0.18); }
+.spunta ha-icon { --mdc-icon-size:40px; }
+.pop-tit { font-size:20px; font-weight:700; margin-top:6px; }
+.pop-sotto { color:var(--tenue); font-size:14px; }
+.pop-azioni { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; padding-bottom:4px; }
 .banner-ok { display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:12px 14px 12px 12px; margin:-6px 0 22px; border-radius:26px;
   background:rgba(63,184,245,0.10); border:1px solid rgba(63,184,245,0.45); box-shadow:0 0 30px rgba(63,184,245,0.12); }
 .banner-ok.avviso-b { background:rgba(255,204,102,0.08); border-color:rgba(255,204,102,0.4); box-shadow:none; }

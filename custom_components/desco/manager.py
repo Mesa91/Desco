@@ -678,7 +678,7 @@ class DescoManager:
         lun = date.fromisoformat(piano["settimana"])
         fine = lun + timedelta(days=max(p["giorno"] for p in piano["pasti"]))
         await self._notifica(
-            f"Menu dal {lun.day:02d}/{lun.month:02d} al {fine.day:02d}/{fine.month:02d} da approvare",
+            f"Menu dal {lun.day:02d}/{lun.month:02d} al {fine.day:02d}/{fine.month:02d} da approvare 🍽️",
             "Tocca per aprire Desco e controllare i pasti.",
             {
                 "tag": "desco-menu",
@@ -709,13 +709,8 @@ class DescoManager:
         piano["approvato_da"] = utente
         piano["approvato_il"] = dt_util.now().isoformat()
         r = await self.invia_spesa()
-        chi = f" da {utente}" if utente else ""
-        await self._notifica(
-            "✅ Menu approvato",
-            f"Menu approvato{chi}: {r['totale']} prodotti nella lista della spesa.",
-            {"tag": "desco-menu", "url": "/desco", "clickAction": "/desco"},
-        )
-        return r
+        # la conferma si vede nel pannello (pop-up); niente notifica sul telefono
+        return {**r, "utente": utente}
 
     # ------------------------------------------------------------------ utilità per i sensori
 
