@@ -676,15 +676,10 @@ class DescoManager:
         if not piano:
             return
         lun = date.fromisoformat(piano["settimana"])
-        righe = []
-        for g in sorted({p["giorno"] for p in piano["pasti"]}):
-            pr = next((p for p in piano["pasti"] if p["giorno"] == g and p["tipo"] == "pranzo"), None)
-            ce = next((p for p in piano["pasti"] if p["giorno"] == g and p["tipo"] == "cena"), None)
-            nome = lambda p: planner.info_pasto(p, self.lib)["titolo"].split(" · ")[0] if p else "—"  # noqa: E731
-            righe.append(f"{planner.GIORNI[g][:3]}: {nome(pr)} / {nome(ce)}")
+        fine = lun + timedelta(days=max(p["giorno"] for p in piano["pasti"]))
         await self._notifica(
-            f"🍽️ Menu dal {lun.day}/{lun.month}: da approvare",
-            "\n".join(righe) + "\nControllate i pasti: quando date l'ok, la lista della spesa si compila da sola.",
+            f"Menu dal {lun.day:02d}/{lun.month:02d} al {fine.day:02d}/{fine.month:02d} da approvare",
+            "Toccate per controllare i pasti. Con «Va bene così» la lista della spesa si compila da sola.",
             {
                 "tag": "desco-menu",
                 "url": "/desco",
