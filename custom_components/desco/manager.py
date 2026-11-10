@@ -684,7 +684,6 @@ class DescoManager:
                 "tag": "desco-menu",
                 "url": "/desco",  # iPhone
                 "clickAction": "/desco",  # Android: il tocco apre Desco a schermo intero
-                "actions": [{"action": "DESCO_APPROVA", "title": "Va bene così"}],
             },
         )
 
