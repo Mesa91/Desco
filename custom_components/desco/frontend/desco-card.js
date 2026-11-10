@@ -60,6 +60,9 @@ class DescoCard extends HTMLElement {
     const promemoria = this._config.mostra_promemoria && pr && pr.state && !/^Niente/.test(pr.state)
       ? `<div class="sera"><ha-icon icon="mdi:bell-ring-outline"></ha-icon><span>${escH(pr.state)}</span></div>` : "";
     const manca = !e.pranzo_oggi && !e.cena_oggi;
+    const sm = e.stato_menu;
+    const daApprovare = sm && sm.state === "Da approvare"
+      ? `<div class="sera appr"><ha-icon icon="mdi:clipboard-check-outline"></ha-icon><span>Menu della settimana da approvare: tocca per vederlo</span></div>` : "";
     this.shadowRoot.innerHTML = `<style>${STILE}</style>
       <ha-card role="button" tabindex="0" aria-label="Apri Desco: i pasti di oggi">
         <div class="testa">
@@ -70,7 +73,7 @@ class DescoCard extends HTMLElement {
         ${manca ? `<div class="riga"><span class="tenue">Desco non è configurato: aggiungi l'integrazione.</span></div>` : `
           ${this._riga("mdi:food-takeout-box-outline", "Pranzo", "Linda", e.pranzo_oggi)}
           ${this._riga("mdi:silverware-variant", "Cena", "per 2", e.cena_oggi)}
-          ${promemoria}`}
+          ${daApprovare}${promemoria}`}
       </ha-card>`;
   }
 
@@ -106,6 +109,7 @@ ha-card:focus-visible { outline:2px solid var(--primary-color); outline-offset:2
 .sera { display:flex; align-items:center; gap:8px; margin-left:52px; padding:6px 12px; border-radius:999px; font-size:12px;
   background:rgba(255,204,102,0.10); color:#ffd27a; }
 .sera ha-icon { --mdc-icon-size:16px; }
+.sera.appr { background:rgba(63,184,245,0.14); color:#8fdcff; }
 `;
 
 if (!customElements.get("desco-card")) customElements.define("desco-card", DescoCard);

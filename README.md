@@ -14,6 +14,7 @@ Menu settimanale equilibrato per Home Assistant: per ogni pasto **una proteina, 
 - **Promemoria serale** sul telefono: pranzo di domani, cosa cucinare doppio, cosa scongelare, preparazione in anticipo
 - **Trascina e scambia**: sposta un pasto su un altro giorno o tra pranzo e cena (mouse e touch)
 - **Storico**: ogni settimana passata resta consultabile, divisa per mese, e si può riproporre
+- **Menu automatico con approvazione**: il giorno e l'ora scelti (di base venerdì alle 21) Desco prepara il menu della settimana dopo e lo manda ai telefoni; con «Va bene così» (dalla notifica o dall'app) compila la lista della spesa e avvisa tutti
 - **Annulla**: dopo un cambio indesiderato (rigenera, ⇄, trascinamento) un tasto riporta il menu com'era
 - **Dispensa e freezer**: quello che avete già in casa esce dalla spesa e il menu preferisce i piatti che lo usano
 - **Lista della spesa**: un tasto invia gli ingredienti della settimana alla To-do di Home Assistant
@@ -63,9 +64,10 @@ mostra_promemoria: true
 | `sensor.desco_cena_di_oggi` | cena di oggi |
 | `sensor.desco_pranzo_di_domani` | pranzo di domani (utile per prepararlo la sera prima) |
 | `sensor.desco_cena_di_domani` | cena di domani |
+| `sensor.desco_stato_del_menu` | «Da approvare» / «Approvato» / «Nessun menu» |
 | `sensor.desco_promemoria_di_stasera` | cosa preparare stasera per domani; attributo `testo` con il messaggio completo |
 
-Servizi: `desco.genera_settimana` (`settimana: auto | corrente | prossima`), `desco.invia_lista_spesa` e `desco.invia_promemoria`.
+Servizi: `desco.genera_settimana` (`settimana: auto | corrente | prossima`), `desco.invia_lista_spesa`, `desco.invia_promemoria` e `desco.approva_menu`.
 
 Il promemoria serale si attiva da Impostazioni → Dispositivi e servizi → Desco → **Configura**: scegli i telefoni (`notify.mobile_app_…`) e l'orario. Non serve nessuna automazione. Evento `desco_piano_aggiornato` a ogni modifica del menu.
 

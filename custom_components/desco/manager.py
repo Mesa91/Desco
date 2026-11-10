@@ -50,6 +50,7 @@ class DescoManager:
         self.lib: dict[str, dict] = {}
         self._listeners: list[Callable[[], None]] = []
         self._annulla: list[dict] = []  # istantanee del menu per «Annulla» (solo in memoria)
+        self.su_impostazioni = None  # richiamata dopo il salvataggio delle preferenze
 
     # ------------------------------------------------------------------ opzioni
 
@@ -93,6 +94,9 @@ class DescoManager:
             self.data.get("dispensa"))
 
     async def _salva(self, piano_cambiato: bool = False) -> None:
+        piano = self.data.get("piano")
+        if piano_cambiato and piano and piano.get("stato") == "approvato":
+            piano["spesa_da_aggiornare"] = True  # il menu è cambiato dopo l'approvazione
         await self._store.async_save(self.data)
         if piano_cambiato:
             self.hass.bus.async_fire(EVENT_UPDATED, {"settimana": (self.data.get("piano") or {}).get("settimana")})
@@ -167,6 +171,7 @@ class DescoManager:
             "n_archivio": len(self.data["archivio"]),
             "preparazioni": planner.preparazioni(self._pasti(), self.lib) if piano else [],
             "notifiche": bool(self.opt(CONF_NOTIFY)),
+            "servizi_notifica": list(self.opt(CONF_NOTIFY) or []),
             "promemoria": self.promemoria() if piano else None,
         }
 
@@ -228,6 +233,7 @@ class DescoManager:
             "pasti": pasti,
             "avvisi": avvisi,
             "generato": dt_util.now().isoformat(),
+            "stato": "proposta",  # diventa «approvato» quando la famiglia dà l'ok
         }
         await self._salva(piano_cambiato=True)
 
@@ -366,6 +372,13 @@ class DescoManager:
         s["cene_doppie"] = max(0, min(4, int(s.get("cene_doppie", 2) or 0)))
         s["pranzo_solo_tonno"] = bool(s.get("pranzo_solo_tonno", True))
         s["pranzo_niente_brodi"] = bool(s.get("pranzo_niente_brodi", True))
+        s["auto_genera"] = bool(s.get("auto_genera", True))
+        s["auto_giorno"] = max(0, min(6, int(s.get("auto_giorno", 4))))
+        try:
+            hh, mm = str(s.get("auto_ora", "21:00")).split(":")[:2]
+            s["auto_ora"] = f"{max(0, min(23, int(hh))):02d}:{max(0, min(59, int(mm))):02d}"
+        except ValueError:
+            s["auto_ora"] = "21:00"
         s["obiettivi"] = {k: max(0, min(10, int(round(float(v)))))
                           for k, v in {**planner.OBIETTIVI_DEFAULT, **(s.get("obiettivi") or {})}.items()
                           if k in planner.OBIETTIVI_DEFAULT}
@@ -374,6 +387,8 @@ class DescoManager:
         s["giorni"] = sorted({int(g) for g in s.get("giorni", []) if 0 <= int(g) <= 6}) or [0, 1, 2, 3, 4]
         self.data["settings"] = s
         await self._salva()
+        if self.su_impostazioni:
+            self.su_impostazioni()
 
     async def salva_componente(self, comp: dict) -> dict:
         nome = str(comp.get("nome", "")).strip()
@@ -631,8 +646,82 @@ class DescoManager:
                 "todo", "add_item", {"item": voce}, target={"entity_id": entity}, blocking=True)
             aggiunte += 1
         self.data["spesa_inviata"] = voci
+        if self.data.get("piano"):
+            self.data["piano"]["spesa_da_aggiornare"] = False
         await self._salva()
         return {"aggiunte": aggiunte, "rimosse": len(vecchie), "totale": len(voci), "entity": entity}
+
+    # ------------------------------------------------------------------ menu automatico e approvazione
+
+    async def _notifica(self, titolo: str, testo: str, dati: dict | None = None) -> bool:
+        servizi = self.opt(CONF_NOTIFY) or []
+        for srv in servizi:
+            dominio, _, nome = srv.partition(".")
+            if dominio != "notify" or not nome:
+                continue
+            msg = {"title": titolo, "message": testo}
+            if dati and nome.startswith("mobile_app"):
+                msg["data"] = dati
+            try:
+                await self.hass.services.async_call("notify", nome, msg, blocking=True)
+            except Exception as err:  # noqa: BLE001
+                _LOGGER.warning("Notifica Desco a %s non riuscita: %s", srv, err)
+        return bool(servizi)
+
+    async def notifica_proposta(self) -> None:
+        piano = self.data.get("piano")
+        if not piano:
+            return
+        lun = date.fromisoformat(piano["settimana"])
+        righe = []
+        for g in sorted({p["giorno"] for p in piano["pasti"]}):
+            pr = next((p for p in piano["pasti"] if p["giorno"] == g and p["tipo"] == "pranzo"), None)
+            ce = next((p for p in piano["pasti"] if p["giorno"] == g and p["tipo"] == "cena"), None)
+            nome = lambda p: planner.info_pasto(p, self.lib)["titolo"].split(" · ")[0] if p else "—"  # noqa: E731
+            righe.append(f"{planner.GIORNI[g][:3]}: {nome(pr)} / {nome(ce)}")
+        await self._notifica(
+            f"🍽️ Menu dal {lun.day}/{lun.month}: da approvare",
+            "\n".join(righe) + "\nControllate i pasti: quando date l'ok, la lista della spesa si compila da sola.",
+            {
+                "tag": "desco-menu",
+                "url": "/desco",
+                "clickAction": "/desco",
+                "actions": [
+                    {"action": "DESCO_APPROVA", "title": "Va bene così"},
+                    {"action": "URI", "title": "Apri Desco", "uri": "/desco"},
+                ],
+            },
+        )
+
+    async def menu_automatico(self) -> None:
+        """Il giorno e l'ora scelti: prepara il menu della settimana dopo e avvisa la famiglia."""
+        st = self.settings
+        oggi = dt_util.now().date()
+        if not st.get("auto_genera", True) or oggi.weekday() != int(st.get("auto_giorno", 4)):
+            return
+        prossima = planner.lunedi_di(oggi) + timedelta(days=7)
+        piano = self.data.get("piano")
+        if not (piano and piano.get("settimana") == prossima.isoformat()):
+            await self.genera(prossima.isoformat())
+        elif piano.get("stato") == "approvato":
+            return  # già fatto e approvato a mano
+        await self.notifica_proposta()
+
+    async def approva(self, utente: str | None = None) -> dict:
+        piano = self.data.get("piano")
+        if not piano:
+            raise HomeAssistantError("Nessun menu da approvare")
+        piano["stato"] = "approvato"
+        piano["approvato_da"] = utente
+        piano["approvato_il"] = dt_util.now().isoformat()
+        r = await self.invia_spesa()
+        chi = f" da {utente}" if utente else ""
+        await self._notifica(
+            "✅ Menu approvato",
+            f"Menu approvato{chi}: {r['totale']} prodotti nella lista della spesa.",
+            {"tag": "desco-menu", "url": "/desco", "clickAction": "/desco"},
+        )
+        return r
 
     # ------------------------------------------------------------------ utilità per i sensori
 

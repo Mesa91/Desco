@@ -54,6 +54,9 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "cene_doppie": 2,  # volte a settimana in cui la cena fa anche il pranzo del giorno dopo
     "pranzo_solo_tonno": True,  # a pranzo, come pesce, solo tonno in scatola
     "pranzo_niente_brodi": True,  # a pranzo niente zuppe, minestre e piatti brodosi
+    "auto_genera": True,  # genera da solo il menu della settimana dopo
+    "auto_giorno": 4,  # 0 = lunedì … 4 = venerdì
+    "auto_ora": "21:00",
 }
 
 

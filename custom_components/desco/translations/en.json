@@ -49,6 +49,10 @@
     "invia_promemoria": {
       "name": "Send reminder",
       "description": "Sends tonight's reminder to the configured phones now."
+    },
+    "approva_menu": {
+      "name": "Approve menu",
+      "description": "Approves the weekly menu and fills the shopping list."
     }
   }
 }

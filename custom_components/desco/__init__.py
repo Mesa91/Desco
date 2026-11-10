@@ -10,7 +10,7 @@ from homeassistant.components import frontend, panel_custom
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
+from homeassistant.core import Event, HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse, callback
 from homeassistant.helpers.event import async_track_time_change
 
 from .const import (
@@ -84,6 +84,48 @@ async def async_setup_entry(hass: HomeAssistant, entry: DescoConfigEntry) -> boo
     hass.services.async_register(
         DOMAIN, "invia_promemoria", _promemoria, supports_response=SupportsResponse.OPTIONAL)
 
+    # menu automatico (es. venerdì alle 21) — si riprogramma quando cambiano le preferenze
+    annulla_auto = {"f": None}
+
+    @callback
+    def _programma_auto() -> None:
+        if annulla_auto["f"]:
+            annulla_auto["f"]()
+        hh, mm = (manager.settings.get("auto_ora") or "21:00").split(":")
+
+        async def _scatta(_now) -> None:
+            try:
+                await manager.menu_automatico()
+            except Exception as err:  # noqa: BLE001
+                _LOGGER.warning("Menu automatico Desco non riuscito: %s", err)
+
+        annulla_auto["f"] = async_track_time_change(hass, _scatta, hour=int(hh), minute=int(mm), second=0)
+
+    _programma_auto()
+    manager.su_impostazioni = _programma_auto
+    entry.async_on_unload(lambda: annulla_auto["f"] and annulla_auto["f"]())
+
+    # «Va bene così» premuto dalla notifica sul telefono
+    async def _azione_notifica(event: Event) -> None:
+        if event.data.get("action") != "DESCO_APPROVA":
+            return
+        nome = None
+        if event.context.user_id:
+            utente = await hass.auth.async_get_user(event.context.user_id)
+            nome = utente.name if utente else None
+        try:
+            await manager.approva(nome)
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.warning("Approvazione menu da notifica non riuscita: %s", err)
+
+    entry.async_on_unload(hass.bus.async_listen("mobile_app_notification_action", _azione_notifica))
+
+    async def _approva(call: ServiceCall) -> ServiceResponse:
+        return await manager.approva(call.data.get("utente"))
+
+    hass.services.async_register(
+        DOMAIN, "approva_menu", _approva, supports_response=SupportsResponse.OPTIONAL)
+
     if manager.opt(CONF_NOTIFY):
         ora, minuto = manager.orario_promemoria()
 
@@ -110,6 +152,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: DescoConfigEntry) -> bo
         hass.services.async_remove(DOMAIN, "genera_settimana")
         hass.services.async_remove(DOMAIN, "invia_lista_spesa")
         hass.services.async_remove(DOMAIN, "invia_promemoria")
+        hass.services.async_remove(DOMAIN, "approva_menu")
         frontend.async_remove_panel(hass, PANEL_URL)
         hass.data.pop(DOMAIN, None)
     return ok

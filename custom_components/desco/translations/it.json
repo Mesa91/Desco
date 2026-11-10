@@ -63,6 +63,10 @@
     "invia_promemoria": {
       "name": "Invia promemoria",
       "description": "Manda subito il promemoria di stasera ai telefoni configurati."
+    },
+    "approva_menu": {
+      "name": "Approva il menu",
+      "description": "Approva il menu della settimana e compila la lista della spesa."
     }
   }
 }

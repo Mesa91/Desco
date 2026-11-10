@@ -28,6 +28,8 @@ def _comando(schema: dict, azione):
     async def handler(hass: HomeAssistant, conn: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
         try:
             mgr = _mgr(hass)
+            if msg.get("type") == "desco/approva" and conn.user:
+                msg = {**msg, "utente": conn.user.name}
             extra = await azione(mgr, msg)
             risposta = mgr.stato(msg.get("con"))
             if extra is not None:
@@ -76,6 +78,7 @@ COMANDI = [
      lambda m, msg: m.suggerisci(msg["cat"], msg["quanti"], msg["asporto"])),
     ({vol.Required("type"): "desco/invia_spesa"}, lambda m, msg: m.invia_spesa()),
     ({vol.Required("type"): "desco/annulla"}, lambda m, msg: m.annulla()),
+    ({vol.Required("type"): "desco/approva"}, lambda m, msg: m.approva(msg.get("utente"))),
     ({vol.Required("type"): "desco/dispensa", vol.Required("azione"): vol.In(["aggiungi", "togli", "svuota"]),
       vol.Optional("nome", default=""): str},
      lambda m, msg: m.dispensa(msg["azione"], msg["nome"])),

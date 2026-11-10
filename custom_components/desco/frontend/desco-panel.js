@@ -241,6 +241,10 @@ class DescoPanel extends HTMLElement {
       }
       case "ricetta": this._apriRicetta(idx, false); break;
       case "rifai-ricetta": this._apriRicetta(this.modal?.idx, true); break;
+      case "approva":
+        this._conferma("Approvate il menu della settimana?", "Desco compila subito la lista della spesa e avvisa la famiglia.").then((ok) => ok &&
+          this._ws("desco/approva", {}, { messaggio: (r) => r ? `Menu approvato: ${r.totale} prodotti nella lista della spesa` : "Menu approvato" }));
+        break;
       case "prova-notifica": this._ws("desco/prova_promemoria", {}, { messaggio: "Promemoria inviato" }); break;
       case "svuota":
         this._conferma("Vuoi cancellare il menu della settimana?").then((ok) => ok && this._ws("desco/svuota", {}, { messaggio: "Menu cancellato", annullabile: true }));
@@ -315,6 +319,9 @@ class DescoPanel extends HTMLElement {
       porzioni_pranzo: Number(q("porz_pranzo").value),
       porzioni_cena: Number(q("porz_cena").value),
       cene_doppie: Number(q("cene_doppie").value),
+      auto_genera: q("auto_genera").checked,
+      auto_giorno: Number(q("auto_giorno").value),
+      auto_ora: q("auto_ora").value || "21:00",
       obiettivi: Object.fromEntries(MACRO.map(([k]) => [k, Number(q(`ob-${k}`).value) || 0])),
     };
     const r = await this._ws("desco/impostazioni", { settings }, { messaggio: "Preferenze salvate: valgono dalla prossima generazione" });
@@ -423,6 +430,7 @@ class DescoPanel extends HTMLElement {
     const settimana = `${fmtData(lun, { day: "numeric" })} – ${fmtData(ven, { day: "numeric", month: "short" })}`;
     return `
       ${this._chipsStato(settimana)}
+      ${this._bannerApprovazione(p)}
       ${sez("mdi:silverware-fork-knife", "Menu della settimana", `<div class="sez-azioni">
         ${pillBtn("genera", "mdi:shuffle-variant", "Rigenera", `data-sett="${lun}" title="Rigenera tutto tranne i pasti bloccati"`)}
         ${prossima ? pillBtn("genera", "mdi:calendar-arrow-right", `Settimana del ${fmtData(pred)}`, `data-sett="${pred}"`) : ""}
@@ -435,13 +443,34 @@ class DescoPanel extends HTMLElement {
       <div class="piede"><button class="link" data-act="svuota">Cancella menu</button></div>`;
   }
 
+  _bannerApprovazione(p) {
+    const stato = p.stato || "approvato";
+    if (stato === "proposta") {
+      return `<section class="banner-ok">
+        <span class="badge-ic grande"><ha-icon icon="mdi:clipboard-check-outline"></ha-icon></span>
+        <div class="b-testo"><b>Menu proposto, da approvare</b><span>Controllate i pasti e cambiate quello che non va. Quando date l'ok, la lista della spesa si compila da sola.</span></div>
+        ${pillBtn("approva", "mdi:check-bold", "Approva e crea la spesa", "", true)}
+      </section>`;
+    }
+    if (p.spesa_da_aggiornare) {
+      return `<section class="banner-ok avviso-b">
+        <span class="badge-ic grande"><ha-icon icon="mdi:cart-arrow-refresh"></ha-icon></span>
+        <div class="b-testo"><b>Il menu è cambiato dopo l'approvazione</b><span>Aggiorna la lista della spesa con i pasti nuovi.</span></div>
+        ${pillBtn("spesa", "mdi:cart-outline", "Aggiorna la spesa", "", true)}
+      </section>`;
+    }
+    return "";
+  }
+
   _chipsStato(settimana) {
     const cont = this.s.conteggi || {};
     const ob = this.s.settings.obiettivi || {};
     const chip = (col, label, val, title = "") => `<span class="chip-s" title="${esc(title)}"><span class="chip-ic" style="--cc:${col}"><span></span></span><span><small>${label}</small><b>${val}</b></span></span>`;
     const prom = this.s.promemoria;
+    const st = this.s.piano?.stato || "approvato";
     return `<div class="chips-stato">
       <span class="chip-s"><span class="chip-ic ic"><ha-icon icon="mdi:calendar-week"></ha-icon></span><span><small>Settimana</small><b>${settimana}</b></span></span>
+      ${st === "approvato" ? `<span class="chip-s"><span class="chip-ic" style="--cc:#6ee7a8"><span></span></span><span><small>Menu</small><b>Approvato${this.s.piano?.approvato_da ? ` da ${esc(this.s.piano.approvato_da)}` : ""}</b></span></span>` : ""}
       ${MACRO.filter(([k]) => (ob[k] || 0) > 0 || cont[k]).map(([k, l, , col]) => chip(col, l, `${cont[k] || 0} / ${ob[k] ?? 0}`, `Obiettivo: ${ob[k] ?? 0} a settimana`)).join("")}
       ${prom && prom.breve && !/^Niente/.test(prom.breve) ? chip("#8fdcff", "Stasera", esc(prom.breve.replace(/^Stasera: /, "")), prom.testo) : ""}
     </div>`;
@@ -870,6 +899,16 @@ class DescoPanel extends HTMLElement {
           <input type="range" id="quota" min="0" max="0.8" step="0.1" value="${s.quota_piatti_unici}" data-out="o-quota" data-fmt="pct">
         </div>
         <div class="campo">
+          <div class="riga-flex"><label>Menu automatico</label><label class="switch"><input type="checkbox" id="auto_genera" ${s.auto_genera !== false ? "checked" : ""}><span></span></label></div>
+          <div class="nota">Il giorno scelto Desco prepara il menu della settimana dopo e lo manda ai telefoni da approvare. Con l'ok compila la lista della spesa.</div>
+          <div class="auto-quando">
+            <select id="auto_giorno" aria-label="Giorno">${["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"].map((g, i) => `<option value="${i}" ${Number(s.auto_giorno ?? 4) === i ? "selected" : ""}>${g}</option>`).join("")}</select>
+            <span>alle</span>
+            <input type="time" id="auto_ora" value="${esc(s.auto_ora || "21:00")}" aria-label="Ora">
+          </div>
+          <div class="nota">${this.s.servizi_notifica?.length ? `Notifiche a: ${this.s.servizi_notifica.map((x) => esc(x.replace("notify.", ""))).join(", ")}` : "Nessun telefono per le notifiche: sceglili in Impostazioni → Dispositivi e servizi → Desco → Configura."}</div>
+        </div>
+        <div class="campo">
           <label>Cene doppie a settimana <output id="o-doppie">${s.cene_doppie ?? 2}</output></label>
           <div class="nota">Quante volte un contorno della cena (cereali, verdure cotte) si cucina doppio per diventare il pranzo del giorno dopo. 0 = mai.</div>
           <input type="range" id="cene_doppie" min="0" max="4" step="1" value="${s.cene_doppie ?? 2}" data-out="o-doppie" data-fmt="num">
@@ -1248,6 +1287,15 @@ const STILE_A = `
 .dock-b:hover { background:rgba(255,255,255,0.05); }
 .dock-b.on { background:#135a80; color:#8fdcff; }
 .app { position:relative; }
+.banner-ok { display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:12px 14px 12px 12px; margin:-6px 0 22px; border-radius:26px;
+  background:rgba(63,184,245,0.10); border:1px solid rgba(63,184,245,0.45); box-shadow:0 0 30px rgba(63,184,245,0.12); }
+.banner-ok.avviso-b { background:rgba(255,204,102,0.08); border-color:rgba(255,204,102,0.4); box-shadow:none; }
+.badge-ic.grande { width:44px; height:44px; } .badge-ic.grande ha-icon { --mdc-icon-size:22px; }
+.b-testo { flex:1 1 260px; display:flex; flex-direction:column; gap:2px; line-height:1.35; }
+.b-testo span { color:var(--tenue); font-size:13px; }
+.riga-flex { display:flex; justify-content:space-between; align-items:center; }
+.auto-quando { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0 6px; }
+.auto-quando select, .auto-quando input { font:inherit; color:var(--testo); background:var(--pill); border:1px solid var(--linea); border-radius:12px; padding:8px 12px; color-scheme:dark; }
 .conf-velo { background:rgba(0,0,0,0.55); z-index:40; }
 .conf { width:min(400px, calc(100vw - 32px)); background:var(--ha-dialog-surface-background, var(--mdc-theme-surface, #1e2228)); color:var(--primary-text-color, #e8f1f8);
   border-radius:var(--ha-dialog-border-radius, 28px); padding:24px 24px 16px; box-shadow:0 12px 40px rgba(0,0,0,0.5); font-family:var(--ha-font-family-body, inherit); }

@@ -22,7 +22,8 @@ SENSORI = [
 
 async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback) -> None:
     mgr: DescoManager = entry.runtime_data
-    entita = [PastoSensor(mgr, entry.entry_id, *s) for s in SENSORI] + [PromemoriaSensor(mgr, entry.entry_id)]
+    entita = [PastoSensor(mgr, entry.entry_id, *s) for s in SENSORI] + [
+        PromemoriaSensor(mgr, entry.entry_id), StatoMenuSensor(mgr, entry.entry_id)]
     async_add_entities(entita)
 
     @callback
@@ -95,3 +96,23 @@ class PromemoriaSensor(PastoSensor):
     def extra_state_attributes(self) -> dict:
         p = self._mgr.promemoria()
         return {"desco": "promemoria_sera", **({"testo": p["testo"], "titolo": p["titolo"]} if p else {})}
+
+
+class StatoMenuSensor(PastoSensor):
+    """Stato del menu: da approvare / approvato."""
+
+    def __init__(self, mgr: DescoManager, entry_id: str) -> None:
+        super().__init__(mgr, entry_id, "stato_menu", "Stato del menu", "cena", 0, "mdi:clipboard-check-outline")
+
+    @property
+    def native_value(self) -> str:
+        piano = self._mgr.data.get("piano")
+        if not piano:
+            return "Nessun menu"
+        return "Approvato" if piano.get("stato", "approvato") == "approvato" else "Da approvare"
+
+    @property
+    def extra_state_attributes(self) -> dict:
+        piano = self._mgr.data.get("piano") or {}
+        return {"desco": "stato_menu", "settimana": piano.get("settimana"),
+                "approvato_da": piano.get("approvato_da"), "spesa_da_aggiornare": piano.get("spesa_da_aggiornare", False)}
