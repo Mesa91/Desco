@@ -1,6 +1,6 @@
 """Costanti di Desco."""
 DOMAIN = "desco"
-VERSION = "1.0.21"
+VERSION = "1.0.22"
 NAME = "Desco"
 
 STORAGE_KEY = "desco.data"

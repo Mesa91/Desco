@@ -694,7 +694,9 @@ class DescoManager:
             "Tocca per aprire Desco e controllare i pasti.",
             {
                 "tag": "desco-menu",
-                "alert_once": True,  # il secondo invio sostituisce il primo senza suonare di nuovo
+                "alert_once": True,
+                "priority": "high",  # Android: consegna immediata anche col telefono in riposo
+                "ttl": 0,  # il secondo invio sostituisce il primo senza suonare di nuovo
                 "url": "/desco",  # iPhone
                 "clickAction": "/desco",  # Android: il tocco apre Desco a schermo intero
             },
