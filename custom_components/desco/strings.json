@@ -14,7 +14,7 @@
         "data_description": {
           "todo_entity": "Lista To-do dove inviare gli ingredienti della settimana.",
           "gemini_api_key": "Da Google AI Studio (piano gratuito). Serve solo per farsi suggerire piatti nuovi.",
-          "gemini_model": "Per esempio gemini-2.5-flash",
+          "gemini_model": "Per esempio gemini-3.8-flash (se Google ritira il modello, Desco passa da solo al più recente)",
           "notify_services": "Telefoni a cui mandare ogni sera cosa preparare per domani (es. notify.mobile_app_telefono_di_linda). Lascia vuoto per non ricevere notifiche.",
           "notify_time": "Ogni sera a quest'ora, se domani c'è qualcosa nel menu."
         }
@@ -38,7 +38,7 @@
         "data_description": {
           "todo_entity": "Lista To-do dove inviare gli ingredienti della settimana.",
           "gemini_api_key": "Da Google AI Studio (piano gratuito). Serve solo per farsi suggerire piatti nuovi.",
-          "gemini_model": "Per esempio gemini-2.5-flash",
+          "gemini_model": "Per esempio gemini-3.8-flash (se Google ritira il modello, Desco passa da solo al più recente)",
           "notify_services": "Telefoni a cui mandare ogni sera cosa preparare per domani (es. notify.mobile_app_telefono_di_linda). Lascia vuoto per non ricevere notifiche.",
           "notify_time": "Ogni sera a quest'ora, se domani c'è qualcosa nel menu."
         }

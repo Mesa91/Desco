@@ -492,9 +492,9 @@ class DescoManager:
         try:
             r = await gemini.ricetta_pasto(
                 async_get_clientsession(self.hass), self.opt(CONF_GEMINI_KEY, ""),
-                self.opt(CONF_GEMINI_MODEL) or DEFAULT_GEMINI_MODEL,
+                self._modello(),
                 [d for d in info["dettagli"] if d["id"]], int(p.get("porzioni", 1)),
-                p["tipo"] == "pranzo", bool(self.settings["microonde"]), avanzi,
+                p["tipo"] == "pranzo", bool(self.settings["microonde"]), avanzi, self._modello_cambiato,
             )
         except gemini.GeminiError as err:
             raise HomeAssistantError(str(err)) from err
@@ -596,19 +596,30 @@ class DescoManager:
 
     # ------------------------------------------------------------------ Gemini
 
+    def _modello(self) -> str:
+        scelto = self.opt(CONF_GEMINI_MODEL) or DEFAULT_GEMINI_MODEL
+        # se il modello scelto è stato ritirato da Google, si usa quello trovato al suo posto
+        sost = self.data.get("gemini_sostituto") or {}
+        return sost.get("nuovo") if sost.get("vecchio") == scelto else scelto
+
+    def _modello_cambiato(self, nuovo: str) -> None:
+        self.data["gemini_sostituto"] = {"vecchio": self.opt(CONF_GEMINI_MODEL) or DEFAULT_GEMINI_MODEL, "nuovo": nuovo}
+        self.hass.async_create_task(self._salva())
+
     async def suggerisci(self, cat: str, quanti: int, per_asporto: bool) -> list[dict]:
         sett = self._settimana() or planner.settimana_predefinita(dt_util.now().date())
         try:
             return await gemini.suggerisci(
                 async_get_clientsession(self.hass),
                 self.opt(CONF_GEMINI_KEY, ""),
-                self.opt(CONF_GEMINI_MODEL) or DEFAULT_GEMINI_MODEL,
+                self._modello(),
                 cat,
                 max(1, min(8, int(quanti))),
                 self.settings,
                 (sett + timedelta(days=2)).month,
                 [c["nome"] for c in self.lib.values()],
                 per_asporto,
+                self._modello_cambiato,
             )
         except gemini.GeminiError as err:
             raise HomeAssistantError(str(err)) from err

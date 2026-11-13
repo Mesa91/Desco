@@ -28,6 +28,74 @@ NOMI_CAT = {
 class GeminiError(Exception):
     """Errore nella chiamata a Gemini."""
 
+    def __init__(self, msg: str, modello_ritirato: bool = False) -> None:
+        super().__init__(msg)
+        self.modello_ritirato = modello_ritirato
+
+
+MODELS_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+
+
+def _ritirato(status: int, msg: str) -> bool:
+    m = msg.lower()
+    return status == 404 or "no longer available" in m or "not found" in m or "deprecated" in m
+
+
+async def _chiama(session: aiohttp.ClientSession, api_key: str, model: str, body: dict, timeout: int) -> str:
+    """Chiama generateContent e restituisce il testo della risposta."""
+    try:
+        async with session.post(API_URL.format(model=model), params={"key": api_key}, json=body,
+                                timeout=aiohttp.ClientTimeout(total=timeout)) as resp:
+            data = await resp.json(content_type=None)
+            if resp.status != 200:
+                msg = (data or {}).get("error", {}).get("message", f"HTTP {resp.status}")
+                raise GeminiError(f"Gemini: {msg}", modello_ritirato=_ritirato(resp.status, msg))
+    except aiohttp.ClientError as err:
+        raise GeminiError(f"Gemini non raggiungibile: {err}") from err
+    try:
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError, TypeError) as err:
+        raise GeminiError("Risposta di Gemini non leggibile, riprova.") from err
+
+
+async def modello_piu_recente(session: aiohttp.ClientSession, api_key: str) -> str | None:
+    """Il modello «flash» stabile più recente disponibile per questa chiave (es. gemini-3.8-flash)."""
+    try:
+        async with session.get(MODELS_URL, params={"key": api_key, "pageSize": 200},
+                               timeout=aiohttp.ClientTimeout(total=20)) as resp:
+            data = await resp.json(content_type=None)
+    except aiohttp.ClientError:
+        return None
+    candidati = []
+    for m in (data or {}).get("models", []):
+        nome = str(m.get("name", "")).removeprefix("models/")
+        if "generateContent" not in m.get("supportedGenerationMethods", []):
+            continue
+        if not re.fullmatch(r"gemini-(\d+(?:\.\d+)?)-flash", nome):
+            continue  # niente lite, preview, versioni datate
+        candidati.append((float(re.match(r"gemini-(\d+(?:\.\d+)?)", nome).group(1)), nome))
+    return max(candidati)[1] if candidati else None
+
+
+async def con_modello(session: aiohttp.ClientSession, api_key: str, model: str, body: dict, timeout: int,
+                      su_cambio=None) -> str:
+    """Come _chiama, ma se il modello è stato ritirato passa da solo al più recente."""
+    if not api_key:
+        raise GeminiError("Chiave API di Gemini non configurata (Impostazioni → Dispositivi e servizi → Desco → Configura).")
+    try:
+        return await _chiama(session, api_key, model, body, timeout)
+    except GeminiError as err:
+        if not err.modello_ritirato:
+            raise
+        nuovo = await modello_piu_recente(session, api_key)
+        if not nuovo or nuovo == model:
+            raise
+        _LOGGER.info("Modello Gemini %s ritirato: passo a %s", model, nuovo)
+        testo = await _chiama(session, api_key, nuovo, body, timeout)
+        if su_cambio:
+            su_cambio(nuovo)
+        return testo
+
 
 def _slug(testo: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "_", testo.lower()).strip("_")
@@ -99,31 +167,15 @@ def _pulisci(raw: Any, cat: str) -> dict | None:
 
 
 async def suggerisci(session: aiohttp.ClientSession, api_key: str, model: str, cat: str, quanti: int,
-                     settings: dict, mese: int, esistenti: list[str], per_asporto: bool) -> list[dict]:
-    if not api_key:
-        raise GeminiError("Chiave API di Gemini non configurata (Impostazioni → Integrazioni → Desco → Configura).")
+                     settings: dict, mese: int, esistenti: list[str], per_asporto: bool, su_cambio=None) -> list[dict]:
     body = {
         "contents": [{"role": "user", "parts": [{"text": _prompt(cat, quanti, settings, mese, esistenti, per_asporto)}]}],
         "generationConfig": {"responseMimeType": "application/json", "temperature": 0.9},
     }
+    testo = await con_modello(session, api_key, model, body, 60, su_cambio)
     try:
-        async with session.post(
-            API_URL.format(model=model),
-            params={"key": api_key},
-            json=body,
-            timeout=aiohttp.ClientTimeout(total=60),
-        ) as resp:
-            data = await resp.json(content_type=None)
-            if resp.status != 200:
-                msg = (data or {}).get("error", {}).get("message", f"HTTP {resp.status}")
-                raise GeminiError(f"Gemini: {msg}")
-    except aiohttp.ClientError as err:
-        raise GeminiError(f"Gemini non raggiungibile: {err}") from err
-    try:
-        testo = data["candidates"][0]["content"]["parts"][0]["text"]
         lista = json.loads(testo)
-    except (KeyError, IndexError, ValueError, TypeError) as err:
-        _LOGGER.debug("Risposta Gemini non valida: %s", data)
+    except ValueError as err:
         raise GeminiError("Risposta di Gemini non leggibile, riprova.") from err
     if isinstance(lista, dict):
         lista = lista.get("piatti") or lista.get("items") or [lista]
@@ -159,26 +211,16 @@ Rispondi SOLO con un oggetto JSON:
 
 
 async def ricetta_pasto(session: aiohttp.ClientSession, api_key: str, model: str, dettagli: list[dict],
-                       porzioni: int, per_asporto: bool, microonde: bool, avanzi: list[str]) -> dict:
-    if not api_key:
-        raise GeminiError("Chiave API di Gemini non configurata (Impostazioni → Dispositivi e servizi → Desco → Configura).")
+                       porzioni: int, per_asporto: bool, microonde: bool, avanzi: list[str], su_cambio=None) -> dict:
     body = {
         "contents": [{"role": "user", "parts": [{"text": _prompt_ricetta(dettagli, porzioni, per_asporto, microonde, avanzi)}]}],
         "generationConfig": {"responseMimeType": "application/json", "temperature": 0.4},
     }
     try:
-        async with session.post(API_URL.format(model=model), params={"key": api_key}, json=body,
-                                timeout=aiohttp.ClientTimeout(total=90)) as resp:
-            data = await resp.json(content_type=None)
-            if resp.status != 200:
-                raise GeminiError(f"Gemini: {(data or {}).get('error', {}).get('message', f'HTTP {resp.status}')}")
-    except aiohttp.ClientError as err:
-        raise GeminiError(f"Gemini non raggiungibile: {err}") from err
-    try:
-        r = json.loads(data["candidates"][0]["content"]["parts"][0]["text"])
+        r = json.loads(await con_modello(session, api_key, model, body, 90, su_cambio))
         if isinstance(r, list):
             r = r[0]
-    except (KeyError, IndexError, ValueError, TypeError) as err:
+    except ValueError as err:
         raise GeminiError("Risposta di Gemini non leggibile, riprova.") from err
     testo = lambda x: str(x).strip()[:600]  # noqa: E731
     return {
