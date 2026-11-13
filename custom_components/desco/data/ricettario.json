@@ -1,5 +1,5 @@
 {
- "versione": 1,
+ "versione": 2,
  "nota": "Quantità per 1 porzione. asporto: freddo = buono anche freddo, caldo = da riscaldare (microonde), no = non adatto al trasporto. costo: 1 = €, 2 = €€, 3 = €€€. stagione: mesi in cui la verdura è di stagione (assente = tutto l'anno). dispensa: ingredienti che non vanno in lista spesa.",
  "componenti": [
   {
@@ -2194,6 +2194,2057 @@
    ],
    "prep": "Lessa le patate a cubetti 12 minuti e falle raffreddare; unisci insalata, mais e cotto a listarelle. Condimento a parte.",
    "anticipo": true
+  },
+  {
+   "id": "lenticchie_insalata",
+   "nome": "Insalata di lenticchie e verdure",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 10,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "lenticchie lessate",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "sedano",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Scola le lenticchie e condiscile con carota e sedano a cubetti, olio, sale e un goccio di aceto. Si conserva 2 giorni in frigo.",
+   "anticipo": true
+  },
+  {
+   "id": "fagioli_tonno_cipolla",
+   "nome": "Fagioli con tonno e cipolla rossa",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "fagioli cannellini lessati",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "cipolla rossa",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Unisci fagioli scolati, tonno sgocciolato e cipolla rossa a fettine sottili; olio, sale e pepe."
+  },
+  {
+   "id": "burger_lenticchie",
+   "nome": "Burger di lenticchie",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "lenticchie lessate",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 20,
+     "u": "g"
+    },
+    {
+     "nome": "carote",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Frulla grossolanamente lenticchie e carota grattugiata con il pangrattato, forma 2 burger e cuocili in padella 4 minuti per lato.",
+   "anticipo": true
+  },
+  {
+   "id": "ceci_curry",
+   "nome": "Ceci al curry con pomodoro",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "ceci lessati",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "curry",
+     "dispensa": true
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Soffriggi la cipolla, aggiungi curry, ceci e passata e cuoci 8-10 minuti finché il sugo si asciuga bene.",
+   "anticipo": true
+  },
+  {
+   "id": "edamame",
+   "nome": "Edamame saltati",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 8,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "edamame surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Cuoci gli edamame surgelati 5 minuti in acqua bollente, scolali e saltali con olio, sale e un goccio di salsa di soia."
+  },
+  {
+   "id": "fave_pecorino",
+   "nome": "Fave fresche con pecorino",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 10,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "fave fresche",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "pecorino",
+     "q": 20,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Sbollenta le fave 3 minuti, pelale e condiscile con olio e scaglie di pecorino.",
+   "stagione": [
+    4,
+    5,
+    6
+   ]
+  },
+  {
+   "id": "cecina",
+   "nome": "Farinata di ceci",
+   "cat": "proteina",
+   "gruppo": "legumi",
+   "minuti": 30,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "farina di ceci",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Sbatti la farina di ceci con 200 ml d'acqua e sale, lascia riposare (anche dalla mattina), versa in teglia ben unta e cuoci a 230 °C per 20 minuti.",
+   "anticipo": true
+  },
+  {
+   "id": "tonno_olio_limone",
+   "nome": "Tonno all'olio con limone",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 5,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "tonno all'olio",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Sgocciola il tonno all'olio e condiscilo con limone, prezzemolo e pepe."
+  },
+  {
+   "id": "polpette_tonno",
+   "nome": "Polpette di tonno e ricotta",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 25,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "ricotta",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 25,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Impasta tonno sgocciolato, ricotta, parmigiano e pangrattato, forma le polpette e cuocile in forno a 200 °C per 15 minuti.",
+   "anticipo": true
+  },
+  {
+   "id": "platessa_forno",
+   "nome": "Platessa gratinata",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "filetti di platessa surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 15,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Disponi i filetti in teglia, copri con pangrattato, prezzemolo e un filo d'olio; forno a 200 °C per 12 minuti.",
+   "scongela": "filetti di platessa"
+  },
+  {
+   "id": "orata_cartoccio",
+   "nome": "Orata al cartoccio",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 25,
+   "costo": 3,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "filetti di orata",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "pomodorini",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Chiudi i filetti nella carta forno con pomodorini, limone, olio e sale; forno a 200 °C per 18 minuti."
+  },
+  {
+   "id": "calamari_padella",
+   "nome": "Calamari in padella",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "anelli di calamaro surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Salta i calamari in padella ben calda con olio, aglio e prezzemolo per 6-8 minuti, finché l'acqua evapora."
+  },
+  {
+   "id": "sgombro_patate",
+   "nome": "Sgombro con cipolla e capperi",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "sgombro in scatola",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "cipolla rossa",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "capperi",
+     "dispensa": true
+    }
+   ],
+   "prep": "Sgocciola lo sgombro e condiscilo con cipolla rossa a fettine, capperi e un filo di limone."
+  },
+  {
+   "id": "salmone_affumicato",
+   "nome": "Salmone affumicato con limone",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 3,
+   "costo": 3,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "salmone affumicato",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.25,
+     "u": "pz"
+    }
+   ],
+   "prep": "Servi il salmone con limone, pepe e un filo d'olio."
+  },
+  {
+   "id": "merluzzo_pomodorini",
+   "nome": "Merluzzo con pomodorini e olive",
+   "cat": "proteina",
+   "gruppo": "pesce",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "filetti di merluzzo surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "pomodorini",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "olive",
+     "dispensa": true
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "In padella scalda olio e pomodorini tagliati, adagia il merluzzo, aggiungi le olive, copri e cuoci 10 minuti.",
+   "scongela": "filetti di merluzzo"
+  },
+  {
+   "id": "pollo_curcuma",
+   "nome": "Bocconcini di pollo alla curcuma",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "petto di pollo",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "curcuma",
+     "dispensa": true
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Taglia il pollo a cubetti, infarinalo leggermente con curcuma e cuocilo in padella 8-10 minuti con un goccio d'acqua.",
+   "anticipo": true
+  },
+  {
+   "id": "cosce_pollo_forno",
+   "nome": "Sovracosce di pollo al forno",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 40,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "sovracosce di pollo",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Condisci con olio, sale, rosmarino e paprika e cuoci a 200 °C per 35-40 minuti.",
+   "anticipo": true
+  },
+  {
+   "id": "tacchino_limone",
+   "nome": "Fettine di tacchino al limone",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 10,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "fesa di tacchino a fette",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "limone",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Infarina le fettine, rosolale 2 minuti per lato e sfuma con il succo di limone."
+  },
+  {
+   "id": "polpette_pollo",
+   "nome": "Polpette di pollo al forno",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 25,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "macinato di pollo",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 15,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Impasta macinato, pangrattato e parmigiano, forma le polpette e cuocile a 200 °C per 18 minuti.",
+   "anticipo": true
+  },
+  {
+   "id": "lonza_latte",
+   "nome": "Lonza di maiale in padella",
+   "cat": "proteina",
+   "gruppo": "carne_bianca",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "lonza di maiale a fette",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Rosola le fette di lonza 2-3 minuti per lato con olio e salvia, sfuma con un goccio di latte e lascia addensare."
+  },
+  {
+   "id": "polpettone",
+   "nome": "Polpettone al forno",
+   "cat": "proteina",
+   "gruppo": "carne_rossa",
+   "minuti": 50,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "macinato misto",
+     "q": 130,
+     "u": "g"
+    },
+    {
+     "nome": "pangrattato",
+     "q": 20,
+     "u": "g"
+    },
+    {
+     "nome": "uova",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Impasta tutto, forma un polpettone e cuoci a 180 °C per 40 minuti. Ottimo fatto la domenica e affettato in settimana.",
+   "anticipo": true
+  },
+  {
+   "id": "salsiccia_padella",
+   "nome": "Salsiccia in padella",
+   "cat": "proteina",
+   "gruppo": "carne_rossa",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "salsiccia",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Bucherella la salsiccia e cuocila in padella con un goccio d'acqua per 12-15 minuti, girandola spesso."
+  },
+  {
+   "id": "tagliata_rucola",
+   "nome": "Tagliata con rucola e grana",
+   "cat": "proteina",
+   "gruppo": "carne_rossa",
+   "minuti": 10,
+   "costo": 3,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "controfiletto di manzo",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "rucola",
+     "q": 20,
+     "u": "g"
+    },
+    {
+     "nome": "grana",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Piastra ben calda, 3 minuti per lato, riposo 2 minuti, taglia a fette e servi su rucola con scaglie di grana."
+  },
+  {
+   "id": "frittata_zucchine",
+   "nome": "Frittata di zucchine",
+   "cat": "proteina",
+   "gruppo": "uova",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "zucchine",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Rosola le zucchine a rondelle, versa le uova sbattute col parmigiano e cuoci coperto a fuoco basso 8 minuti, poi gira.",
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "frittata_spinaci",
+   "nome": "Frittata di spinaci",
+   "cat": "proteina",
+   "gruppo": "uova",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "spinaci surgelati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Scongela gli spinaci in padella, unisci le uova sbattute col parmigiano e cuoci coperto, poi gira.",
+   "anticipo": true
+  },
+  {
+   "id": "uova_occhio",
+   "nome": "Uova all'occhio di bue",
+   "cat": "proteina",
+   "gruppo": "uova",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Padella antiaderente con un filo d'olio, uova a fuoco medio con coperchio per 3-4 minuti."
+  },
+  {
+   "id": "muffin_uova",
+   "nome": "Muffin salati di uova e verdure",
+   "cat": "proteina",
+   "gruppo": "uova",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "peperoni",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Sbatti le uova con parmigiano e verdure a cubetti, versa negli stampini da muffin e cuoci a 180 °C per 18 minuti.",
+   "anticipo": true
+  },
+  {
+   "id": "caprese",
+   "nome": "Caprese",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 5,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "mozzarella",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "pomodori",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Alterna fette di mozzarella e pomodoro, basilico, olio e sale.",
+   "stagione": [
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "id": "ricotta_forno",
+   "nome": "Ricotta al forno con erbe",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "ricotta",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Mescola la ricotta con parmigiano, erbe e pepe, versa in una pirofilina e cuoci a 200 °C per 20 minuti."
+  },
+  {
+   "id": "fiocchi_latte",
+   "nome": "Fiocchi di latte con erba cipollina",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 2,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "fiocchi di latte",
+     "q": 150,
+     "u": "g"
+    }
+   ],
+   "prep": "Condisci i fiocchi di latte con erba cipollina, pepe e un filo d'olio."
+  },
+  {
+   "id": "halloumi",
+   "nome": "Formaggio alla piastra (halloumi)",
+   "cat": "proteina",
+   "gruppo": "latticini",
+   "minuti": 8,
+   "costo": 3,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "halloumi",
+     "q": 100,
+     "u": "g"
+    }
+   ],
+   "prep": "Taglia a fette e cuoci sulla piastra calda 2 minuti per lato, finché è dorato."
+  },
+  {
+   "id": "mortadella",
+   "nome": "Mortadella",
+   "cat": "proteina",
+   "gruppo": "salumi",
+   "minuti": 2,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "mortadella",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Servi a fette sottili."
+  },
+  {
+   "id": "pane_casereccio",
+   "nome": "Pane casereccio",
+   "cat": "carboidrato",
+   "gruppo": "pane",
+   "minuti": 1,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "pane casereccio",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Una fetta abbondante, anche tostata."
+  },
+  {
+   "id": "crostini",
+   "nome": "Crostini di pane",
+   "cat": "carboidrato",
+   "gruppo": "pane",
+   "minuti": 8,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "pane integrale",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Taglia il pane a cubetti e tostalo in padella o forno con un filo d'olio."
+  },
+  {
+   "id": "riso_venere",
+   "nome": "Riso venere",
+   "cat": "carboidrato",
+   "gruppo": "riso",
+   "minuti": 20,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "riso venere",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci in acqua salata 18-20 minuti, scola e condisci con olio. Ottimo anche freddo.",
+   "anticipo": true
+  },
+  {
+   "id": "orzo_perlato_insalata",
+   "nome": "Orzo perlato",
+   "cat": "carboidrato",
+   "gruppo": "cereali",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "orzo perlato",
+     "q": 70,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci 20-25 minuti in acqua salata, scola e condisci con olio.",
+   "anticipo": true
+  },
+  {
+   "id": "patate_dolci",
+   "nome": "Patate dolci al forno",
+   "cat": "carboidrato",
+   "gruppo": "patate",
+   "minuti": 35,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "patate dolci",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "A spicchi con olio, sale e paprika, forno a 200 °C per 30 minuti.",
+   "stagione": [
+    9,
+    10,
+    11,
+    12
+   ]
+  },
+  {
+   "id": "pure",
+   "nome": "Purè di patate",
+   "cat": "carboidrato",
+   "gruppo": "patate",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "patate",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "latte",
+     "q": 50,
+     "u": "ml"
+    }
+   ],
+   "prep": "Lessa le patate, schiacciale e lavorale con latte caldo, una noce di burro e sale."
+  },
+  {
+   "id": "pasta_corta",
+   "nome": "Pasta corta di semola",
+   "cat": "carboidrato",
+   "gruppo": "pasta",
+   "minuti": 12,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta di semola",
+     "q": 80,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci al dente e condiscila con la verdura del pasto."
+  },
+  {
+   "id": "tortillas",
+   "nome": "Tortillas di mais",
+   "cat": "carboidrato",
+   "gruppo": "pane",
+   "minuti": 3,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "tortillas",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Scaldala 30 secondi in padella e farciscila con proteina e verdura."
+  },
+  {
+   "id": "cime_rapa",
+   "nome": "Cime di rapa saltate",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "cime di rapa",
+     "q": 250,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Sbollenta le cime 5 minuti, poi saltale in padella con olio, aglio e peperoncino.",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "catalogna",
+   "nome": "Catalogna ripassata",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "catalogna",
+     "q": 250,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Lessa la catalogna 8 minuti, strizzala e ripassala in padella con olio e aglio.",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3,
+    4
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "carote_padella",
+   "nome": "Carote glassate",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "carote",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Carote a rondelle in padella con olio e un dito d'acqua, coperchio 10 minuti, poi asciuga a fuoco vivo.",
+   "anticipo": true
+  },
+  {
+   "id": "piselli_menta",
+   "nome": "Piselli alla menta",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 10,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "piselli surgelati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Cuoci i piselli in padella con olio, un goccio d'acqua e qualche foglia di menta per 8 minuti."
+  },
+  {
+   "id": "funghi_trifolati",
+   "nome": "Funghi trifolati",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "funghi champignon",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Salta i funghi a fette con olio, aglio e prezzemolo per 10 minuti a fuoco vivo.",
+   "stagione": [
+    9,
+    10,
+    11
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "cavolo_romanesco",
+   "nome": "Cavolo romanesco al vapore",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "cavolo romanesco",
+     "q": 250,
+     "u": "g"
+    }
+   ],
+   "prep": "Cimette al vapore 10 minuti; condisci con olio e limone.",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "topinambur",
+   "nome": "Topinambur al forno",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 30,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "topinambur",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Lavati bene e a fette, olio e sale, forno a 200 °C per 25 minuti.",
+   "stagione": [
+    11,
+    12,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "id": "caponata_light",
+   "nome": "Caponata veloce",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "melanzane",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "sedano",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 50,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Melanzane a cubetti in padella con olio, poi sedano e passata; 15 minuti e un goccio di aceto. Più buona il giorno dopo.",
+   "stagione": [
+    7,
+    8,
+    9
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "peperonata",
+   "nome": "Peperonata",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "peperoni",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 40,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Peperoni e cipolla a falde in padella coperta 15 minuti, poi la passata e altri 5 minuti.",
+   "stagione": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "fagiolini_pomodoro",
+   "nome": "Fagiolini al pomodoro",
+   "cat": "verdura",
+   "gruppo": "cotta",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "fagiolini",
+     "q": 200,
+     "u": "g"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Sbollenta i fagiolini 5 minuti e finiscili in padella con passata e olio per 10 minuti.",
+   "stagione": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "anticipo": true
+  },
+  {
+   "id": "insalata_valeriana",
+   "nome": "Valeriana e mele",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "valeriana",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "mela",
+     "q": 0.5,
+     "u": "pz"
+    }
+   ],
+   "prep": "Valeriana con mela a fettine sottili, olio, sale e un goccio di aceto di mele.",
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "id": "rucola_pomodorini",
+   "nome": "Rucola e pomodorini",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "rucola",
+     "q": 50,
+     "u": "g"
+    },
+    {
+     "nome": "pomodorini",
+     "q": 100,
+     "u": "g"
+    }
+   ],
+   "prep": "Rucola con pomodorini tagliati, olio e sale.",
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "id": "insalata_ravanelli",
+   "nome": "Insalata con ravanelli",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "insalata",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "ravanelli",
+     "q": 4,
+     "u": "pz"
+    }
+   ],
+   "prep": "Insalata con ravanelli a fettine sottili, olio, sale e limone.",
+   "stagione": [
+    3,
+    4,
+    5,
+    6
+   ]
+  },
+  {
+   "id": "puntarelle",
+   "nome": "Puntarelle",
+   "cat": "verdura",
+   "gruppo": "cruda",
+   "minuti": 10,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "puntarelle",
+     "q": 120,
+     "u": "g"
+    }
+   ],
+   "prep": "Taglia a listarelle sottili, lasciale 10 minuti in acqua fredda e condisci con olio, aceto e acciuga.",
+   "stagione": [
+    11,
+    12,
+    1,
+    2
+   ]
+  },
+  {
+   "id": "u_cous_ceci_verdure",
+   "nome": "Couscous con ceci e verdure al forno",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "couscous",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "ceci lessati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "zucchine",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "peperoni",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Verdure a cubetti in forno a 200 °C per 15 minuti; nel frattempo idrata il couscous e unisci tutto con i ceci.",
+   "gruppo_carbo": "cereali",
+   "anticipo": true,
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "id": "u_riso_ceci_zucca",
+   "nome": "Riso con zucca e ceci",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "riso basmati",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "zucca",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "ceci lessati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Zucca a cubetti in padella 12 minuti con olio e rosmarino, poi i ceci; unisci al riso cotto.",
+   "gruppo_carbo": "riso",
+   "anticipo": true,
+   "stagione": [
+    9,
+    10,
+    11,
+    12,
+    1
+   ]
+  },
+  {
+   "id": "u_insalata_farro_tonno",
+   "nome": "Farro con tonno, pomodorini e olive",
+   "cat": "unico",
+   "gruppo": "pesce",
+   "minuti": 25,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "farro",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "pomodorini",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "olive",
+     "dispensa": true
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Cuoci e raffredda il farro, unisci tonno, pomodorini tagliati, olive e olio.",
+   "gruppo_carbo": "cereali",
+   "anticipo": true
+  },
+  {
+   "id": "u_pasta_tonno_pomodoro",
+   "nome": "Pasta al tonno e pomodoro",
+   "cat": "unico",
+   "gruppo": "pesce",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta di semola",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Scalda la passata con olio e aglio 8 minuti, aggiungi il tonno e condisci la pasta al dente. Sugo ben ristretto per il trasporto.",
+   "gruppo_carbo": "pasta",
+   "anticipo": true
+  },
+  {
+   "id": "u_spaghetti_vongole",
+   "nome": "Spaghetti alle vongole",
+   "cat": "unico",
+   "gruppo": "pesce",
+   "minuti": 20,
+   "costo": 3,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "spaghetti",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "vongole",
+     "q": 250,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Apri le vongole in padella con olio e aglio, sguscia metà, e salta gli spaghetti al dente nel loro sughetto con prezzemolo.",
+   "gruppo_carbo": "pasta"
+  },
+  {
+   "id": "u_poke_salmone",
+   "nome": "Poke di salmone",
+   "cat": "unico",
+   "gruppo": "pesce",
+   "minuti": 20,
+   "costo": 3,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "riso basmati",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "salmone fresco",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "avocado",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "cetrioli",
+     "q": 0.5,
+     "u": "pz"
+    }
+   ],
+   "prep": "Riso cotto e raffreddato, salmone a cubetti marinato con soia, avocado e cetriolo a fette.",
+   "gruppo_carbo": "riso"
+  },
+  {
+   "id": "u_pasta_ricotta_spinaci",
+   "nome": "Pasta ricotta e spinaci",
+   "cat": "unico",
+   "gruppo": "latticini",
+   "minuti": 15,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta di semola",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "ricotta",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "spinaci surgelati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 10,
+     "u": "g"
+    }
+   ],
+   "prep": "Cuoci gli spinaci in padella, frullali con ricotta e parmigiano e condisci la pasta al dente.",
+   "gruppo_carbo": "pasta",
+   "anticipo": true
+  },
+  {
+   "id": "u_torta_salata_zucchine",
+   "nome": "Torta salata zucchine e ricotta",
+   "cat": "unico",
+   "gruppo": "latticini",
+   "minuti": 40,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "pasta brisé",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "zucchine",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "ricotta",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "uova",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Zucchine grattugiate e strizzate con ricotta e uovo, versa sulla brisé e cuoci a 180 °C per 35 minuti. Si fa la domenica e dura 3 giorni.",
+   "gruppo_carbo": "pane",
+   "anticipo": true,
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "id": "u_torta_salata_porri",
+   "nome": "Torta salata porri e scamorza",
+   "cat": "unico",
+   "gruppo": "latticini",
+   "minuti": 40,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "pasta brisé",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "porri",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "scamorza",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "uova",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Stufa i porri, mescola con scamorza a cubetti e uovo, versa sulla brisé e cuoci a 180 °C per 35 minuti.",
+   "gruppo_carbo": "pane",
+   "anticipo": true,
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "id": "u_pizza_teglia",
+   "nome": "Pizza in teglia con verdure",
+   "cat": "unico",
+   "gruppo": "latticini",
+   "minuti": 30,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "impasto per pizza",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "mozzarella",
+     "q": 0.5,
+     "u": "pz"
+    }
+   ],
+   "prep": "Stendi l'impasto in teglia, condisci con passata, mozzarella e la verdura che hai, forno a 230 °C per 15-18 minuti.",
+   "gruppo_carbo": "pane"
+  },
+  {
+   "id": "u_frittata_pasta",
+   "nome": "Frittata di pasta",
+   "cat": "unico",
+   "gruppo": "uova",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "pasta di semola",
+     "q": 60,
+     "u": "g"
+    },
+    {
+     "nome": "uova",
+     "q": 2,
+     "u": "pz"
+    },
+    {
+     "nome": "parmigiano",
+     "q": 15,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Unisci la pasta cotta (anche avanzata) alle uova sbattute col parmigiano e cuoci in padella coperta, poi gira.",
+   "gruppo_carbo": "pasta",
+   "anticipo": true
+  },
+  {
+   "id": "u_bowl_pollo_riso",
+   "nome": "Bowl di pollo, riso e verdure",
+   "cat": "unico",
+   "gruppo": "carne_bianca",
+   "minuti": 25,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "riso basmati",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "petto di pollo",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "zucchine",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "carote",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Pollo a cubetti e verdure saltati in padella con un goccio di soia, sopra il riso cotto.",
+   "gruppo_carbo": "riso",
+   "anticipo": true
+  },
+  {
+   "id": "u_insalata_pollo_patate",
+   "nome": "Insalata di pollo, patate e fagiolini",
+   "cat": "unico",
+   "gruppo": "carne_bianca",
+   "minuti": 25,
+   "costo": 2,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "petto di pollo",
+     "q": 120,
+     "u": "g"
+    },
+    {
+     "nome": "patate",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "fagiolini",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Lessa patate e fagiolini, cuoci il pollo alla piastra a striscioline e condisci tutto freddo con olio e limone.",
+   "gruppo_carbo": "patate",
+   "anticipo": true,
+   "stagione": [
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "id": "u_pasta_ragu_bianco",
+   "nome": "Pasta al ragù bianco",
+   "cat": "unico",
+   "gruppo": "carne_rossa",
+   "minuti": 30,
+   "costo": 2,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta di semola",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "macinato misto",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "cipolla",
+     "q": 0.25,
+     "u": "pz"
+    },
+    {
+     "nome": "carote",
+     "q": 0.5,
+     "u": "pz"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Soffriggi cipolla e carota, rosola il macinato, sfuma con un goccio di vino e cuoci 15 minuti; condisci la pasta.",
+   "gruppo_carbo": "pasta",
+   "anticipo": true
+  },
+  {
+   "id": "u_chili_veloce",
+   "nome": "Chili di fagioli e carne",
+   "cat": "unico",
+   "gruppo": "carne_rossa",
+   "minuti": 30,
+   "costo": 2,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "macinato di manzo",
+     "q": 80,
+     "u": "g"
+    },
+    {
+     "nome": "fagioli rossi lessati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "passata di pomodoro",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "tortillas",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Rosola il macinato con cipolla e paprika, aggiungi fagioli e passata e cuoci 15 minuti; servi con tortillas.",
+   "gruppo_carbo": "pane",
+   "brodoso": true,
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "id": "u_pasta_ceci",
+   "nome": "Pasta e ceci asciutta",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "caldo",
+   "ingredienti": [
+    {
+     "nome": "pasta corta di semola",
+     "q": 70,
+     "u": "g"
+    },
+    {
+     "nome": "ceci lessati",
+     "q": 100,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Rosola i ceci con olio, aglio e rosmarino, schiacciane metà e lega con la pasta al dente e poca acqua di cottura.",
+   "gruppo_carbo": "pasta",
+   "anticipo": true
+  },
+  {
+   "id": "u_crema_ceci_pane",
+   "nome": "Vellutata di ceci con crostini",
+   "cat": "unico",
+   "gruppo": "legumi",
+   "minuti": 20,
+   "costo": 1,
+   "asporto": "no",
+   "ingredienti": [
+    {
+     "nome": "ceci lessati",
+     "q": 150,
+     "u": "g"
+    },
+    {
+     "nome": "pane integrale",
+     "q": 50,
+     "u": "g"
+    },
+    {
+     "nome": "olio extravergine",
+     "dispensa": true
+    }
+   ],
+   "prep": "Frulla i ceci caldi con brodo e olio, servi con crostini tostati.",
+   "gruppo_carbo": "pane",
+   "brodoso": true,
+   "stagione": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "id": "u_piadina_tonno",
+   "nome": "Piadina tonno e verdure",
+   "cat": "unico",
+   "gruppo": "pesce",
+   "minuti": 5,
+   "costo": 1,
+   "asporto": "freddo",
+   "ingredienti": [
+    {
+     "nome": "piadine",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "tonno al naturale",
+     "q": 1,
+     "u": "pz"
+    },
+    {
+     "nome": "insalata",
+     "q": 30,
+     "u": "g"
+    },
+    {
+     "nome": "pomodori",
+     "q": 1,
+     "u": "pz"
+    }
+   ],
+   "prep": "Scalda la piadina e farciscila con tonno, insalata e pomodoro; chiudila nella carta forno.",
+   "gruppo_carbo": "pane"
   }
  ]
 }

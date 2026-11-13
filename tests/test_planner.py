@@ -147,3 +147,18 @@ def test_pranzo_niente_brodi():
                 assert not any(L[c].get("brodoso") for c in p["componenti"]), p
     assert not P.pesce_ok_a_pranzo(L["minestrone"], {})
     assert P.pesce_ok_a_pranzo(L["minestrone"], {"pranzo_niente_brodi": False})
+
+
+def test_ricettario_integro():
+    import json
+    from pathlib import Path
+    d = json.loads((Path(__file__).parents[1] / "custom_components/desco/data/ricettario.json").read_text())
+    comp = d["componenti"]
+    ids = [c["id"] for c in comp]
+    assert len(ids) == len(set(ids))
+    for c in comp:
+        assert c["cat"] in ("proteina", "carboidrato", "verdura", "unico"), c["id"]
+        assert c["asporto"] in ("freddo", "caldo", "no"), c["id"]
+        assert c["ingredienti"] and c["prep"], c["id"]
+        if c["cat"] == "unico":
+            assert c.get("gruppo_carbo"), c["id"]

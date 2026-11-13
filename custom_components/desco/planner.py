@@ -120,11 +120,15 @@ def obiettivi_scalati(settings: dict, n_pasti: int) -> dict[str, float]:
 REPARTI = [
     ("Frutta e verdura", ("insalata", "carot", "cipoll", "finocch", "cavol", "broccol", "verza", "radicch", "zucca",
                           "bieta", "carciof", "zucchin", "melanzan", "peperon", "pomodor", "cetriol", "rucola",
-                          "limon", "aranc", "porri", "patat", "asparag", "spinacini")),
+                          "limon", "aranc", "porri", "patat", "asparag", "spinacini", "fagiolin", "sedano", "fave fresc",
+                          "cime di rapa", "catalogn", "funghi", "topinambur", "valerian", "mela", "ravanell",
+                          "puntarell", "avocado")),
     ("Pane", ("pane", "piadin")),
-    ("Carne e pesce", ("pollo", "tacchino", "manzo", "macinat", "hamburger", "salmone", "straccetti")),
+    ("Carne e pesce", ("pollo", "tacchino", "manzo", "macinat", "hamburger", "salmone", "straccetti",
+                          "orata", "vongole", "salsicc", "lonza", "maiale", "controfilett")),
     ("Banco frigo", ("uova", "mozzarell", "ricotta", "feta", "parmigian", "grana", "scamorz", "stracchin", "yogurt",
-                     "prosciutt", "bresaol", "speck", "tofu", "gnocchi")),
+                     "prosciutt", "bresaol", "speck", "tofu", "gnocchi", "mortadell", "fiocchi di latte",
+                     "halloumi", "pecorin", "latte", "pasta brise", "impasto per pizza")),
     ("Surgelati", ("surgelat", "minestrone")),
 ]
 ORDINE_REPARTI = ["Frutta e verdura", "Pane", "Carne e pesce", "Banco frigo", "Surgelati", "Scaffale"]
