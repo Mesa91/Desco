@@ -14,6 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
@@ -693,6 +694,7 @@ class DescoManager:
             "Tocca per aprire Desco e controllare i pasti.",
             {
                 "tag": "desco-menu",
+                "alert_once": True,  # il secondo invio sostituisce il primo senza suonare di nuovo
                 "url": "/desco",  # iPhone
                 "clickAction": "/desco",  # Android: il tocco apre Desco a schermo intero
             },
@@ -711,6 +713,15 @@ class DescoManager:
         elif piano.get("stato") == "approvato":
             return  # già fatto e approvato a mano
         await self.notifica_proposta()
+        # Il push dell'app mobile può fallire di passaggio (HA lo scrive solo nel log, senza errore
+        # per noi): ripetiamo l'invio dopo qualche minuto. Stesso tag + alert_once: se la prima
+        # notifica era arrivata, la seconda la aggiorna in silenzio.
+        async def _ripeti(_now) -> None:
+            p = self.data.get("piano")
+            if p and p.get("settimana") == prossima.isoformat() and p.get("stato") != "approvato":
+                await self.notifica_proposta()
+        for minuti in (3, 15):
+            async_call_later(self.hass, minuti * 60, _ripeti)
 
     async def approva(self, utente: str | None = None) -> dict:
         piano = self.data.get("piano")
