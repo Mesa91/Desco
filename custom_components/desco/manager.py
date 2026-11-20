@@ -631,6 +631,20 @@ class DescoManager:
         except gemini.GeminiError as err:
             raise HomeAssistantError(str(err)) from err
 
+    async def compila(self, nome: str, cat: str | None = None) -> dict:
+        nome = (nome or "").strip()
+        if not nome:
+            raise HomeAssistantError("Scrivi prima il nome del piatto")
+        if not self.gemini_attivo:
+            raise HomeAssistantError("Serve la chiave di Gemini (Impostazioni → Desco → Configura)")
+        try:
+            return await gemini.compila_piatto(
+                async_get_clientsession(self.hass), self.opt(CONF_GEMINI_KEY, ""), self._modello(),
+                nome, cat if cat in ("proteina", "carboidrato", "verdura", "unico") else None,
+                self.settings, self._modello_cambiato)
+        except gemini.GeminiError as err:
+            raise HomeAssistantError(str(err)) from err
+
     # ------------------------------------------------------------------ lista della spesa
 
     async def invia_spesa(self) -> dict:

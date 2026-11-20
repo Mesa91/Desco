@@ -92,6 +92,8 @@ COMANDI = [
     ({vol.Required("type"): "desco/inserisci", vol.Required("comp_id"): str,
       vol.Optional("tipo"): vol.Any(None, "pranzo", "cena")},
      lambda m, msg: m.inserisci(msg["comp_id"], msg.get("tipo"))),
+    ({vol.Required("type"): "desco/compila", vol.Required("nome"): str, vol.Optional("cat"): vol.Any(None, str)},
+     lambda m, msg: m.compila(msg["nome"], msg.get("cat"))),
     ({vol.Required("type"): "desco/prova_promemoria"}, lambda m, msg: m.invia_promemoria(forza=True)),
 ]
 

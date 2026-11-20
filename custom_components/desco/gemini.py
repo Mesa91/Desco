@@ -161,6 +161,13 @@ def _pulisci(raw: Any, cat: str) -> dict | None:
     }
     if raw.get("brodoso"):
         comp["brodoso"] = True
+    if raw.get("anticipo"):
+        comp["anticipo"] = True
+    if raw.get("scongela"):
+        comp["scongela"] = str(raw["scongela"])[:60] if isinstance(raw["scongela"], str) else nome
+    mesi = sorted({int(m) for m in (raw.get("stagione") or []) if str(m).isdigit() and 1 <= int(m) <= 12})
+    if mesi and len(mesi) < 12:
+        comp["stagione"] = mesi
     if cat == "unico":
         comp["gruppo_carbo"] = raw.get("gruppo_carbo") if raw.get("gruppo_carbo") in GRUPPI["carboidrato"] else "cereali"
     return comp
@@ -230,3 +237,50 @@ async def ricetta_pasto(session: aiohttp.ClientSession, api_key: str, model: str
         "contenitore": testo(r["contenitore"]) if r.get("contenitore") else None,
         "consigli": testo(r.get("consigli") or ""),
     }
+
+
+def _prompt_compila(nome: str, cat: str | None, settings: dict) -> str:
+    esclusi = ", ".join(settings.get("esclusi", [])) or "nessuno"
+    quale = (f"È da classificare come {NOMI_CAT.get(cat, cat)}." if cat else
+             "Decidi tu se è una proteina (secondo), un carboidrato, una verdura (contorno) o un piatto unico "
+             "(che da solo ha proteina e carboidrato).")
+    return f"""Sei un cuoco italiano pratico. Compila la scheda del piatto «{nome}» per un ricettario di tutti i giorni.
+{quale}
+Dai la versione più semplice e veloce da fare a casa, con ingredienti da supermercato italiano.
+Se il piatto contiene questi alimenti da evitare ({esclusi}), proponi la versione senza.
+Quantità PER UNA PERSONA, in g, ml o pz. Olio, sale, spezie ed erbe vanno marcati "dispensa": true senza quantità.
+Rispondi SOLO con un oggetto JSON:
+{{"nome": nome del piatto ripulito (iniziale maiuscola),
+ "cat": "proteina"|"carboidrato"|"verdura"|"unico",
+ "gruppo": per proteina o unico uno tra {GRUPPI['proteina']}, per carboidrato uno tra {GRUPPI['carboidrato']}, per verdura uno tra {GRUPPI['verdura']},
+ "gruppo_carbo": solo per unico, uno tra {GRUPPI['carboidrato']},
+ "minuti": int, "costo": 1|2|3 (1 = economico),
+ "asporto": "freddo" se è buono anche freddo in un contenitore, "caldo" se va scaldato al microonde, "no" se non si porta,
+ "brodoso": true se è una zuppa, minestra, vellutata o ha molto sugo liquido,
+ "anticipo": true se si può preparare 1-3 giorni prima e tenere in frigo,
+ "scongela": nome dell'ingrediente surgelato da scongelare la sera prima, oppure null,
+ "stagione": lista dei mesi (1-12) in cui gli ingredienti freschi principali sono di stagione, [] se va bene tutto l'anno,
+ "ingredienti": [{{"nome": str, "q": number, "u": "g"|"ml"|"pz"}} oppure {{"nome": str, "dispensa": true}}],
+ "prep": "istruzioni in 2-3 frasi"}}"""
+
+
+async def compila_piatto(session: aiohttp.ClientSession, api_key: str, model: str, nome: str, cat: str | None,
+                         settings: dict, su_cambio=None) -> dict:
+    """Dal solo nome, una scheda completa del piatto (da controllare e salvare nel ricettario)."""
+    body = {
+        "contents": [{"role": "user", "parts": [{"text": _prompt_compila(nome, cat, settings)}]}],
+        "generationConfig": {"responseMimeType": "application/json", "temperature": 0.3},
+    }
+    try:
+        r = json.loads(await con_modello(session, api_key, model, body, 60, su_cambio))
+    except ValueError as err:
+        raise GeminiError("Risposta di Gemini non leggibile, riprova.") from err
+    if isinstance(r, list):
+        r = r[0] if r else {}
+    scelta = cat or (r.get("cat") if r.get("cat") in ("proteina", "carboidrato", "verdura", "unico") else "unico")
+    comp = _pulisci(r, scelta)
+    if not comp:
+        raise GeminiError("Gemini non ha saputo compilare questo piatto, prova a scriverlo meglio.")
+    comp.pop("id", None)
+    comp.pop("origine", None)
+    return comp

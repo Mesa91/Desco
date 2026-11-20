@@ -216,6 +216,7 @@ class DescoPanel extends HTMLElement {
         this._conferma("Vuoi eliminare questo piatto dal ricettario?").then((ok) => ok && this._ws("desco/elimina_componente", { comp_id: id }, { messaggio: "Piatto eliminato" }));
         break;
       case "salva-piatto": this._salvaPiatto(); break;
+      case "compila": this._compila(); break;
       case "suggerisci": this._suggerisci(); break;
       case "aggiungi-sugg": {
         const c = this.suggeriti.find((x) => x.id === id);
@@ -261,6 +262,25 @@ class DescoPanel extends HTMLElement {
   }
 
   /* finestra di conferma come quella nativa di Home Assistant (es. «Vuoi aprire il cancello?») */
+  async _compila() {
+    const m = this.modal;
+    const nome = this.shadowRoot.getElementById("p-nome")?.value.trim();
+    if (!nome) { this._toast("Scrivi prima il nome del piatto", true); return; }
+    // un piatto già esistente tiene la sua categoria; uno nuovo la decide Gemini
+    const cat = m.comp.id ? this.shadowRoot.getElementById("p-cat")?.value : null;
+    m.comp.nome = nome;
+    m.compila = true;
+    this._render();
+    const r = await this._ws("desco/compila", { nome, cat });
+    m.compila = false;
+    if (this.modal !== m) return;  // dialogo chiuso nel frattempo
+    if (r?.risultato) {
+      m.comp = { ...r.risultato, ...(m.comp.id ? { id: m.comp.id, origine: m.comp.origine } : {}) };
+      m.compilato = true;
+    }
+    this._render();
+  }
+
   async _aggiungiDesiderio(id, quando) {
     this.modal = null;
     const r = await this._ws("desco/desiderio", { azione: "aggiungi", comp_id: id, tipo: quando });
@@ -1041,7 +1061,7 @@ class DescoPanel extends HTMLElement {
     return `<div class="velo"><div class="dialogo largo">
       <div class="d-testa"><b>${c.id ? "Modifica piatto" : "Nuovo piatto"}</b><button class="ico" data-act="chiudi"><ha-icon icon="mdi:close"></ha-icon></button></div>
       <div class="form">
-        <label class="full">Nome<input id="p-nome" value="${esc(c.nome || "")}" placeholder="es. Polpette di lenticchie"></label>
+        <label class="full">Nome<span class="nome-riga"><input id="p-nome" value="${esc(c.nome || "")}" placeholder="es. Polpette di lenticchie">${this.s.gemini ? `<button class="btn gem" data-act="compila" ${this.modal.compila ? "disabled" : ""} title="Scrivi il nome e Gemini compila il resto"><ha-icon icon="${this.modal.compila ? "mdi:loading" : "mdi:creation"}" class="${this.modal.compila ? "gira" : ""}"></ha-icon>${this.modal.compila ? "Compilo…" : "Compila con Gemini"}</button>` : ""}</span>${this.modal.compilato ? `<small class="gem-nota">Compilato da Gemini: controlla quantità e dati, poi salva.</small>` : ""}</label>
         <label>Categoria<select id="p-cat">${Object.entries(CAT).map(([k, v]) => `<option value="${k}" ${k === cat ? "selected" : ""}>${v.label}</option>`).join("")}</select></label>
         <label>${cat === "unico" ? "Proteina" : "Tipo"}<select id="p-gruppo">${GRUPPI_CAT[cat].map((g) => `<option value="${g}" ${g === c.gruppo ? "selected" : ""}>${GRUPPI[g]}</option>`).join("")}</select></label>
         ${cat === "unico" ? `<label>Carboidrato<select id="p-gruppo-carbo">${GRUPPI_CAT.carboidrato.map((g) => `<option value="${g}" ${g === c.gruppo_carbo ? "selected" : ""}>${GRUPPI[g]}</option>`).join("")}</select></label>` : ""}
@@ -1323,6 +1343,13 @@ input.inline { border:1px dashed var(--linea); border-radius:999px; padding:6px 
 
 /* ---------- stile «Vetro blu» come la dashboard Home 3D ---------- */
 const STILE_A = `
+.nome-riga { display:flex; gap:8px; align-items:center; }
+.nome-riga input { flex:1; min-width:0; }
+.btn.gem { white-space:nowrap; background:rgba(79,195,247,0.12); border:1px solid rgba(79,195,247,0.35); color:#8fdcff; }
+.gem-nota { display:block; margin-top:4px; color:#8fdcff; }
+.gira { animation: gira 1s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+
 .desideri { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 18px; }
 .des { display:inline-flex; align-items:center; gap:6px; padding:5px 6px 5px 12px; border-radius:999px; font-size:13px;
   background:rgba(12,20,34,0.62); border:1px solid rgba(79,195,247,0.16); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }

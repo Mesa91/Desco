@@ -43,7 +43,7 @@ Gli aggiornamenti compaiono nella scheda **Installati** del Marketplace. Nella b
 - **Piatti che volete**: in *Settimana* aggiungi i piatti che vi va di mangiare (quando capita, a pranzo o a cena). Entrano da soli nel menu automatico del venerdì; se c'è già un menu da approvare entrano subito, al posto di un piatto simile. Le regole del pranzo da portare restano valide: un piatto non adatto finisce a cena. Escono dalla lista quando approvate il menu.
 - **Storico**: le settimane precedenti, aperte una per una; *Riproponi* rimette quella settimana come menu da cucinare.
 - **Spesa**: elenco ingredienti con quantità; *Invia* li aggiunge alla To-do. Reinviando, le voci della volta prima non ancora spuntate vengono sostituite.
-- **Ricettario**: attiva/disattiva piatti, crea i tuoi, *Idee con Gemini*.
+- **Ricettario**: attiva/disattiva piatti, crea i tuoi, *Idee con Gemini*. In *Nuovo piatto* basta scrivere il nome e toccare *Compila con Gemini*: categoria, tempi, costo, stagione, ingredienti e preparazione vengono riempiti da soli, tu controlli e salvi.
 - **Preferenze**: alimenti esclusi, tempo massimo, budget, microonde, verdure di stagione, quota di piatti unici, porzioni.
 
 ## Scheda per la dashboard
