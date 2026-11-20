@@ -86,6 +86,12 @@ COMANDI = [
      lambda m, msg: m.vota(msg["comp_id"], msg["voto"])),
     ({vol.Required("type"): "desco/ricetta", vol.Required("idx"): int, vol.Optional("rifai", default=False): bool},
      lambda m, msg: m.ricetta(msg["idx"], msg["rifai"])),
+    ({vol.Required("type"): "desco/desiderio", vol.Required("azione"): vol.In(["aggiungi", "togli", "svuota"]),
+      vol.Optional("comp_id", default=""): str, vol.Optional("tipo"): vol.Any(None, "pranzo", "cena")},
+     lambda m, msg: m.desiderio(msg["azione"], msg["comp_id"], msg.get("tipo"))),
+    ({vol.Required("type"): "desco/inserisci", vol.Required("comp_id"): str,
+      vol.Optional("tipo"): vol.Any(None, "pranzo", "cena")},
+     lambda m, msg: m.inserisci(msg["comp_id"], msg.get("tipo"))),
     ({vol.Required("type"): "desco/prova_promemoria"}, lambda m, msg: m.invia_promemoria(forza=True)),
 ]
 

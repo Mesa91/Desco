@@ -398,10 +398,24 @@ class Pianificatore:
                 return scelta
         return None
 
-    def componi_pasto(self, pasti: list[dict], idx: int) -> dict:
+    def componi_pasto(self, pasti: list[dict], idx: int, preset: list[dict] | None = None) -> dict:
         slot = pasti[idx]
         provvisorio = {**slot, "componenti": []}
         pasti[idx] = provvisorio
+        if preset:
+            # piatti chiesti da voi: si mettono loro e si completa il resto del pasto intorno
+            unico = next((c for c in preset if c.get("cat") == "unico"), None)
+            if unico:
+                provvisorio["componenti"] = [unico["id"]]
+                return provvisorio
+            per_cat = {c["cat"]: c for c in preset}
+            for cat in CATEGORIE:
+                if cat in per_cat:
+                    provvisorio["componenti"].append(per_cat[cat]["id"])
+                    continue
+                comp = self.scegli_componente(cat, pasti, idx, provvisorio["componenti"] + [c["id"] for c in preset])
+                provvisorio["componenti"].append(comp["id"] if comp else None)
+            return provvisorio
         quota = float(self.settings.get("quota_piatti_unici", 0.3))
         if self.rng.random() < quota:
             unico = self.scegli_componente("unico", pasti, idx, [])
@@ -419,7 +433,36 @@ class Pianificatore:
                 )
         return provvisorio
 
-    def genera(self, bloccati: list[dict] | None = None) -> list[dict]:
+    def _slot_per_richiesta(self, comp: dict, tipo: str | None, slots: list[dict], liberi: list[int],
+                            preset: dict[int, list[dict]]) -> int | None:
+        """Sceglie dove mettere un piatto chiesto, rispettando le regole del pranzo da portare."""
+        microonde = bool(self.settings.get("microonde", True))
+        validi = []
+        for i in liberi:
+            s = slots[i]
+            if tipo in ("pranzo", "cena") and s["tipo"] != tipo:
+                continue
+            if s["tipo"] == "pranzo" and not (asporto_ok(comp, microonde) and pesce_ok_a_pranzo(comp, self.settings)):
+                continue
+            gia = preset.get(i, [])
+            if comp.get("cat") == "unico" and gia:
+                continue
+            if any(c.get("cat") in ("unico", comp.get("cat")) for c in gia):
+                continue
+            # due piatti chiesti con la stessa proteina non finiscono nello stesso giorno
+            g_prot = macro_di(gruppo_proteico(comp)) if gruppo_proteico(comp) else None
+            if g_prot and any(macro_di(gruppo_proteico(c)) == g_prot
+                              for j, lst in preset.items() if slots[j]["giorno"] == s["giorno"]
+                              for c in lst if gruppo_proteico(c)):
+                continue
+            validi.append(i)
+        if not validi:
+            return None
+        # meglio unirsi a un pasto già "prenotato" (es. contorno + secondo chiesti) se compatibile, poi a caso
+        self.rng.shuffle(validi)
+        return validi[0]
+
+    def genera(self, bloccati: list[dict] | None = None, richiesti: list[dict] | None = None) -> list[dict]:
         slots = slot_settimana(self.settings)
         pasti: list[dict | None] = [None] * len(slots)
         bloccati_map = {(b["giorno"], b["tipo"]): b for b in (bloccati or []) if b.get("bloccato")}
@@ -434,9 +477,29 @@ class Pianificatore:
         da_fare.sort(key=lambda i: 0 if slots[i]["tipo"] == "pranzo" else 1)
         for i in da_fare:
             pasti[i] = {**slots[i], "componenti": []}
+        preset: dict[int, list[dict]] = {}
+        gia_messi = {c for p in pasti if p for c in p.get("componenti", []) if c}
+        for r in richiesti or []:
+            comp = self.lib.get(r.get("id"))
+            if not comp or comp["id"] in gia_messi:
+                continue
+            i = self._slot_per_richiesta(comp, r.get("tipo"), slots, da_fare, preset)
+            if i is None and r.get("tipo") in ("pranzo", "cena"):
+                i = self._slot_per_richiesta(comp, None, slots, da_fare, preset)
+                if i is not None:
+                    self.avvisi.append(f"{comp['nome']}: messo a {slots[i]['tipo']}, a {r['tipo']} non era adatto")
+            if i is None:
+                self.avvisi.append(f"{comp['nome']}: non c'è un pasto adatto in cui inserirlo")
+                continue
+            preset.setdefault(i, []).append(comp)
+            gia_messi.add(comp["id"])
+        # prima i pasti con piatti chiesti, così il resto della settimana si bilancia intorno a loro
+        da_fare.sort(key=lambda i: 0 if i in preset else 1)
         for i in da_fare:
-            self.componi_pasto(pasti, i)
+            self.componi_pasto(pasti, i, preset.get(i))
             pasti[i]["bloccato"] = False
+            if i in preset:
+                pasti[i]["richiesto"] = [c["id"] for c in preset[i]]
         return pasti  # type: ignore[return-value]
 
 
@@ -474,13 +537,14 @@ def punteggio_piano(pasti: list[dict], lib: dict[str, dict], settings: dict | No
 
 def genera_settimana(lib: dict[str, dict], settings: dict | None, settimana: date,
                      storico: list[str] | None = None, bloccati: list[dict] | None = None,
-                     tentativi: int = 40, seed: int | None = None) -> tuple[list[dict], list[str]]:
+                     tentativi: int = 40, seed: int | None = None,
+                     richiesti: list[dict] | None = None) -> tuple[list[dict], list[str]]:
     """Genera più piani e tiene il migliore. Ritorna (pasti, avvisi)."""
     rng = random.Random(seed)
     migliore, avvisi_m, pen_m = None, [], math.inf
     for _ in range(tentativi):
         pian = Pianificatore(lib, settings, settimana, storico, random.Random(rng.random()))
-        pasti = pian.genera(bloccati)
+        pasti = pian.genera(bloccati, richiesti)
         pen = punteggio_piano(pasti, lib, settings)
         if pen < pen_m:
             migliore, avvisi_m, pen_m = pasti, pian.avvisi, pen
@@ -521,6 +585,70 @@ def rigenera_componente(lib: dict[str, dict], settings: dict | None, settimana: 
     return pasti
 
 
+def inserisci_piatto(lib: dict[str, dict], settings: dict | None, settimana: date, pasti: list[dict],
+                     comp_id: str, tipo: str | None = None, storico: list[str] | None = None,
+                     seed: int | None = None) -> tuple[list[dict], str | None]:
+    """Mette un piatto chiesto in un menu già fatto, cambiando il meno possibile.
+
+    Sceglie il pasto dove sostituisce qualcosa dello stesso tipo (meglio se della stessa
+    famiglia di proteine, così le proporzioni restano quelle) e rispetta le regole del pranzo.
+    Ritorna (pasti, avviso) — avviso è None se è andato tutto come chiesto.
+    """
+    comp = lib.get(comp_id)
+    if not comp:
+        raise ValueError("Piatto non trovato nel ricettario")
+    pasti = [dict(p, componenti=list(p.get("componenti", []))) for p in pasti]
+    if any(comp_id in p["componenti"] for p in pasti):
+        return pasti, f"{comp['nome']} è già nel menu"
+    st = unisci_impostazioni(settings)
+    rng = random.Random(seed)
+    microonde = bool(st.get("microonde", True))
+    macro = macro_di(gruppo_proteico(comp)) if gruppo_proteico(comp) else None
+
+    def candidati(t: str | None) -> list[tuple[float, int]]:
+        out = []
+        for i, p in enumerate(pasti):
+            if p.get("bloccato") or (t in ("pranzo", "cena") and p["tipo"] != t):
+                continue
+            if p["tipo"] == "pranzo" and not (asporto_ok(comp, microonde) and pesce_ok_a_pranzo(comp, st)):
+                continue
+            if p.get("richiesto"):
+                continue  # non si toglie un altro piatto chiesto
+            attuali = [lib.get(c, {}) for c in p["componenti"] if c]
+            unico_attuale = any(c.get("cat") == "unico" for c in attuali)
+            costo = rng.random()  # a parità, a caso
+            if comp.get("cat") == "unico" or unico_attuale:
+                costo += 1  # cambia il pasto intero
+            vecchio = next((c for c in attuali if c.get("cat") in (comp.get("cat"), "unico")), None)
+            if macro and vecchio and gruppo_proteico(vecchio) and macro_di(gruppo_proteico(vecchio)) == macro:
+                costo -= 2  # stessa famiglia di proteine: le proporzioni non cambiano
+            out.append((costo, i))
+        return sorted(out)
+
+    avviso = None
+    cand = candidati(tipo)
+    if not cand and tipo in ("pranzo", "cena"):
+        cand = candidati(None)
+        if cand:
+            avviso = f"{comp['nome']}: messo a {pasti[cand[0][1]]['tipo']}, a {tipo} non era adatto"
+    if not cand:
+        return pasti, f"{comp['nome']}: non c'è un pasto adatto in cui inserirlo"
+    idx = cand[0][1]
+    pasto = pasti[idx]
+    attuali = [c for c in pasto["componenti"] if c]
+    if comp.get("cat") == "unico" or any(lib.get(c, {}).get("cat") == "unico" for c in attuali):
+        pian = Pianificatore(lib, st, settimana, storico, rng)
+        pian.componi_pasto(pasti, idx, [comp])
+    else:
+        pos = CATEGORIE.index(comp["cat"])
+        while len(pasto["componenti"]) < 3:
+            pasto["componenti"].append(None)
+        pasto["componenti"][pos] = comp_id
+    pasti[idx]["richiesto"] = sorted(set(pasti[idx].get("richiesto", [])) | {comp_id})
+    pasti[idx]["bloccato"] = False
+    return pasti, avviso
+
+
 # --------------------------------------------------------------------------- cucinare una volta, mangiare due
 
 def _per_slot(pasti: list[dict]) -> dict[tuple[int, str], dict]:
@@ -544,7 +672,7 @@ def applica_cene_doppie(pasti: list[dict], lib: dict[str, dict], settings: dict 
         if fatte >= massimo:
             break
         cena, pranzo, cena_dopo = slot.get((g, "cena")), slot.get((g + 1, "pranzo")), slot.get((g + 1, "cena"))
-        if not cena or not pranzo or pranzo.get("bloccato"):
+        if not cena or not pranzo or pranzo.get("bloccato") or pranzo.get("richiesto"):
             continue
         if any(lib.get(c, {}).get("cat") == "unico" for c in cena["componenti"] + pranzo["componenti"] if c):
             continue

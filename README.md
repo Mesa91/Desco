@@ -40,6 +40,7 @@ Gli aggiornamenti compaiono nella scheda **Installati** del Marketplace. Nella b
 
 - **Settimana**: *Genera* crea il menu (da lunedì a venerdì la settimana in corso, nel weekend la prossima). Tocca un piatto per vedere ingredienti e preparazione; ⇄ cambia solo quel componente, ✎ lo scegli tu, ↻ rifà tutto il pasto, 🔒 blocca un pasto quando rigeneri.
 - Per scambiare due pasti trascinali dalla maniglia ⠿ uno sull'altro: i piatti si spostano, le porzioni restano quelle dello slot (1 a pranzo, 2 a cena). Se a pranzo finisce un piatto poco adatto al trasporto compare un avviso.
+- **Piatti che volete**: in *Settimana* aggiungi i piatti che vi va di mangiare (quando capita, a pranzo o a cena). Entrano da soli nel menu automatico del venerdì; se c'è già un menu da approvare entrano subito, al posto di un piatto simile. Le regole del pranzo da portare restano valide: un piatto non adatto finisce a cena. Escono dalla lista quando approvate il menu.
 - **Storico**: le settimane precedenti, aperte una per una; *Riproponi* rimette quella settimana come menu da cucinare.
 - **Spesa**: elenco ingredienti con quantità; *Invia* li aggiunge alla To-do. Reinviando, le voci della volta prima non ancora spuntate vengono sostituite.
 - **Ricettario**: attiva/disattiva piatti, crea i tuoi, *Idee con Gemini*.

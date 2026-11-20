@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+from functools import partial
 import json
 import logging
 import re
@@ -87,6 +88,7 @@ class DescoManager:
         self.data.setdefault("archivio", [])
         self.data.setdefault("voti", {})
         self.data.setdefault("dispensa", [])
+        self.data.setdefault("desideri", [])  # piatti che volete nel prossimo menu: [{id, tipo}]
         self._ricostruisci()
 
     def _ricostruisci(self) -> None:
@@ -174,6 +176,8 @@ class DescoManager:
             "notifiche": bool(self.opt(CONF_NOTIFY)),
             "servizi_notifica": list(self.opt(CONF_NOTIFY) or []),
             "promemoria": self.promemoria() if piano else None,
+            "desideri": [{**d, "nome": self.lib[d["id"]]["nome"], "cat": self.lib[d["id"]].get("cat")}
+                         for d in self.data["desideri"] if d["id"] in self.lib],
         }
 
     def pasto_del(self, giorno: date, tipo: str) -> dict | None:
@@ -226,8 +230,10 @@ class DescoManager:
         elif precedente:
             self.data["storico"] = [c for p in precedente["pasti"] for c in p.get("componenti", []) if c]
             self._archivia(precedente)
+        richiesti = [d for d in self.data["desideri"] if d["id"] in self.lib]
         pasti, avvisi = await self.hass.async_add_executor_job(
-            planner.genera_settimana, self.lib, self.settings, lun, self.data["storico"], bloccati
+            partial(planner.genera_settimana, self.lib, self.settings, lun, self.data["storico"], bloccati,
+                    richiesti=richiesti)
         )
         self.data["piano"] = {
             "settimana": lun.isoformat(),
@@ -725,6 +731,42 @@ class DescoManager:
         for minuti in (3, 15):
             async_call_later(self.hass, minuti * 60, _ripeti)
 
+    # ------------------------------------------------------------------ piatti che volete voi
+
+    async def desiderio(self, azione: str, comp_id: str = "", tipo: str | None = None) -> dict | None:
+        """Lista dei piatti da mettere nel prossimo menu. Si svuota da sola quando approvate."""
+        lista = self.data["desideri"]
+        if azione == "aggiungi":
+            if comp_id not in self.lib:
+                raise HomeAssistantError("Piatto non trovato nel ricettario")
+            lista[:] = [d for d in lista if d["id"] != comp_id]
+            lista.append({"id": comp_id, "tipo": tipo if tipo in ("pranzo", "cena") else None})
+        elif azione == "togli":
+            lista[:] = [d for d in lista if d["id"] != comp_id]
+        elif azione == "svuota":
+            lista.clear()
+        await self._salva()
+        return None
+
+    async def inserisci(self, comp_id: str, tipo: str | None = None) -> dict:
+        """Mette subito un piatto nel menu attuale, cambiando un solo pasto."""
+        piano = self.data.get("piano")
+        if not piano:
+            raise HomeAssistantError("Nessun menu: genera prima la settimana")
+        try:
+            pasti, avviso = planner.inserisci_piatto(
+                self.lib, self.settings, date.fromisoformat(piano["settimana"]), piano["pasti"],
+                comp_id, tipo, self.data["storico"])
+        except ValueError as err:
+            raise HomeAssistantError(str(err)) from err
+        if pasti != piano["pasti"]:
+            self._foto()
+            piano["pasti"] = pasti
+            await self._salva(piano_cambiato=True)
+        dove = next((f"{planner.GIORNI[p['giorno']].lower()} a {p['tipo']}" for p in pasti
+                     if comp_id in p.get("componenti", [])), None)
+        return {"avviso": avviso, "dove": dove, "nome": self.lib[comp_id]["nome"]}
+
     async def approva(self, utente: str | None = None) -> dict:
         piano = self.data.get("piano")
         if not piano:
@@ -732,6 +774,9 @@ class DescoManager:
         piano["stato"] = "approvato"
         piano["approvato_da"] = utente
         piano["approvato_il"] = dt_util.now().isoformat()
+        # i piatti chiesti che sono entrati nel menu approvato escono dalla lista
+        nel_menu = {c for p in piano["pasti"] for c in p.get("componenti", []) if c}
+        self.data["desideri"] = [d for d in self.data["desideri"] if d["id"] not in nel_menu]
         r = await self.invia_spesa()
         # la conferma si vede nel pannello (pop-up); niente notifica sul telefono
         return {**r, "utente": utente}

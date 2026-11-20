@@ -88,7 +88,7 @@ class DescoPanel extends HTMLElement {
   /* ricettario e storico sono pesanti: si chiedono al server solo quando servono */
   _servono() {
     const con = [];
-    if (this.tab === "ricettario" || this.modal?.tipo === "scegli" || this.modal?.tipo === "piatto") con.push("ricettario");
+    if (this.tab === "ricettario" || this.modal?.tipo === "scegli" || this.modal?.tipo === "piatto" || this.modal?.tipo === "desidera") con.push("ricettario");
     if (this.tab === "storico") con.push("archivio");
     return con;
   }
@@ -187,6 +187,13 @@ class DescoPanel extends HTMLElement {
         this._ws("desco/imposta_componente", { idx: mi, pos: mp, comp_id: id }, { messaggio: "Piatto scelto", annullabile: true });
         break;
       }
+      case "desidera":
+        this.modal = { tipo: "desidera", q: "", quando: null };
+        if (!this.ric) this._ws("desco/stato"); else this._render();
+        break;
+      case "des-quando": this.modal.quando = el.dataset.val || null; this._render(); break;
+      case "des-scelto": this._aggiungiDesiderio(id, this.modal?.quando || null); break;
+      case "togli-des": this._ws("desco/desiderio", { azione: "togli", comp_id: id }); break;
       case "chiudi": this.modal = null; this._render(); break;
       case "vai-spesa": this.modal = null; this.tab = "spesa"; this._render(); break;
       case "spesa":
@@ -254,6 +261,47 @@ class DescoPanel extends HTMLElement {
   }
 
   /* finestra di conferma come quella nativa di Home Assistant (es. «Vuoi aprire il cancello?») */
+  async _aggiungiDesiderio(id, quando) {
+    this.modal = null;
+    const r = await this._ws("desco/desiderio", { azione: "aggiungi", comp_id: id, tipo: quando });
+    if (!r) return;
+    // con un menu ancora da approvare, il piatto entra subito; altrimenti aspetta il prossimo venerdì
+    if (r.piano?.stato === "proposta") {
+      this._ws("desco/inserisci", { comp_id: id, tipo: quando }, {
+        annullabile: true,
+        messaggio: (x) => x?.dove ? `${x.nome}: messo ${x.dove}${x.avviso && /non era adatto/.test(x.avviso) ? " (a pranzo non andava bene)" : ""}` : (x?.avviso || "Aggiunto"),
+      });
+    } else {
+      const nome = (r.desideri || []).find((d) => d.id === id)?.nome || "Piatto";
+      this._toast(`${nome}: entrerà nel prossimo menu`);
+    }
+  }
+
+  _desideri() {
+    const lista = this.s.desideri || [];
+    const proposta = this.s.piano?.stato === "proposta";
+    const g = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"][this.s.settings.auto_giorno ?? 4];
+    const spiega = proposta
+      ? "Quello che aggiungi entra subito nel menu da approvare, al posto di un piatto simile."
+      : `Entrano da soli nel menu di ${g} sera. Escono dalla lista quando approvate il menu.`;
+    return `${sez("mdi:heart-plus-outline", "Piatti che volete", `<div class="sez-azioni">${pillBtn("desidera", "mdi:plus", "Aggiungi un piatto", "", true)}</div>`)}
+      <div class="desideri">
+        ${lista.map((d) => `<span class="des" style="--cc:${(CAT[d.cat] || CAT.verdura).color}"><span class="punto"></span>${esc(d.nome)}${d.tipo ? ` <small>${d.tipo}</small>` : ""}<button class="des-x" data-act="togli-des" data-id="${esc(d.id)}" title="Togli dalla lista" aria-label="Togli"><ha-icon icon="mdi:close"></ha-icon></button></span>`).join("")}
+        <span class="nota des-nota">${lista.length ? spiega : `Avete voglia di qualcosa in particolare? Aggiungilo qui. ${spiega}`}</span>
+      </div>`;
+  }
+
+  _desideraHtml() {
+    const m = this.modal;
+    const presi = new Set((this.s.desideri || []).map((d) => d.id));
+    const lista = this._filtraRicette("tutti", m.q, m.quando === "pranzo").filter((c) => c.attivo && !presi.has(c.id))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "it")).slice(0, 80);
+    return lista.map((c) => `<button class="s-riga" data-act="des-scelto" data-id="${esc(c.id)}" style="--cc:${CAT[c.cat].color}">
+        <span class="punto"></span><span class="s-nome">${esc(c.nome)}${c.cat === "unico" ? ` <span class="tag">unico</span>` : ""}</span>
+        <span class="s-meta">${CAT[c.cat].label} · ${c.minuti}′</span></button>`).join("")
+      || `<p class="nota">Nessun piatto trovato.</p>`;
+  }
+
   _conferma(testo, dettaglio = "") {
     if (this._risolvi) this._risolvi(false);
     this.modal = { tipo: "conferma", testo, dettaglio };
@@ -269,6 +317,11 @@ class DescoPanel extends HTMLElement {
     const t = e.target;
     if (t.id === "cerca") { this.cerca = t.value; this._renderLista(); }
     if (t.id === "cerca-scegli" && this.modal) { this.modal.q = t.value; this._renderScegli(); }
+    if (t.id === "cerca-des" && this.modal) {
+      this.modal.q = t.value;
+      const l = this.shadowRoot.getElementById("des-lista");
+      if (l) l.innerHTML = this._desideraHtml();
+    }
     if (t.dataset.out) {
       const o = this.shadowRoot.getElementById(t.dataset.out);
       if (o) o.textContent = t.dataset.fmt === "pct" ? `${Math.round(t.value * 100)}%` : t.dataset.fmt === "num" ? t.value : `${t.value} min`;
@@ -421,7 +474,8 @@ class DescoPanel extends HTMLElement {
         <div class="row center">
           <button class="btn primario" data-act="genera" data-sett="auto"><ha-icon icon="mdi:auto-fix"></ha-icon>Genera la settimana del ${fmtData(pred)}</button>
         </div>
-      </section>`;
+      </section>
+      ${this._desideri()}`;
     }
     const lun = p.settimana;
     const ven = new Date(new Date(lun + "T12:00:00").getTime() + 4 * 864e5).toISOString().slice(0, 10);
@@ -433,6 +487,7 @@ class DescoPanel extends HTMLElement {
     return `
       ${this._chipsStato(settimana)}
       ${this._bannerApprovazione(p)}
+      ${this._desideri()}
       ${sez("mdi:silverware-fork-knife", "Menu della settimana", `<div class="sez-azioni">
         ${pillBtn("genera", "mdi:shuffle-variant", "Rigenera", `data-sett="${lun}" title="Rigenera tutto tranne i pasti bloccati"`)}
         ${prossima ? pillBtn("genera", "mdi:calendar-arrow-right", `Settimana del ${fmtData(pred)}`, `data-sett="${pred}"`) : ""}
@@ -516,7 +571,7 @@ class DescoPanel extends HTMLElement {
     return `<li class="c ${c.id ? "" : "manca"}" style="--cc:${info.color}">
       <div class="c-riga">
         <span class="punto" title="${info.label}"></span>
-        <button class="c-nome" data-act="apri" data-key="${k}">${esc(c.nome)}${c.legame === "doppio" ? ` <span class="legame" title="Cucinane ${m.porzioni + 1} porzioni: una va nel pranzo di domani">×${m.porzioni + 1}</span>` : ""}${c.legame === "avanzo" ? ` <span class="legame avanzo" title="Cucinato ieri sera insieme alla cena">da ieri sera</span>` : ""}${c.scongela ? ` <span class="legame gelo" title="Da scongelare la sera prima">🧊</span>` : ""}${c.voto > 0 ? ` <span class="cuore" title="Vi piace">👍</span>` : ""}</button>
+        <button class="c-nome" data-act="apri" data-key="${k}">${esc(c.nome)}${c.legame === "doppio" ? ` <span class="legame" title="Cucinane ${m.porzioni + 1} porzioni: una va nel pranzo di domani">×${m.porzioni + 1}</span>` : ""}${c.legame === "avanzo" ? ` <span class="legame avanzo" title="Cucinato ieri sera insieme alla cena">da ieri sera</span>` : ""}${c.scongela ? ` <span class="legame gelo" title="Da scongelare la sera prima">🧊</span>` : ""}${c.voto > 0 ? ` <span class="cuore" title="Vi piace">👍</span>` : ""}${(m.richiesto || []).includes(c.id) ? ` <span class="legame chiesto" title="L'avete chiesto voi">chiesto</span>` : ""}</button>
         ${m.bloccato ? "" : `<span class="c-azioni">
           <button class="mini" data-act="cambia" data-idx="${m.idx}" data-pos="${pos}" title="Un'altra ${info.label.toLowerCase()}"><ha-icon icon="mdi:swap-horizontal"></ha-icon></button>
           <button class="mini" data-act="scegli" data-idx="${m.idx}" data-pos="${pos}" title="Scegli tu"><ha-icon icon="mdi:pencil-outline"></ha-icon></button>
@@ -958,6 +1013,18 @@ class DescoPanel extends HTMLElement {
       </div></div>`;
     }
     if (this.modal.tipo === "ricetta") return this._modalRicetta();
+    if (this.modal.tipo === "desidera") {
+      const m = this.modal;
+      const q = (v, l) => `<button class="seg ${(m.quando || "") === v ? "on" : ""}" data-act="des-quando" data-val="${v}">${l}</button>`;
+      return `<div class="velo"><div class="dialogo">
+        <div class="d-testa"><b>Aggiungi un piatto</b><button class="ico" data-act="chiudi"><ha-icon icon="mdi:close"></ha-icon></button></div>
+        <div class="segmenti">${q("", "Quando capita")}${q("pranzo", "A pranzo")}${q("cena", "A cena")}</div>
+        <div class="cerca"><ha-icon icon="mdi:magnify"></ha-icon><input id="cerca-des" placeholder="Cerca un piatto o un ingrediente" value="${esc(m.q)}"></div>
+        ${m.quando === "pranzo" ? `<div class="nota">Solo piatti adatti al pranzo da portare.</div>` : ""}
+        <div id="des-lista" class="scegli-lista">${this.ric ? this._desideraHtml() : `<p class="nota">Carico il ricettario…</p>`}</div>
+        <div class="nota">Non c'è? <button class="link" data-act="tab" data-tab="ricettario">Crealo nel Ricettario</button> e poi aggiungilo qui.</div>
+      </div></div>`;
+    }
     if (this.modal.tipo === "scegli") {
       const m = this.modal;
       return `<div class="velo"><div class="dialogo">
@@ -1256,6 +1323,20 @@ input.inline { border:1px dashed var(--linea); border-radius:999px; padding:6px 
 
 /* ---------- stile «Vetro blu» come la dashboard Home 3D ---------- */
 const STILE_A = `
+.desideri { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 18px; }
+.des { display:inline-flex; align-items:center; gap:6px; padding:5px 6px 5px 12px; border-radius:999px; font-size:13px;
+  background:rgba(12,20,34,0.62); border:1px solid rgba(79,195,247,0.16); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+.des .punto { width:8px; height:8px; border-radius:50%; background:var(--cc); flex:none; }
+.des small { color:var(--tenue); }
+.des-x { border:0; background:transparent; padding:2px; border-radius:50%; display:inline-flex; color:var(--tenue); }
+.des-x:hover { color:var(--testo); background:rgba(255,255,255,0.08); }
+.des-x ha-icon { --mdc-icon-size:15px; }
+.des-nota { flex-basis:100%; margin:2px 0 0; }
+.segmenti { display:flex; gap:6px; margin:0 0 10px; }
+.seg { flex:1; padding:7px 10px; border-radius:999px; border:1px solid rgba(79,195,247,0.16); background:transparent; font-size:13px; }
+.seg.on { background:rgba(79,195,247,0.18); border-color:rgba(79,195,247,0.5); color:#8fdcff; }
+.legame.chiesto { background:rgba(255,128,171,0.16); color:#ff9ec0; }
+
 :host { --sfondo:#071321; --carta:rgba(9,24,39,0.78); --testo:#e8f1f8; --tenue:#8aa4b8; --linea:rgba(120,190,255,0.13);
   --primary-color:#3fb8f5; --accento:#4fc3f7; --badge:#0d2b45; --pill:rgba(5,15,26,0.82); --raggio:26px; }
 .app { background: radial-gradient(120% 90% at 50% 0%, #0d2d48 0%, #0a1f33 45%, #071321 100%); color:var(--testo); }

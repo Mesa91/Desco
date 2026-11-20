@@ -162,3 +162,23 @@ def test_ricettario_integro():
         assert c["ingredienti"] and c["prep"], c["id"]
         if c["cat"] == "unico":
             assert c.get("gruppo_carbo"), c["id"]
+
+
+def test_piatti_richiesti_entrano_nel_menu():
+    import json
+    from datetime import date
+    from pathlib import Path
+    d = json.loads((Path(__file__).parents[1] / "custom_components/desco/data/ricettario.json").read_text())
+    lib = P.costruisci_libreria(d["componenti"], [], [])
+    ric = [{"id": "u_spaghetti_vongole"}, {"id": "cime_rapa", "tipo": "cena"},
+           {"id": "polpette_tonno", "tipo": "pranzo"}, {"id": "salmone_forno", "tipo": "pranzo"}]
+    for seed in range(5):
+        pasti, avvisi = P.genera_settimana(lib, {}, date(2026, 11, 23), seed=seed, richiesti=ric)
+        dove = {r["id"]: [p for p in pasti if r["id"] in p["componenti"]] for r in ric}
+        assert all(dove.values())
+        assert dove["cime_rapa"][0]["tipo"] == "cena"
+        assert dove["polpette_tonno"][0]["tipo"] == "pranzo"
+        # il salmone a pranzo non è ammesso (solo tonno): finisce a cena con un avviso
+        assert dove["salmone_forno"][0]["tipo"] == "cena"
+        assert any("Salmone" in a for a in avvisi)
+        assert dove["u_spaghetti_vongole"][0]["tipo"] == "cena"  # non trasportabile
